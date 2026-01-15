@@ -1,0 +1,84 @@
+# Import Organization Rules
+
+## Import Sorting Requirements
+
+When organizing imports in any file, follow these rules strictly:
+
+1. **Separate External and Internal Dependencies**
+   - External dependencies (from `node_modules` or packages) must be placed above internal dependencies (from `@/`, `./`, or `../`)
+   - Add a comment `// External Dependencies` above the external dependencies section
+   - Add a comment `// Internal Dependencies` above the internal dependencies section
+
+2. **Sort by Code Length (Shortest to Longest)**
+   - Within each section (External and Internal), sort imports by the total character length of the import statement
+   - Shortest imports come first, longest imports come last
+   - Count the entire import line including `import`, spaces, and the semicolon
+
+3. **Example Format**
+
+```typescript
+// External Dependencies
+import * as Haptics from "expo-haptics";
+import { Pressable } from "react-native";
+import React, { type FC, type ReactNode, useEffect } from "react";
+import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
+
+// Internal Dependencies
+import { SomeComponent } from "@/components";
+import { useCustomHook } from "@/hooks/useCustomHook";
+```
+
+4. **Type Imports**
+   - Use `type` keyword for type-only imports (e.g., `import { type FC, type ReactNode } from "react"`)
+   - Type imports are included in the length calculation
+
+5. **Namespace Imports**
+   - Namespace imports (e.g., `import * as Haptics`) are included in the length calculation
+
+## When to Apply
+
+- Apply these rules whenever you add, modify, or reorganize imports in any file
+- When refactoring code, ensure imports follow this format
+- When creating new files, organize imports according to these rules from the start
+
+---
+
+# UI Verification Rules
+
+## Screenshot Verification for UI Updates
+
+When making UI updates or changes to visual components, follow these verification steps:
+
+1. **Take Screenshots After UI Changes**
+   - After implementing UI changes, take a screenshot to verify the visual result
+   - Use available screenshot tools to capture the current state of the UI
+   - Verify that the UI matches the requested functionality and appearance
+
+2. **Iterative Improvement**
+   - If the screenshot reveals that the UI does not match what was requested, continue iterating
+   - Make necessary adjustments to the code
+   - Take another screenshot after each iteration to verify progress
+   - Continue this cycle until the UI functionally and visually matches what was asked
+
+3. **When to Verify**
+   - Always verify UI changes with screenshots when:
+     - Creating new UI components
+     - Modifying existing components' appearance or layout
+     - Changing styling, colors, spacing, or visual behavior
+     - Implementing animations or transitions
+     - Updating responsive layouts or breakpoints
+     - Making changes that affect the visual presentation
+
+4. **Verification Checklist**
+   - [ ] Screenshot taken after initial implementation
+   - [ ] UI matches requested functionality
+   - [ ] UI matches requested appearance/design
+   - [ ] All interactive elements work as expected
+   - [ ] No visual regressions introduced
+   - [ ] Iteration complete when all requirements are met
+
+5. **Don't Consider UI Work Complete Until**
+   - Screenshots confirm the UI matches the request
+   - All visual and functional requirements are met
+   - No further iterations are needed
+

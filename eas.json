@@ -1,0 +1,45 @@
+{
+  "cli": {
+    "version": ">= 3.0.0",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "base": {
+      "node": "22.11.0",
+      "env": {
+        "SENTRY_DSN": "$SENTRY_DSN",
+        "SENTRY_AUTH_TOKEN": "$SENTRY_AUTH_TOKEN"
+      },
+      "channel": "base"
+    },
+    "development": {
+      "extends": "base",
+      "developmentClient": true,
+      "distribution": "internal",
+      "env": {
+        "APP_VARIANT": "development"
+      },
+      "channel": "development"
+    },
+    "preview": {
+      "extends": "base",
+      "distribution": "internal",
+      "autoIncrement": true,
+      "channel": "preview",
+      "env": {
+        "APP_VARIANT": "preview"
+      }
+    },
+    "production": {
+      "extends": "base",
+      "autoIncrement": true,
+      "channel": "production",
+      "env": {
+        "APP_VARIANT": "production"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}
