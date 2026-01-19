@@ -126,7 +126,7 @@ export const getExtractionStatus = async (
  * @returns The import quota
  */
 const getImportQuota = (queryClient: any): ImportQuota => {
-  const cachedData = queryClient.getQueryData([QUERY_KEYS.IMPORT_QUOTA]);
+  const cachedData = queryClient.getQueryData([QUERY_KEYS.RECIPE_QUOTA]);
 
   // Return cached data if available
   if (cachedData) {
@@ -192,10 +192,10 @@ const refetchImportData = (queryClient: ReturnType<typeof useQueryClient>) => {
   // Use refetchQueries for infinite queries to force immediate refetch from the beginning
   // This ensures the UI updates immediately after import completion
   queryClient.refetchQueries({ queryKey: [QUERY_KEYS.COLLECTIONS] });
-  queryClient.refetchQueries({ queryKey: [QUERY_KEYS.IMPORTS] });
+  queryClient.refetchQueries({ queryKey: [QUERY_KEYS.RECIPES] });
 
   // Use refetchQueries for non-infinite queries to get the latest data
-  queryClient.refetchQueries({ queryKey: [QUERY_KEYS.IMPORT_QUOTA] });
+  queryClient.refetchQueries({ queryKey: [QUERY_KEYS.RECIPE_QUOTA] });
 };
 
 /**

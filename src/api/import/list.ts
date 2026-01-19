@@ -16,8 +16,8 @@ const fetchImports = async (cursor?: string): Promise<ImportPageResult> => {
   try {
     const client = getApiClient();
     const url = cursor
-      ? `${API_ENDPOINTS.EXTRACTIONS_LIST_V1}?cursor=${encodeURIComponent(cursor)}`
-      : API_ENDPOINTS.EXTRACTIONS_LIST_V1;
+      ? `${API_ENDPOINTS.RECIPES_LIST_V1}?cursor=${encodeURIComponent(cursor)}`
+      : API_ENDPOINTS.RECIPES_LIST_V1;
 
     const response = (await client.get(url)) as
       | {
@@ -94,11 +94,10 @@ export const useImports = () => {
   const { isAuthenticated } = useAuthStore();
 
   return useInfiniteQuery({
-    queryKey: [QUERY_KEYS.IMPORTS],
+    queryKey: [QUERY_KEYS.RECIPES],
     queryFn: ({ pageParam }) => fetchImports(pageParam),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => lastPage.meta.next_cursor ?? undefined,
-    enabled: isAuthenticated,
     // Optimize for faster pagination
     staleTime: 5 * 60 * 1000, // 5 minutes - matches global config
     gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime) - keep pages in cache longer
@@ -113,6 +112,6 @@ export const useInvalidateImports = () => {
 
   return () => {
     // Use refetchQueries for infinite queries to force immediate refetch
-    queryClient.refetchQueries({ queryKey: [QUERY_KEYS.IMPORTS] });
+    queryClient.refetchQueries({ queryKey: [QUERY_KEYS.RECIPES] });
   };
 };

@@ -16,4 +16,5 @@ export interface PaginationMeta {
   per_page: number;
   next_cursor: string | null;
   prev_cursor: string | null;
+  has_more_pages: boolean;
 }

@@ -1,6 +1,6 @@
 // External Dependencies
-import { StyleSheet } from "react-native";
-import React, { type FC, forwardRef } from "react";
+import React, { forwardRef } from "react";
+import { Platform, StyleSheet } from "react-native";
 
 import Animated, {
   Extrapolation,
@@ -94,15 +94,21 @@ const styles = StyleSheet.create({
     transformOrigin: "left",
   },
   currentTitle: {
+    fontFamily: Platform.select({
+      android: "BricolageGrotesque_500Medium",
+      ios: "BricolageGrotesque-Medium",
+    }),
     fontSize: 28,
     color: "#000",
-    fontWeight: "500",
   },
   previousTitle: {
+    fontFamily: Platform.select({
+      android: "BricolageGrotesque_500Medium",
+      ios: "BricolageGrotesque-Medium",
+    }),
     fontSize: 28,
     opacity: 0.5,
     color: "#667",
     marginTop: -2,
-    fontWeight: "500",
   },
 });

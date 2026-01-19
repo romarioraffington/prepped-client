@@ -1,46 +1,44 @@
 // External dependencies
-import { FontAwesome } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import { View, Text, StyleSheet } from "react-native";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 // Internal dependencies
-import { useCollectionRecommendations } from "@/api";
+import { useImportRecommendations } from "@/api/import";
 import { parseSlug, capitalizeWords } from "@/libs/utils";
 import { RecommendationsScreen } from "@/components/screens/RecommendationScreen";
 import { DefaultRecommendationItemActions, DefaultSwipeableRecommendationItem } from "@/components/Recommendations";
 
 type RecommendationsParams = {
   slug: string;
-  category?: string;
-  previousTitle?: string;
 }
 
 export default function Recommendations() {
-  const { slug, category, previousTitle } = useLocalSearchParams<RecommendationsParams>();
+  const { slug } = useLocalSearchParams<RecommendationsParams>();
 
   // Parse the slug to get ID and name
-  const { name: slugName, id: collectionId } = parseSlug(slug);
+  const { name: slugName, id: recipeId } = parseSlug(slug);
 
   const {
     data,
     isLoading,
-  } = useCollectionRecommendations(collectionId, category);
+  } = useImportRecommendations(recipeId);
 
   const region = data?.region;
   const recommendations = data?.recommendations || [];
   const displayName = data?.name ? data?.name : capitalizeWords(slugName);
 
-  // Create subtitle component with collection icon
-  function CollectionSubtitle() {
+  // Create subtitle component with recipe icon
+  function RecipeSubtitle() {
     return (
       <View style={styles.subtitleContainer}>
-        <FontAwesome
-          size={14}
-          name="folder"
-          color="#3B82F6"
+        <MaterialCommunityIcons
+          size={18}
+          color="#FF6B35"
+          name="chef-hat"
           style={styles.subtitleIcon}
         />
-        <Text style={styles.subtitleText}>Collection</Text>
+        <Text style={styles.subtitleText}>Recipe</Text>
       </View>
     );
   }
@@ -49,11 +47,10 @@ export default function Recommendations() {
     <View style={styles.container}>
       <RecommendationsScreen
         region={region}
+        name={displayName}
         isLoading={isLoading}
-        previousTitle={previousTitle}
-        subtitle={CollectionSubtitle}
+        subtitle={RecipeSubtitle}
         recommendations={recommendations}
-        name={category ? category : displayName}
         renderItemActions={(props) => <DefaultRecommendationItemActions {...props} />}
         renderSwipeableItem={(props) => <DefaultSwipeableRecommendationItem {...props} />}
       />
@@ -72,11 +69,11 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   subtitleIcon: {
-    marginRight: 6,
+    marginRight: 2,
   },
   subtitleText: {
     fontSize: 14,
     fontWeight: "500",
-    color: "#3B82F6",
+    color: "#FF6B35",
   },
 });

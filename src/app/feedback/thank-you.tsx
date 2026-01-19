@@ -11,14 +11,13 @@ export default function ThankYou() {
   const handleClose = () => {
     Haptics.selectionAsync();
 
-    if (returnTo === 'imports') {
-      router.push("/imports");
+    if (returnTo === 'recipes') {
+      router.push("/");
     } else {
       router.push("/account");
     }
 
     router.dismissAll();
-
   };
 
   return (

@@ -1,6 +1,7 @@
 export * from "./Auth";
 export * from "./Hours";
 export * from "./Import";
+export * from "./Recipe";
 export * from "./Review";
 export * from "./Platform";
 export * from "./AssetType";

@@ -58,7 +58,7 @@ import {
 
 type FontAwesome6IconName = ComponentProps<typeof FontAwesome6>["name"];
 
-export default function ImportDetails() {
+export default function RecipeDetails() {
   const router = useRouter();
   const navigation = useNavigation();
   const fadeAnim = useSharedValue(0);
@@ -349,7 +349,7 @@ export default function ImportDetails() {
     }
 
     router.push({
-      pathname: "/imports/[slug]/recommendations",
+      pathname: "/recipes/[slug]/recommendations",
       params: {
         slug,
       },

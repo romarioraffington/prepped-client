@@ -3,6 +3,7 @@ import Animated from "react-native-reanimated";
 import { forwardRef, useCallback, useMemo, type ReactElement } from "react";
 
 import {
+  Platform,
   View,
   Text,
   FlatList,
@@ -17,6 +18,7 @@ import {
 import { ImageGridItem } from "./ImageGridItem";
 import { LoadingImageGridList } from "./LoadingImageGridList";
 import type { ImageGridItem as ImageGridItemType } from "@/libs/types";
+import { formatRelativeTime } from "@/libs/utils/date";
 
 interface ImageGridListProps {
   isLoading?: boolean;
@@ -46,14 +48,14 @@ export const ImageGridList = forwardRef<FlatList<ImageGridItemType> | null, Imag
       loadingRows,
       refreshControl,
       scrollEventThrottle,
-      ListHeaderComponent,
-      onScroll,
-      animatedScrollHandler,
-      onItemPress,
-      onItemOptionsPress,
-      onEndReached,
       onEndReachedThreshold,
       contentContainerStyle,
+      ListHeaderComponent,
+      onScroll,
+      onItemPress,
+      onEndReached,
+      onItemOptionsPress,
+      animatedScrollHandler,
     },
     ref,
   ) => {
@@ -66,16 +68,29 @@ export const ImageGridList = forwardRef<FlatList<ImageGridItemType> | null, Imag
     // Memoize renderItem to avoid re-creations and VirtualizedList churn
     const renderItem = useCallback(
       ({ item }: { item: ImageGridItemType }) => {
-        // Generate metadata showing cities and recommendations count
-        const metadataParts: string[] = [];
-        if (item.citiesCount && item.citiesCount > 0) {
-          metadataParts.push(`${item.citiesCount} ${item.citiesCount === 1 ? 'city' : 'cities'}`);
-        }
-        if (item.recommendationsCount > 0) {
-          metadataParts.push(`${item.recommendationsCount} ${item.recommendationsCount === 1 ? 'place' : 'places'}`);
-        }
-        const metadata = metadataParts.length > 0 ? (
-          <Text style={styles.metadataText}>{metadataParts.join(' • ')}</Text>
+        // Generate metadata showing recipe count and last updated timestamp
+        const recipeCount = item.count > 0 ? (
+          <Text style={styles.recipeCountText}>
+            {item.count} {item.count === 1 ? 'Recipe' : 'Recipes'}
+          </Text>
+        ) : null;
+
+        const timestamp = item.lastUpdatedTimestamp
+          ? formatRelativeTime(item.lastUpdatedTimestamp)
+          : null;
+
+        const timestampText = timestamp ? (
+          <Text style={styles.timestampText}>
+            {timestamp}
+          </Text>
+        ) : null;
+
+        const metadata = recipeCount || timestampText ? (
+          <View style={styles.metadataRow}>
+            {recipeCount}
+            {recipeCount && timestampText && <Text style={styles.metadataSeparator}> </Text>}
+            {timestampText}
+          </View>
         ) : null;
 
         return (
@@ -169,9 +184,32 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     justifyContent: "space-between",
   },
-  metadataText: {
+  metadataRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  recipeCountText: {
+    fontFamily: Platform.select({
+      android: "Manrope_500Medium",
+      ios: "Manrope-Medium",
+    }),
+    color: "#666",
+    fontSize: 14,
+  },
+  timestampText: {
+    fontFamily: Platform.select({
+      android: "Manrope_400Regular",
+      ios: "Manrope-Regular",
+    }),
     color: "#999",
-    fontSize: 13,
-    marginTop: 2,
+    fontSize: 14,
+  },
+  metadataSeparator: {
+    fontFamily: Platform.select({
+      android: "Manrope_400Regular",
+      ios: "Manrope-Regular",
+    }),
+    color: "#999",
+    fontSize: 14,
   },
 });

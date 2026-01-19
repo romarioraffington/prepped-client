@@ -16,22 +16,23 @@ import Animated, {
 // Internal Imports
 import { useHeaderAnimation } from "@/hooks";
 import type { ImageGridItem } from "@/libs/types";
+import { Colors } from "@/libs/constants";
 import { TabScrollProvider, useTabScroll } from "@/contexts";
 import { BOTTOM_NAV_SCROLL_EVENT } from "@/hooks/useBottomNavigationAnimation";
 import { FloatingAddButton, TopTabs, CONTENT_WIDTH, type TabData, type TabsData } from "@/components";
 
 // Content Components
-import Imports from "./imports";
-import Collections from "./index";
+import Recipes from "./recipes";
+import Cookbooks from "./index";
 
 enum Tab {
-  Collections = 0,
-  Imports = 1,
+  Cookbooks = 0,
+  Recipes = 1,
 }
 
 const tabs: TabsData = [
-  { label: "Collections", value: Tab.Collections },
-  { label: "Imports", value: Tab.Imports },
+  { label: "Cookbooks", value: Tab.Cookbooks },
+  { label: "Recipes", value: Tab.Recipes },
 ];
 
 const HOME_TAB_PRESS_EVENT = "tabPress:home";
@@ -55,9 +56,9 @@ function TabsContent() {
   const activeTabIndex = useSharedValue(0);
   const horizontalListOffsetX = useSharedValue(0);
   const isHorizontalListScrollingX = useSharedValue(false);
-  const importsListRef = useRef<ScrollableRef | null>(null);
+  const recipesListRef = useRef<ScrollableRef | null>(null);
   const horizontalListRef = useRef<FlatList<TabData> | null>(null);
-  const collectionsListRef = useRef<FlatList<ImageGridItem> | null>(null);
+  const cookbooksListRef = useRef<FlatList<ImageGridItem> | null>(null);
 
   // Header animation
   const { rHeaderStyle, rBlurStyle, scrollHandler, resetHeaderForTabSwitch } = useHeaderAnimation({
@@ -125,15 +126,15 @@ function TabsContent() {
 
   const renderTabContent = ({ item }: { item: TabData }) => (
     <View style={styles.tabContentContainer}>
-      {item.value === Tab.Collections ? (
-        <Collections
-          listRef={collectionsListRef}
+      {item.value === Tab.Cookbooks ? (
+        <Cookbooks
+          listRef={cookbooksListRef}
           scrollHandler={scrollHandler}
           headerHeight={headerHeight}
         />
       ) : (
-        <Imports
-          listRef={importsListRef}
+        <Recipes
+          listRef={recipesListRef}
           scrollHandler={scrollHandler}
           headerHeight={headerHeight}
         />
@@ -143,11 +144,11 @@ function TabsContent() {
 
   const scrollTabToTop = useCallback(
     (tabIndex: number) => {
-      if (tabIndex === Tab.Collections) {
-        collectionsListRef.current?.scrollToOffset?.({ offset: 0, animated: true });
+      if (tabIndex === Tab.Cookbooks) {
+        cookbooksListRef.current?.scrollToOffset?.({ offset: 0, animated: true });
       }
-      if (tabIndex === Tab.Imports) {
-        importsListRef.current?.scrollToOffset?.({ offset: 0, animated: true });
+      if (tabIndex === Tab.Recipes) {
+        recipesListRef.current?.scrollToOffset?.({ offset: 0, animated: true });
       }
     },
     [],
@@ -181,8 +182,8 @@ function TabsContent() {
   useEffect(() => {
     const homeListener = DeviceEventEmitter.addListener(HOME_TAB_PRESS_EVENT, () => {
       const currentIndex = activeTabIndex.value;
-      if (currentIndex === Tab.Imports) {
-        switchToTab(Tab.Collections);
+      if (currentIndex === Tab.Recipes) {
+        switchToTab(Tab.Cookbooks);
         return;
       }
       scrollTabToTop(currentIndex);
@@ -254,7 +255,7 @@ function TabsContent() {
 
       <FloatingAddButton
         rightOffset={20}
-        bottomOffset={50}
+        bottomOffset={70}
         disableTranslate
         animationValue={fabOpacity}
       />
@@ -273,7 +274,7 @@ export default function TabsLayout() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "white",
+    backgroundColor: Colors.background,
   },
   blurContainer: {
     position: "absolute",
@@ -290,7 +291,7 @@ const styles = StyleSheet.create({
     right: 0,
     zIndex: 60,
     overflow: "hidden",
-    backgroundColor: "transparent",
+    backgroundColor: Colors.background,
   },
   headerContent: {
     paddingBottom: 0,

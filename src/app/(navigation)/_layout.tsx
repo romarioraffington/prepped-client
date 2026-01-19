@@ -1,8 +1,7 @@
 // External Dependencies
 import { Tabs } from "expo-router";
 import { Animated } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { FontAwesome } from "@expo/vector-icons";
+import { AntDesign, Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import { DeviceEventEmitter } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -30,13 +29,17 @@ export default function BottomNavigation() {
           return {
             tabBarItemStyle: {
               marginTop: 5,
+              paddingHorizontal: 8,
+            },
+            tabBarLabelStyle: {
+              fontSize: 10,
             },
             sceneStyle: {
-              backgroundColor: "#fff",
+              backgroundColor: Colors.background,
             },
             headerShown: false,
             tabBarShowLabel: true,
-            tabBarActiveTintColor: Colors.primaryPurple,
+            tabBarActiveTintColor: Colors.primary,
             tabBarBackground: () => (
               <Animated.View
                 style={{
@@ -45,7 +48,9 @@ export default function BottomNavigation() {
                   left: 0,
                   right: 0,
                   bottom: -insets.bottom,
-                  backgroundColor: "rgba(255, 255, 255, 0.9)",
+                  backgroundColor: Colors.background,
+                  borderTopLeftRadius: 20,
+                  borderTopRightRadius: 20,
                   opacity: tabBarAnimation,
                   transform: [
                     {
@@ -66,6 +71,7 @@ export default function BottomNavigation() {
               position: "absolute",
               height: TAB_BAR_HEIGHT,
               paddingBottom: insets.bottom,
+              paddingHorizontal: 30,
               backgroundColor: "transparent",
               opacity: tabBarAnimation,
               overflow: "hidden",
@@ -87,9 +93,9 @@ export default function BottomNavigation() {
         <Tabs.Screen
           name="(home)"
           options={{
-            title: "Home",
+            title: "Kitchen",
             tabBarIcon: ({ color }) => (
-              <Ionicons size={22} name="home-outline" color={color} />
+              <MaterialCommunityIcons size={20} name="chef-hat" color={color} />
             ),
           }}
           listeners={() => ({
@@ -103,9 +109,9 @@ export default function BottomNavigation() {
           options={{
             headerShown: false,
             headerTransparent: true,
-            title: "Wishlists",
+            title: "Grocery",
             tabBarIcon: ({ color }) => (
-              <FontAwesome size={22} name="heart-o" color={color} />
+              <MaterialIcons size={20} name="shopping-cart" color={color} />
             ),
           }}
           listeners={() => ({
@@ -122,15 +128,8 @@ export default function BottomNavigation() {
             headerShown: true,
             headerTransparent: true,
             tabBarIcon: ({ color, focused }) => (
-              <ProfileIcon
-                size={25}
-                letter={user?.name?.charAt(0)}
-                imageUrl={
-                  user?.profileImage
-                    ? { uri: user.profileImage }
-                    : require("~/assets/images/welcome/leaning-tower-of-pisa-in-pisa-italy.webp")
-                }
-              />
+              <MaterialIcons size={22} name="person" color={color} />
+
             ),
           }}
           listeners={() => ({

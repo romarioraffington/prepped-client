@@ -127,7 +127,7 @@ export default function Account() {
       await refreshSubscriptionStatus();
 
       // Refresh quota status
-      await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.IMPORT_QUOTA] });
+      await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.RECIPE_QUOTA] });
     } catch (error) {
       reportError(error, {
         component: "AccountScreen",
@@ -147,8 +147,8 @@ export default function Account() {
         contentContainerStyle={[styles.contentContainer, { paddingTop: headerHeight + 16 }]}
         refreshControl={
           <RefreshControl
-            tintColor={Colors.primaryPurple}
-            colors={[Colors.primaryPurple]}
+            tintColor={Colors.primary}
+            colors={[Colors.primary]}
             refreshing={isRefreshing}
             onRefresh={handleRefresh}
           />

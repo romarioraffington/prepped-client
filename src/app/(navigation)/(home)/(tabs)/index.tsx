@@ -19,17 +19,17 @@ import {
 // API
 import { useCollections } from "@/api";
 
-interface CollectionsProps {
+interface CookbooksProps {
   scrollHandler: ReturnType<typeof useAnimatedScrollHandler>;
   headerHeight: number;
   listRef?: React.RefObject<FlatList<ImageGridItem> | null>;
 }
 
-export default function Collections({
+export default function Cookbooks({
   scrollHandler,
   headerHeight,
   listRef,
-}: CollectionsProps) {
+}: CookbooksProps) {
   const router = useRouter();
   // Add small extra top padding so content clears
   // the translucent header without overlap
@@ -37,10 +37,10 @@ export default function Collections({
   const [refreshing, setRefreshing] = useState(false);
 
   const {
-    error,
-    isLoading,
     data,
+    error,
     refetch,
+    isLoading,
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
@@ -118,11 +118,11 @@ export default function Collections({
   }, [refetch]);
 
   // Memoize to prevent re-renders in ImageGridList
-  const handleBoardItemPress = useCallback((collectionItem: ImageGridItem) => {
-    const slug = createFullSlug(collectionItem.name, collectionItem.id);
+  const handleBoardItemPress = useCallback((cookbookItem: ImageGridItem) => {
+    const slug = createFullSlug(cookbookItem.name, cookbookItem.id);
 
     router.push({
-      pathname: "/collections/[slug]",
+      pathname: "/cookbooks/[slug]",
       params: {
         slug,
       },
@@ -160,13 +160,13 @@ export default function Collections({
             ListHeaderComponent={
               <View style={[styles.emptyStateContainer, { paddingTop: contentTopPadding }]}>
                 <EmptyImageState
-                  title="Create a collection ✨"
-                  description={`Share travel recommendations \n from other apps to start building your collection.`}
+                  title="Create a cookbook ✨"
+                  description={`Share recipes from other apps to start building your cookbook.`}
                 />
               </View>
             }
-            contentContainerStyle={styles.emptyStateContainer}
             scrollEventThrottle={16}
+            contentContainerStyle={styles.emptyStateContainer}
           />
         </WithPullToRefresh>
       </View>
@@ -196,10 +196,10 @@ export default function Collections({
           items={collections}
           isLoading={isLoading}
           onEndReachedThreshold={0.5}
-          onItemPress={handleBoardItemPress}
           onEndReached={handleEndReached}
-          animatedScrollHandler={scrollHandler}
           isLoadingMore={isFetchingNextPage}
+          onItemPress={handleBoardItemPress}
+          animatedScrollHandler={scrollHandler}
           contentContainerStyle={contentContainerStyle}
         />
       </WithPullToRefresh>

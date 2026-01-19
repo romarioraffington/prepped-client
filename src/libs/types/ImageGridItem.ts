@@ -4,9 +4,8 @@ export interface ImageGridItem {
   id: string;
   name: string;
   imageUris: string[];
-  citiesCount?: number;
-  recommendationsCount: number;
+  count: number;
   hasSubCollections?: boolean;
-  lastUpdatedTimestamp?: number;
+  lastUpdatedTimestamp: number;
   variant?: CollectionVariant;
 }

@@ -16,7 +16,7 @@ import { API_ENDPOINTS, getApiClient, QUERY_KEYS } from "@/libs/constants";
 export const deleteImport = async (id: string): Promise<void> => {
   try {
     const client = getApiClient();
-    const endpoint = `${API_ENDPOINTS.EXTRACTIONS_LIST_V1}/${id}`;
+    const endpoint = `${API_ENDPOINTS.RECIPES_LIST_V1}/${id}`;
     await client.delete(endpoint);
   } catch (error) {
     reportError(error, {
@@ -59,7 +59,7 @@ export const useDeleteImportMutation = () => {
 
     // Optimistically remove item from cache immediately
     onMutate: async (id: string): Promise<MutationContext> => {
-      const queryKey = [QUERY_KEYS.IMPORTS];
+      const queryKey = [QUERY_KEYS.RECIPES];
 
       // Cancel any ongoing refetches to prevent them from overwriting our optimistic update
       // This prevents the shimmer from appearing during the update
@@ -93,7 +93,7 @@ export const useDeleteImportMutation = () => {
     // On error, rollback to previous state
     onError: (_error, _id, context) => {
       if (context?.previousData) {
-        queryClient.setQueryData([QUERY_KEYS.IMPORTS], context.previousData);
+        queryClient.setQueryData([QUERY_KEYS.RECIPES], context.previousData);
       }
     },
 
@@ -109,7 +109,7 @@ export const useDeleteImportMutation = () => {
     onSettled: () => {
       // Only invalidate import details, not the list (to avoid shimmer flash)
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.IMPORT_DETAILS_BASE],
+        queryKey: [QUERY_KEYS.RECIPE_DETAILS_BASE],
       });
     },
   });

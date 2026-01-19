@@ -6,30 +6,30 @@
  */
 const NOTES_BASE = "notes";
 const AMENITIES_BASE = "amenities";
-const IMPORT_DETAILS_BASE = "import-details";
+const RECIPE_DETAILS_BASE = "recipe-details";
 const EXTRACTION_STATUS_BASE = "extraction-status";
 const COLLECTION_DETAILS_BASE = "collection-details";
 const RECOMMENDATION_PHOTOS_BASE = "recommendation-photos";
 const RECOMMENDATION_DETAILS_BASE = "recommendation-details";
-const IMPORT_RECOMMENDATIONS_BASE = "import-recommendations";
+const RECIPE_RECOMMENDATIONS_BASE = "recipe-recommendations";
 const WISHLIST_RECOMMENDATIONS_BASE = "wishlist-recommendations";
 const COLLECTION_RECOMMENDATIONS_BASE = "collection-recommendations";
 
 export const QUERY_KEYS = {
-  // Import
-  IMPORTS: "imports",
-  IMPORT_QUOTA: "importQuota",
+  // Recipe
+  RECIPES: "recipes",
+  RECIPE_QUOTA: "recipeQuota",
 
-  // Import Details
-  IMPORT_DETAILS_BASE,
-  IMPORT_DETAILS: (id: string) => [IMPORT_DETAILS_BASE, id] as const,
+  // Recipe Details
+  RECIPE_DETAILS_BASE,
+  RECIPE_DETAILS: (id: string) => [RECIPE_DETAILS_BASE, id] as const,
 
-  // Import Recommendations
-  // ( query key to fetch imported recommendations to display on the map screen)
-  // i.e imports/[slug]/recommendations
-  IMPORT_RECOMMENDATIONS_BASE,
-  IMPORT_RECOMMENDATIONS: (importId: string) =>
-    [IMPORT_RECOMMENDATIONS_BASE, importId] as const,
+  // Recipe Recommendations
+  // (query key to fetch recipe recommendations to display on the map screen)
+  // i.e recipes/[slug]/recommendations
+  RECIPE_RECOMMENDATIONS_BASE,
+  RECIPE_RECOMMENDATIONS: (recipeId: string) =>
+    [RECIPE_RECOMMENDATIONS_BASE, recipeId] as const,
 
   // Collection
   COLLECTIONS: "collections",

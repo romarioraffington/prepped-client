@@ -8,7 +8,7 @@ import { Colors } from "@/libs/constants";
 export interface DotsLoaderProps {
   /**
    * Color of the loading dots
-   * @default Colors.primaryPurple
+   * @default Colors.primary
    */
   color?: string;
   /**
@@ -34,7 +34,7 @@ export interface DotsLoaderProps {
 }
 
 export const DotsLoader: React.FC<DotsLoaderProps> = ({
-  color = Colors.primaryPurple,
+  color = Colors.primary,
   dotSize = 10,
   dotSpacing = 6,
   backgroundColor = "#fff",

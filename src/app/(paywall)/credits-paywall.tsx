@@ -114,7 +114,7 @@ export default function CreditsPaywall() {
       setShowConfetti(true);
 
       // Invalidate quota to refresh after credit purchase
-      await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.IMPORT_QUOTA] });
+      await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.RECIPE_QUOTA] });
 
       // Purchase successful
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);

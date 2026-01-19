@@ -31,6 +31,7 @@ interface BaseImageCardProps {
   renderOverlay?: () => React.ReactNode;
   renderContent?: () => React.ReactNode;
   imageStyle?: StyleProp<ImageStyle>;
+  backgroundColor?: string;
 }
 
 export const BaseImageCard: React.FC<BaseImageCardProps> = ({
@@ -42,6 +43,7 @@ export const BaseImageCard: React.FC<BaseImageCardProps> = ({
   renderOverlay,
   renderContent,
   imageStyle,
+  backgroundColor,
 }) => {
   // Use index-based height pattern for masonry variation
   // Pattern creates Pinterest-style stagger: tall, medium, short, tall...
@@ -64,7 +66,7 @@ export const BaseImageCard: React.FC<BaseImageCardProps> = ({
     <TouchableOpacity
       key={assetId}
       activeOpacity={0.8}
-      style={[styles.cardContainer]}
+      style={[styles.cardContainer, backgroundColor && { backgroundColor }]}
       onPress={() => onPress(assetId)}
     >
       <View style={[styles.imageContainer, { height: cardHeight }]}>

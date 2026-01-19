@@ -60,12 +60,12 @@ const fetchCollectionDetails = async (
     const collections: ImageGridItem[] = data.collections.map((item) => ({
       id: item.id,
       name: item.name,
-      recommendationsCount: item.recommendationsCount || 0,
+      count: item.recommendationsCount || 0,
       imageUris: item.imageUris || [],
       hasSubCollections: item.hasSubCollections,
       // Validate timestamp - ensure it's a valid number (not NaN)
       lastUpdatedTimestamp: Number.isNaN(item.lastUpdatedTimestamp)
-        ? undefined
+        ? 0
         : item.lastUpdatedTimestamp,
     }));
 

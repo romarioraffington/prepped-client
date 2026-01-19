@@ -3,6 +3,9 @@ import { Stack } from 'expo-router';
 import { StyleSheet } from 'react-native';
 import type { NativeStackNavigationOptions } from '@react-navigation/native-stack';
 
+// Internal Dependencies
+import { Colors } from '@/libs/constants';
+
 // Extended screen options type thatp includes headerTitleContainerStyle
 // This is supported by React Navigation at runtime but not fully typed
 type ExtendedScreenOptions = NativeStackNavigationOptions & {
@@ -27,34 +30,34 @@ export default function HomeLayout() {
         }}
       />
       <Stack.Screen
-        name="imports/[slug]/index"
+        name="recipes/[slug]/index"
         options={{
           headerBackTitle: 'Home',
           headerTransparent: true,
         }}
       />
       <Stack.Screen
-        name="imports/[slug]/recommendations"
+        name="recipes/[slug]/recommendations"
         options={{
-          headerBackTitle: 'Imports',
+          headerBackTitle: 'Recipes',
           headerTransparent: true,
         }}
       />
       <Stack.Screen
-        name="collections/[slug]/index"
+        name="cookbooks/[slug]/index"
         options={{
           headerTransparent: true,
         }}
       />
       <Stack.Screen
-        name="collections/[slug]/recommendations"
+        name="cookbooks/[slug]/recommendations"
         options={{
           headerShown: true,
           headerTransparent: true,
         }}
       />
       <Stack.Screen
-        name="collections/[slug]/options"
+        name="cookbooks/[slug]/options"
         options={{
           headerShown: false,
           presentation: 'formSheet',
@@ -69,6 +72,6 @@ export default function HomeLayout() {
 const styles = StyleSheet.create({
   contentStyle: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: Colors.background,
   },
 });

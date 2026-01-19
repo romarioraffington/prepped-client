@@ -24,6 +24,8 @@ export const Colors = {
   },
   destructive: "#FF3B30",
   successColor: "#4CAF50",
-  primaryPurple: "#6B21A8",
   pinkAccentColor: "#FF385C",
+  background: "#F5F5F0",
+  primary: "#EA580C",
+  matureForeground: "#78716C",
 };

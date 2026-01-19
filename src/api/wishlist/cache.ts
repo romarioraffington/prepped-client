@@ -47,9 +47,9 @@ export const updateAllWishlistCaches = ({
     });
   }
 
-  // 2. Update IMPORT_DETAILS cache
+  // 2. Update RECIPE_DETAILS cache
   const importDetailQueries = queryClient.getQueriesData<ImportDetail>({
-    queryKey: [QUERY_KEYS.IMPORT_DETAILS_BASE],
+    queryKey: [QUERY_KEYS.RECIPE_DETAILS_BASE],
   });
   for (const [queryKey, importDetail] of importDetailQueries) {
     if (!importDetail?.recommendations) continue;
@@ -69,9 +69,9 @@ export const updateAllWishlistCaches = ({
     }
   }
 
-  // 3. Update IMPORT_RECOMMENDATIONS cache
+  // 3. Update RECIPE_RECOMMENDATIONS cache
   const importRecommendationQueries = queryClient.getQueriesData({
-    queryKey: [QUERY_KEYS.IMPORT_RECOMMENDATIONS_BASE],
+    queryKey: [QUERY_KEYS.RECIPE_RECOMMENDATIONS_BASE],
   });
   for (const [queryKey, data] of importRecommendationQueries) {
     if (data && typeof data === "object" && "recommendations" in data) {
@@ -173,7 +173,7 @@ export const snapshotAllWishlistCaches = ({
     queryClient.getQueryData<RecommendationDetail>(recommendationDetailsKey);
 
   const importDetailQueries = queryClient.getQueriesData<ImportDetail>({
-    queryKey: [QUERY_KEYS.IMPORT_DETAILS_BASE],
+    queryKey: [QUERY_KEYS.RECIPE_DETAILS_BASE],
   });
   const previousImportDetails = Array.from(importDetailQueries)
     .filter(([, data]) => data !== undefined)
@@ -183,7 +183,7 @@ export const snapshotAllWishlistCaches = ({
     }));
 
   const importRecommendationQueries = queryClient.getQueriesData({
-    queryKey: [QUERY_KEYS.IMPORT_RECOMMENDATIONS_BASE],
+    queryKey: [QUERY_KEYS.RECIPE_RECOMMENDATIONS_BASE],
   });
   const previousImportRecommendations = Array.from(importRecommendationQueries)
     .filter(([, data]) => data !== undefined)
@@ -297,11 +297,11 @@ export const invalidateAllWishlistQueries = async ({
       : []),
     // Invalidate queries - only refetch active queries
     queryClient.invalidateQueries({
-      queryKey: [QUERY_KEYS.IMPORT_DETAILS_BASE],
+      queryKey: [QUERY_KEYS.RECIPE_DETAILS_BASE],
       refetchType: "active",
     }),
     queryClient.invalidateQueries({
-      queryKey: [QUERY_KEYS.IMPORT_RECOMMENDATIONS_BASE],
+      queryKey: [QUERY_KEYS.RECIPE_RECOMMENDATIONS_BASE],
       refetchType: "active",
     }),
     queryClient.invalidateQueries({

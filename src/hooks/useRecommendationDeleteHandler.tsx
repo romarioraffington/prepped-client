@@ -79,13 +79,13 @@ export const useRecommendationDeleteHandler = ({
                     queryKey: QUERY_KEYS.RECOMMENDATION_DETAILS(recommendationSlug),
                   }),
                   queryClient.invalidateQueries({
-                    queryKey: [QUERY_KEYS.IMPORT_RECOMMENDATIONS_BASE],
+                    queryKey: [QUERY_KEYS.RECIPE_RECOMMENDATIONS_BASE],
                   }),
                   queryClient.invalidateQueries({
                     queryKey: [QUERY_KEYS.COLLECTION_RECOMMENDATIONS_BASE],
                   }),
                   queryClient.invalidateQueries({
-                    queryKey: [QUERY_KEYS.IMPORT_DETAILS_BASE],
+                    queryKey: [QUERY_KEYS.RECIPE_DETAILS_BASE],
                   }),
                 ]);
               })

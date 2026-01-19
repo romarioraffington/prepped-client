@@ -108,7 +108,7 @@ export default function ManageSubscription() {
   if (!isInitialized) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={Colors.primaryPurple} />
+        <ActivityIndicator size="large" color={Colors.primary} />
         <Text style={styles.loadingText}>Loading subscriptions...</Text>
       </View>
     );
@@ -151,8 +151,8 @@ export default function ManageSubscription() {
             </View>
           </View>
           <View style={styles.planRow}>
-            <Text style={[styles.planLabel, { color: isAutoRenewEnabled ? Colors.primaryPurple : '#DC2626' }]}>{isAutoRenewEnabled ? 'Renews' : 'Expiring'}</Text>
-            <Text style={[styles.planValue, { color: isAutoRenewEnabled ? Colors.primaryPurple : '#DC2626' }]}>{formatDate(expirationDate)}</Text>
+            <Text style={[styles.planLabel, { color: isAutoRenewEnabled ? Colors.primary : '#DC2626' }]}>{isAutoRenewEnabled ? 'Renews' : 'Expiring'}</Text>
+            <Text style={[styles.planValue, { color: isAutoRenewEnabled ? Colors.primary : '#DC2626' }]}>{formatDate(expirationDate)}</Text>
           </View>
         </View>
       )}
@@ -203,7 +203,7 @@ export default function ManageSubscription() {
           disabled={isRestoring}
         >
           <View style={styles.actionContent}>
-            {isRestoring && <ActivityIndicator size="small" color={Colors.primaryPurple} style={styles.loadingIndicator} />}
+            {isRestoring && <ActivityIndicator size="small" color={Colors.primary} style={styles.loadingIndicator} />}
             <Text style={styles.actionTitle}>
               {isRestoring ? 'Restoring Purchase...' : 'Restore Purchase'}
             </Text>
@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
   },
   planValue: {
     fontSize: 16,
-    color: Colors.primaryPurple,
+    color: Colors.primary,
     fontWeight: '600',
   },
   actionsSection: {
@@ -329,7 +329,7 @@ const styles = StyleSheet.create({
     maxWidth: 260,
   },
   highlightText: {
-    color: Colors.primaryPurple,
+    color: Colors.primary,
     fontWeight: '700',
   },
   cancelText: {

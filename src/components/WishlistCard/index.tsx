@@ -132,7 +132,7 @@ export const WishlistCard: FC<WishlistCardProps> = ({
             </>
           ) : (
             <>
-              <Ionicons name="checkmark-circle" size={14} color={Colors.primaryPurple} />
+              <Ionicons name="checkmark-circle" size={14} color={Colors.primary} />
               <Text style={styles.recommendationBadgeText}>Included</Text>
             </>
           )}
@@ -310,7 +310,7 @@ const styles = StyleSheet.create({
   recommendationBadgeText: {
     fontSize: 11,
     fontWeight: "600",
-    color: Colors.primaryPurple,
+    color: Colors.primary,
   },
   recommendationBadgeSelected: {
     backgroundColor: "#FFF1F1",
@@ -326,7 +326,7 @@ const styles = StyleSheet.create({
   },
   imageWrapperSelected: {
     borderWidth: 2,
-    borderColor: Colors.primaryPurple,
+    borderColor: Colors.primary,
   },
   placeholderTile: {
     flex: 1,

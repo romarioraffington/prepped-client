@@ -5,11 +5,13 @@ import { Ionicons } from "@expo/vector-icons";
 import {
   View,
   Text,
+  Platform,
   StyleSheet,
   TouchableOpacity,
 } from "react-native";
 
 // Internal Imports
+import { Colors } from "@/libs/constants";
 import { useImageErrorFilter } from "@/hooks";
 import type { GridItemProps } from "@/libs/types";
 import { columnWidth, imageGap, itemHeight } from "./consts";
@@ -100,9 +102,11 @@ export const DefaultGridItem = ({
       </View>
 
       {/* Item Info */}
-      <View style={styles.metadataContainer}>
-        {metadata}
-      </View>
+      {metadata && (
+        <View style={styles.metadataContainer}>
+          {metadata}
+        </View>
+      )}
     </TouchableOpacity>
   );
 };
@@ -119,44 +123,50 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     width: columnWidth,
     flexDirection: "row",
-    backgroundColor: "#fff",
+    backgroundColor: Colors.background,
   },
   largeImage: {
+    borderRadius: 16,
     height: itemHeight,
-    width: columnWidth * 0.6 - imageGap,
+    width: columnWidth * 0.5 - imageGap / 2,
   },
   imageGapHorizontal: {
     width: imageGap,
     height: "100%",
-    backgroundColor: "#fff",
+    backgroundColor: Colors.background,
   },
   smallImagesContainer: {
-    width: columnWidth * 0.4,
     height: itemHeight,
     flexDirection: "column",
+    width: columnWidth * 0.52,
   },
   smallImage: {
-    height: itemHeight * 0.5,
-    width: columnWidth * 0.4,
+    borderRadius: 16,
+    width: columnWidth * 0.5,
+    height: (itemHeight - imageGap) / 2,
   },
   imageGapVertical: {
     height: imageGap,
-    backgroundColor: "#fff",
+    backgroundColor: Colors.background,
   },
   imagePlaceholder: {
     backgroundColor: "#f0f0f0",
   },
   titleRow: {
-    marginTop: 8,
+    marginTop: 12,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
   },
   itemName: {
     flex: 1,
-    color: "#333",
-    fontSize: 16,
-    fontWeight: "bold",
+    fontFamily: Platform.select({
+      android: "BricolageGrotesque_700Bold",
+      ios: "BricolageGrotesque-Bold",
+    }),
+    color: "#1a1a1a",
+    fontSize: 17,
+    letterSpacing: -0.3,
   },
   optionsButton: {
     paddingLeft: 8,
@@ -165,5 +175,6 @@ const styles = StyleSheet.create({
   metadataContainer: {
     flexDirection: "row",
     alignItems: "center",
+    marginTop: 4,
   },
 });

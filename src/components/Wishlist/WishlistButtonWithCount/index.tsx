@@ -76,7 +76,7 @@ export const WishlistButtonWithCount: React.FC<WishlistButtonWithCountProps> = (
         <View style={styles.heartIconContainer}>
           <FontAwesome
             size={iconSize}
-            color={Colors.primaryPurple}
+            color={Colors.primary}
             name={isSaved ? "heart" : "heart-o"}
           />
           {wishlistCountDisplay && (
@@ -102,7 +102,7 @@ export const WishlistButtonWithCount: React.FC<WishlistButtonWithCountProps> = (
       <View style={styles.heartIconContainer}>
         <FontAwesome
           size={iconSize}
-          color={Colors.primaryPurple}
+          color={Colors.primary}
           name={isSaved ? "heart" : "heart-o"}
         />
         {wishlistCountDisplay && (
@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: Colors.primaryPurple,
+    backgroundColor: Colors.primary,
   },
   wishlistCountText: {
     color: "#fff",

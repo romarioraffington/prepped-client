@@ -163,7 +163,7 @@ export default function WishlistRecommendations() {
         <FontAwesome
           size={14}
           name="heart"
-          color={Colors.primaryPurple}
+          color={Colors.primary}
           style={styles.subtitleIcon}
         />
         <Text style={styles.subtitleText}>Wishlist</Text>
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
   subtitleText: {
     fontSize: 14,
     fontWeight: "500",
-    color: Colors.primaryPurple,
+    color: Colors.primary,
   },
   itemActionsContainer: {
     marginRight: 10,

@@ -46,11 +46,11 @@ export const SubscriptionStatus = () => {
           <ProBadge text={subscriptionTier.toUpperCase()} />
           <View style={styles.subscriptionInfoTextContainer}>
             <Text style={styles.subscriptionInfoSubscribedTitle}>Tripster 👋</Text>
-            <Text style={[styles.subscribedInfoSubscribedSubtitle, { color: isAutoRenewEnabled ? Colors.primaryPurple : '#DC2626' }]}>
+            <Text style={[styles.subscribedInfoSubscribedSubtitle, { color: isAutoRenewEnabled ? Colors.primary : '#DC2626' }]}>
               {isAutoRenewEnabled ? 'Renews on' : 'Expires on'} {formatDate(expirationDate)}
             </Text>
           </View>
-          <ChevronForward color={Colors.primaryPurple} />
+          <ChevronForward color={Colors.primary} />
         </TouchableOpacity>
       </View>
     )
@@ -144,11 +144,11 @@ const styles = StyleSheet.create({
   subscriptionInfoSubscribedTitle: {
     fontSize: 21,
     fontWeight: "600",
-    color: Colors.primaryPurple,
+    color: Colors.primary,
   },
   subscribedInfoSubscribedSubtitle: {
     fontSize: 14,
-    color: Colors.primaryPurple,
+    color: Colors.primary,
     fontWeight: "400",
   },
 
@@ -194,11 +194,11 @@ const styles = StyleSheet.create({
   upsellTitle: {
     fontSize: 20,
     fontWeight: "600",
-    color: Colors.primaryPurple,
+    color: Colors.primary,
   },
   upsellSubheading: {
     fontSize: 15,
-    color: Colors.primaryPurple,
+    color: Colors.primary,
     fontWeight: "300",
     flexWrap: "wrap",
     lineHeight: 20,

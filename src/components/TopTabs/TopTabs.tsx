@@ -1,5 +1,5 @@
 // External Imports
-import type { SharedValue } from "react-native-reanimated";
+import { useAnimatedReaction, type SharedValue, runOnJS } from "react-native-reanimated";
 import React, { type FC, type RefObject, useState, useCallback } from "react";
 import { Dimensions, type FlatList, View, StyleSheet, type LayoutChangeEvent } from "react-native";
 
@@ -32,6 +32,20 @@ export const TopTabs: FC<Props> = ({
   const [tabMeasurements, setTabMeasurements] = useState<
     { width: number; x: number }[]
   >(new Array(tabs.length).fill({ width: 0, x: 0 }));
+
+  // Track active tab index in React state for re-renders
+  const [currentActiveIndex, setCurrentActiveIndex] = useState(activeTabIndex.value);
+
+  // Sync shared value changes to React state
+  useAnimatedReaction(
+    () => activeTabIndex.value,
+    (current, previous) => {
+      if (current !== previous) {
+        runOnJS(setCurrentActiveIndex)(current);
+      }
+    },
+    [activeTabIndex]
+  );
 
   const handleTabLayout = useCallback(
     (index: number) => (event: LayoutChangeEvent) => {
@@ -72,6 +86,7 @@ export const TopTabs: FC<Props> = ({
           >
             <TabItem
               label={item.label}
+              isActive={currentActiveIndex === index}
               onPress={() => handleTabPress(index)}
             />
           </View>

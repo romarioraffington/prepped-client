@@ -6,18 +6,14 @@ const IS_DEV = process.env.APP_VARIANT === "development";
 export default ({ config }: ConfigContext): ExpoConfig => ({
   ...config,
   name: getAppName(),
-  slug: "tripspire",
-  version: "1.0.3",
-  scheme: "tripspire",
+  slug: "prepped",
+  version: "0.0.1",
+  scheme: "prepped",
   orientation: "portrait",
   userInterfaceStyle: "automatic",
   newArchEnabled: true,
   runtimeVersion: {
     policy: "appVersion",
-  },
-  updates: {
-    url: "https://u.expo.dev/afb60485-2cc7-4ae8-8e95-8f5877500c42",
-    fallbackToCacheTimeout: 0,
   },
   ios: {
     supportsTablet: false,
@@ -40,18 +36,34 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     backgroundColor: SPLASH_BACKGROUND_COLOR,
   },
   extra: {
-    APP_STORE_ID: "6753126737",
-    TRIPSPIRE_API_BASE_URL:
-      process.env.TRIPSPIRE_API_BASE_URL || "http://127.0.0.1:8000",
+    API_SERVER_BASE_URL:
+      process.env.API_SERVER_BASE_URL || "http://127.0.0.1:8000",
     SENTRY_DSN: process.env.SENTRY_DSN,
     GOOGLE_CLIENT_ID_IOS: process.env.GOOGLE_CLIENT_ID_IOS,
     REVENUECAT_API_KEY_IOS: process.env.REVENUECAT_API_KEY_IOS,
     eas: {
-      projectId: "afb60485-2cc7-4ae8-8e95-8f5877500c42",
+      projectId: "afb60485-2cc7-4ae8-8e95-8f5877500c42", // to change
     },
   },
   plugins: [
-    "expo-font",
+    [
+      "expo-font",
+      {
+        fonts: [
+          // Manrope - for body text
+          "node_modules/@expo-google-fonts/manrope/400Regular/Manrope_400Regular.ttf",
+          "node_modules/@expo-google-fonts/manrope/500Medium/Manrope_500Medium.ttf",
+          "node_modules/@expo-google-fonts/manrope/600SemiBold/Manrope_600SemiBold.ttf",
+          "node_modules/@expo-google-fonts/manrope/700Bold/Manrope_700Bold.ttf",
+
+          // Bricolage Grotesque - for headings
+          "node_modules/@expo-google-fonts/bricolage-grotesque/400Regular/BricolageGrotesque_400Regular.ttf",
+          "node_modules/@expo-google-fonts/bricolage-grotesque/500Medium/BricolageGrotesque_500Medium.ttf",
+          "node_modules/@expo-google-fonts/bricolage-grotesque/600SemiBold/BricolageGrotesque_600SemiBold.ttf",
+          "node_modules/@expo-google-fonts/bricolage-grotesque/700Bold/BricolageGrotesque_700Bold.ttf",
+        ],
+      },
+    ],
     "expo-router",
     "expo-web-browser",
     "expo-secure-store",
@@ -102,11 +114,11 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
 });
 
 const getUniqueIdentifier = () => {
-  return "app.tripspire.tripspire";
+  return "recipes.prepped";
 };
 
 const getAppName = () => {
-  return "TripSpire";
+  return "Prepped";
 };
 
 const getIcon = () => {

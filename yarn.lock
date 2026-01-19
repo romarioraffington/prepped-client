@@ -1212,6 +1212,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@expo-google-fonts/bricolage-grotesque@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "@expo-google-fonts/bricolage-grotesque@npm:0.4.1"
+  checksum: 10c0/186eaf7b4a7cc8dae0fe52ead291ae98f37620bc5361a2f62f222fe2cd2cae67eec9bf9d9f272112fbf992bcb3dbfa99b2c2332e7a8fb6e5dfbd883ec627b557
+  languageName: node
+  linkType: hard
+
+"@expo-google-fonts/manrope@npm:^0.4.2":
+  version: 0.4.2
+  resolution: "@expo-google-fonts/manrope@npm:0.4.2"
+  checksum: 10c0/84985ce8a64c584147a702e3e6f0dd11eb3d53180192e50669a814de9d555e778d37f974ca434a7785c3580df8fb594ff6985f82537a8d6934f528feb5aeddc8
+  languageName: node
+  linkType: hard
+
 "@expo/cli@npm:54.0.20":
   version: 54.0.20
   resolution: "@expo/cli@npm:54.0.20"
@@ -3947,6 +3961,8 @@ __metadata:
   dependencies:
     "@babel/core": "npm:^7.25.2"
     "@biomejs/biome": "npm:1.9.4"
+    "@expo-google-fonts/bricolage-grotesque": "npm:^0.4.1"
+    "@expo-google-fonts/manrope": "npm:^0.4.2"
     "@expo/metro-runtime": "npm:^6.1.2"
     "@expo/vector-icons": "npm:^15.0.2"
     "@gorhom/bottom-sheet": "npm:^5.1.2"

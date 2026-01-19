@@ -1,9 +1,8 @@
-//External Dependencies
+// External Dependencies
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 
-//Internal Dependencies
+// Internal Dependencies
 import { reportError } from "@/libs/utils";
-import { useAuthStore } from "@/stores/authStore";
 import { API_ENDPOINTS, getApiClient, QUERY_KEYS } from "@/libs/constants";
 
 import type {
@@ -16,9 +15,8 @@ interface CollectionItem {
   id: string;
   name: string;
   imageUris: string[];
-  citiesCount: number;
-  recommendationsCount: number;
-  lastUpdatedTimestamp: string;
+  count: number;
+  lastUpdatedTimestamp: number;
 }
 
 interface CollectionListResponse {
@@ -64,17 +62,13 @@ const fetchCollections = async (
     }
 
     // Transform the API response to match our ImageGridItem interface
-    const collections = response.data.map((item) => {
-      const timestamp = new Date(item.lastUpdatedTimestamp).getTime();
-      return {
-        id: item.id,
-        name: item.name,
-        imageUris: item.imageUris || [],
-        citiesCount: item.citiesCount || 0,
-        recommendationsCount: item.recommendationsCount || 0,
-        lastUpdatedTimestamp: Number.isNaN(timestamp) ? undefined : timestamp,
-      };
-    });
+    const collections: ImageGridItem[] = response.data.map((item) => ({
+      id: item.id,
+      name: item.name,
+      imageUris: item.imageUris || [],
+      count: item.count || 0,
+      lastUpdatedTimestamp: item.lastUpdatedTimestamp || 0,
+    }));
 
     return {
       data: collections,
@@ -90,14 +84,11 @@ const fetchCollections = async (
 };
 
 export const useCollections = () => {
-  const { isAuthenticated } = useAuthStore();
-
   return useInfiniteQuery({
     queryKey: [QUERY_KEYS.COLLECTIONS],
     queryFn: ({ pageParam }) => fetchCollections(pageParam),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => lastPage.meta.next_cursor ?? undefined,
-    enabled: isAuthenticated, // Only fetch when user is authenticated
   });
 };
 

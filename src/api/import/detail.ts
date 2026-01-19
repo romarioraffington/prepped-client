@@ -47,7 +47,7 @@ const fetchImportDetails = async (id: string): Promise<ImportDetail> => {
 
     const client = getApiClient();
     const responseJson = await client.get(
-      `${API_ENDPOINTS.EXTRACTIONS_LIST_V1}/${id}`,
+      `${API_ENDPOINTS.RECIPES_LIST_V1}/${id}`,
     );
 
     // Expecting shape: { data: { ...details } }
@@ -115,7 +115,7 @@ const mapItemToImportDetail = (result: ImportDetailsResponse): ImportDetail => {
  */
 export const useImportDetails = (id: string) => {
   return useQuery<ImportDetail>({
-    queryKey: QUERY_KEYS.IMPORT_DETAILS(id),
+    queryKey: QUERY_KEYS.RECIPE_DETAILS(id),
     queryFn: () => fetchImportDetails(id),
     enabled: !!id,
   });
@@ -131,11 +131,11 @@ export const useInvalidateImportDetails = () => {
   return (id?: string) => {
     if (id) {
       queryClient.invalidateQueries({
-        queryKey: QUERY_KEYS.IMPORT_DETAILS(id),
+        queryKey: QUERY_KEYS.RECIPE_DETAILS(id),
       });
     } else {
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.IMPORT_DETAILS_BASE],
+        queryKey: [QUERY_KEYS.RECIPE_DETAILS_BASE],
       });
     }
   };

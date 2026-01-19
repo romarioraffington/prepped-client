@@ -15,6 +15,7 @@ import Animated, {
 } from "react-native-reanimated";
 
 // Internal Dependencies
+import { Colors } from "@/libs/constants";
 import { usePullToRefresh } from "../WithPullToRefresh";
 
 // DOT_SIZE controls visual weight of each node; small size keeps motion readable during rotation
@@ -27,8 +28,8 @@ const DOT_GAP = 10;
 const VERTICAL_GAP = DOT_GAP * (Math.sqrt(3) / 2);
 
 // Color cycle order chosen for high contrast between adjacent hues during interpolation
-// Purple gradient matching TripSpire app aesthetics
-const DOT_COLORS = ["#8a49b4", "#7C3AED", "#a855f7", "#c084fc"]; // primary purple, secondary purple, vibrant purple, light purple
+// Primary color gradient matching app aesthetics
+const DOT_COLORS = [Colors.primary, "#F97316", "#FB923C", "#FDBA74"]; // primary orange, vibrant orange, medium orange, light orange
 
 const Dot: FC<{ refreshing: boolean }> = ({ refreshing }) => {
   // scale: subtle breathing to imply activity while refreshing; 0.7–1 mirror repeated with yoyo

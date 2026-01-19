@@ -142,7 +142,7 @@ export const WishlistToggleButton: React.FC<WishlistToggleButtonProps> = ({
     >
       <FontAwesome
         size={size}
-        color={Colors.primaryPurple}
+        color={Colors.primary}
         name={isSaved ? "heart" : "heart-o"}
       />
     </TouchableOpacity>

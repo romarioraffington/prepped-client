@@ -20,7 +20,7 @@ type OptionsParams = {
   isCountry?: string;
 };
 
-export default function CollectionOptions() {
+export default function CookbookOptions() {
   const queryClient = useQueryClient();
   const { showToast } = useActionToast();
   const { slug, isCountry } = useLocalSearchParams<OptionsParams>();
@@ -95,7 +95,7 @@ export default function CollectionOptions() {
     // Small delay to ensure clean navigation
     setTimeout(() => {
       router.push({
-        pathname: "/collections/[slug]/recommendations",
+        pathname: "/cookbooks/[slug]/recommendations",
         params: {
           slug,
           previousTitle: city,
@@ -108,8 +108,8 @@ export default function CollectionOptions() {
     if (isDeletePending || !slug) return;
 
     Alert.alert(
-      "Delete Collection?",
-      `"${displayName}" and all it's recommendations will be deleted.`,
+      "Delete Cookbook?",
+      `"${displayName}" and all its Recipes will be deleted.`,
       [
         {
           text: "Cancel",
@@ -184,7 +184,7 @@ export default function CollectionOptions() {
                 // Show error alert
                 Alert.alert(
                   "Oops!",
-                  error?.message || "Failed to delete collection. Please try again.",
+                  error?.message || "Failed to delete cookbook. Please try again.",
                   [{ text: "OK" }],
                 );
               });

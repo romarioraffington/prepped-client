@@ -1,21 +1,26 @@
 // External Dependencies
 import React, { type FC } from "react";
-import { Pressable, StyleSheet, Text } from "react-native";
+import { Platform, Pressable, StyleSheet, Text } from "react-native";
 
-const TAB_COLOR = "#000000";
+// Internal Dependencies
+import { Colors } from "@/libs/constants";
+
+const TAB_COLOR_ACTIVE = "#000000";
+const TAB_COLOR_INACTIVE = Colors.matureForeground;
 
 export type TabItemProps = {
   label: string;
+  isActive?: boolean;
   onPress: () => void;
 };
 
-export const TabItem: FC<TabItemProps> = ({ label, onPress }) => {
+export const TabItem: FC<TabItemProps> = ({ label, isActive = false, onPress }) => {
   return (
     <Pressable
       style={styles.tabItem}
       onPress={onPress}
     >
-      <Text style={styles.tabText}>
+      <Text style={[styles.tabText, { color: isActive ? TAB_COLOR_ACTIVE : TAB_COLOR_INACTIVE }]}>
         {label}
       </Text>
     </Pressable>
@@ -30,9 +35,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   tabText: {
-    fontWeight: "600",
-    fontSize: 16,
+    fontFamily: Platform.select({
+      ios: "BricolageGrotesque-Bold",
+    }),
+    fontSize: 18,
+    fontWeight: "700",
     marginHorizontal: 0,
-    color: TAB_COLOR,
   },
 });

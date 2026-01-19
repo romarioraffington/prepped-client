@@ -208,7 +208,7 @@ export const SwipeableWrapper = ({
       {/* Left action background (Add to wishlist - Purple) */}
       <Animated.View style={[styles.actionBackground, styles.leftBackground, leftBackgroundStyle]}>
         <Animated.View style={[styles.actionButton, leftActionStyle]}>
-          <Feather name="heart" size={26} color={Colors.primaryPurple} />
+          <Feather name="heart" size={26} color={Colors.primary} />
         </Animated.View>
       </Animated.View>
 

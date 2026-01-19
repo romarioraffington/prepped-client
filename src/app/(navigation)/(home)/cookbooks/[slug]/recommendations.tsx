@@ -1,44 +1,46 @@
 // External dependencies
+import { FontAwesome } from "@expo/vector-icons";
 import { useLocalSearchParams } from "expo-router";
 import { View, Text, StyleSheet } from "react-native";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 // Internal dependencies
-import { useImportRecommendations } from "@/api/import";
+import { useCollectionRecommendations } from "@/api";
 import { parseSlug, capitalizeWords } from "@/libs/utils";
 import { RecommendationsScreen } from "@/components/screens/RecommendationScreen";
 import { DefaultRecommendationItemActions, DefaultSwipeableRecommendationItem } from "@/components/Recommendations";
 
 type RecommendationsParams = {
   slug: string;
+  category?: string;
+  previousTitle?: string;
 }
 
 export default function Recommendations() {
-  const { slug } = useLocalSearchParams<RecommendationsParams>();
+  const { slug, category, previousTitle } = useLocalSearchParams<RecommendationsParams>();
 
   // Parse the slug to get ID and name
-  const { name: slugName, id: collectionId } = parseSlug(slug);
+  const { name: slugName, id: cookbookId } = parseSlug(slug);
 
   const {
     data,
     isLoading,
-  } = useImportRecommendations(collectionId);
+  } = useCollectionRecommendations(cookbookId, category);
 
   const region = data?.region;
   const recommendations = data?.recommendations || [];
   const displayName = data?.name ? data?.name : capitalizeWords(slugName);
 
-  // Create subtitle component with import icon
-  function ImportSubtitle() {
+  // Create subtitle component with cookbook icon
+  function CookbookSubtitle() {
     return (
       <View style={styles.subtitleContainer}>
-        <MaterialCommunityIcons
-          size={18}
-          color="#FF6B35"
-          name="playlist-star"
+        <FontAwesome
+          size={14}
+          name="book"
+          color="#3B82F6"
           style={styles.subtitleIcon}
         />
-        <Text style={styles.subtitleText}>Imported List</Text>
+        <Text style={styles.subtitleText}>Cookbook</Text>
       </View>
     );
   }
@@ -47,10 +49,11 @@ export default function Recommendations() {
     <View style={styles.container}>
       <RecommendationsScreen
         region={region}
-        name={displayName}
         isLoading={isLoading}
-        subtitle={ImportSubtitle}
+        previousTitle={previousTitle}
+        subtitle={CookbookSubtitle}
         recommendations={recommendations}
+        name={category ? category : displayName}
         renderItemActions={(props) => <DefaultRecommendationItemActions {...props} />}
         renderSwipeableItem={(props) => <DefaultSwipeableRecommendationItem {...props} />}
       />
@@ -69,11 +72,11 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   subtitleIcon: {
-    marginRight: 2,
+    marginRight: 6,
   },
   subtitleText: {
     fontSize: 14,
     fontWeight: "500",
-    color: "#FF6B35",
+    color: "#3B82F6",
   },
 });

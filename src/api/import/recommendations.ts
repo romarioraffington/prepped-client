@@ -49,7 +49,7 @@ const fetchImportRecommendations = async (
   try {
     const client = getApiClient();
     const result: ImportRecommendationsResponse = await client.get(
-      `${API_ENDPOINTS.EXTRACTIONS_LIST_V1}/${importId}/recommendations`,
+      `${API_ENDPOINTS.RECIPES_LIST_V1}/${importId}/recommendations`,
     );
     const data = result?.data;
 
@@ -108,11 +108,11 @@ const fetchImportRecommendations = async (
   }
 };
 
-export const useImportRecommendations = (importId: string) => {
+export const useImportRecommendations = (recipeId: string) => {
   return useQuery({
-    queryKey: QUERY_KEYS.IMPORT_RECOMMENDATIONS(importId),
-    queryFn: () => fetchImportRecommendations(importId),
-    enabled: !!importId,
+    queryKey: QUERY_KEYS.RECIPE_RECOMMENDATIONS(recipeId),
+    queryFn: () => fetchImportRecommendations(recipeId),
+    enabled: !!recipeId,
   });
 };
 
@@ -120,9 +120,9 @@ export const useImportRecommendations = (importId: string) => {
 export const useInvalidateImportRecommendations = () => {
   const queryClient = useQueryClient();
 
-  return (importId: string) => {
+  return (recipeId: string) => {
     queryClient.invalidateQueries({
-      queryKey: QUERY_KEYS.IMPORT_RECOMMENDATIONS(importId),
+      queryKey: QUERY_KEYS.RECIPE_RECOMMENDATIONS(recipeId),
     });
   };
 };

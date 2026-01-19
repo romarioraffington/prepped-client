@@ -5,7 +5,7 @@ import type Animated from "react-native-reanimated";
 import type { SharedValue } from "react-native-reanimated";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { router, useLocalSearchParams, useNavigation } from "expo-router";
-import { StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { Platform, StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet";
 import React, { useState, useRef, useMemo, useEffect, forwardRef, useLayoutEffect } from "react";
 
@@ -31,12 +31,12 @@ const filters = [
 ];
 
 // Types
-type CollectionRoute =
-  | "/collections/[slug]"
-  | "/collections/[slug]/recommendations";
+type CookbookRoute =
+  | "/cookbooks/[slug]"
+  | "/cookbooks/[slug]/recommendations";
 
 
-export default function CollectionDetails() {
+export default function CookbookDetails() {
   const navigation = useNavigation();
   const headerHeight = useHeaderHeight();
   const bottomSheetRef = useRef<BottomSheet>(null);
@@ -77,7 +77,7 @@ export default function CollectionDetails() {
   // Handle map button press
   const handleMapPress = React.useCallback(() => {
     router.push({
-      pathname: "/collections/[slug]/recommendations",
+      pathname: "/cookbooks/[slug]/recommendations",
       params: {
         slug,
         previousTitle: title,
@@ -88,7 +88,7 @@ export default function CollectionDetails() {
   // Handle options press - navigate to options modal
   const handleOptionsPress = React.useCallback(() => {
     router.push({
-      pathname: "/collections/[slug]/options",
+      pathname: "/cookbooks/[slug]/options",
       params: {
         slug,
         isCountry: isCountryCollection.toString(),
@@ -160,7 +160,7 @@ export default function CollectionDetails() {
     navigation.setOptions({
       ...getHeaderOptions(),
       headerRight: () => HeaderRightComponent,
-      headerBackTitle: parentCollectionName || "Collections",
+      headerBackTitle: parentCollectionName || "Cookbooks",
     });
   }, [navigation, getHeaderOptions, parentCollectionName, HeaderRightComponent]);
 
@@ -171,24 +171,24 @@ export default function CollectionDetails() {
   }, [refetch]);
 
   const handleItemPress = (item: ImageGridItem) => {
-    let pathname: CollectionRoute = "/collections/[slug]/recommendations";
+    let pathname: CookbookRoute = "/cookbooks/[slug]/recommendations";
     const itemSlug = createFullSlug(`${item.name} ${subCollectionName}`, item.id);
 
     // If item has sub-collections, navigate to the next
     // level (countries → cities, cities → categories)
-    if (item.hasSubCollections && item.recommendationsCount > 2) {
-      pathname = "/collections/[slug]";
+    if (item.hasSubCollections && item.count > 2) {
+      pathname = "/cookbooks/[slug]";
     }
     // If the filter is categories, add the category query parameter
     if (selectedFilter === FilterType.CATEGORIES) {
-      pathname = `${pathname}?category=${encodeURIComponent(item.name)}` as CollectionRoute;
+      pathname = `${pathname}?category=${encodeURIComponent(item.name)}` as CookbookRoute;
     }
 
     router.push({
       pathname,
       params: {
         slug: itemSlug,
-        ...(pathname === "/collections/[slug]/recommendations" && { previousTitle: title }),
+        ...(pathname === "/cookbooks/[slug]/recommendations" && { previousTitle: title }),
       },
     });
   };
@@ -205,7 +205,7 @@ export default function CollectionDetails() {
   const handleItemOptionsPress = React.useCallback((item: ImageGridItem) => {
     const itemSlug = createFullSlug(`${item.name} ${subCollectionName}`, item.id);
     router.push({
-      pathname: "/collections/[slug]/options",
+      pathname: "/cookbooks/[slug]/options",
       params: {
         slug: itemSlug,
         isCountry: "false", // These are city collections, not country collections
@@ -421,10 +421,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   metadataText: {
+    fontFamily: Platform.select({
+      android: "Manrope_400Regular",
+      ios: "Manrope-Regular",
+    }),
     color: "#999",
     fontSize: 13,
   },
   metadataSeparator: {
+    fontFamily: Platform.select({
+      android: "Manrope_400Regular",
+      ios: "Manrope-Regular",
+    }),
     color: "#999",
     fontSize: 10,
   },

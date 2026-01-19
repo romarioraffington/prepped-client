@@ -67,9 +67,9 @@ export const FloatingAddButton: React.FC<FloatingAddButtonProps> = ({
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
             router.push("/(modal)/create");
           }}
-          style={styles.button}
+          style={styles.buttonContainer}
         >
-          <View style={styles.purpleButton}>
+          <View style={styles.button}>
             <Ionicons size={28} name="add" color="#fff" />
           </View>
         </Pressable>
@@ -83,23 +83,23 @@ const styles = StyleSheet.create({
     zIndex: 10000,
     position: "absolute",
   },
-  button: {
-    width: 56,
-    borderRadius: 28,
-    height: 56,
+  buttonContainer: {
+    width: 53,
+    height: 53,
     elevation: 6,
     shadowRadius: 8,
+    borderRadius: 28,
     shadowOpacity: 0.3,
-    shadowColor: Colors.primaryPurple,
+    shadowColor: Colors.primary,
     shadowOffset: { width: 0, height: 4 },
   },
-  purpleButton: {
-    width: 56,
-    height: 56,
+  button: {
+    width: 53,
+    height: 53,
     borderRadius: 28,
     opacity: 0.9,
     alignItems: "center",
-    backgroundColor: Colors.primaryPurple,
+    backgroundColor: Colors.primary,
     justifyContent: "center",
   },
 });

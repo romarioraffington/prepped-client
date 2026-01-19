@@ -31,12 +31,9 @@ const fetchImportQuota = async (): Promise<ImportQuota> => {
 
 // Hook to get import quota information
 export const useImportQuota = () => {
-  const { isAuthenticated } = useAuthStore();
-
   return useQuery({
-    queryKey: [QUERY_KEYS.IMPORT_QUOTA],
+    queryKey: [QUERY_KEYS.RECIPE_QUOTA],
     queryFn: fetchImportQuota,
-    enabled: isAuthenticated,
     refetchOnWindowFocus: true, // Refetch when user returns to app
   });
 };

@@ -94,7 +94,6 @@ export default function HomeLayout() {
   const ref = useNavigationContainerRef();
   const { isUpdateAvailable, isUpdatePending, fetchAndReload } = useAppUpdates();
 
-
   // Handle splash screen hide with cleanup
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -218,44 +217,45 @@ function RootLayoutNavigator() {
     setIsMounted(true);
   }, []);
 
-  useEffect(() => {
-    // Don't redirect while auth is loading or
-    // component not mounted isMounted prevents
-    // "Attempted to navigate before mounting"
-    // error by ensuring the navigation system
-    // is ready before calling router.replace()
-    if (isLoading || !isMounted) return;
+  // Authentication disabled - allow all routes without auth check
+  // useEffect(() => {
+  //   // Don't redirect while auth is loading or
+  //   // component not mounted isMounted prevents
+  //   // "Attempted to navigate before mounting"
+  //   // error by ensuring the navigation system
+  //   // is ready before calling router.replace()
+  //   if (isLoading || !isMounted) return;
 
-    // Everything except login is in the auth group (protected)
-    const isLoginRoute = segments[0] === 'login';
-    const isProtectedRoute = !isLoginRoute;
-    const isOnboardingRoute = segments[0] === '(onboarding)' || segments.some(segment => segment === 'get-started');
+  //   // Everything except login is in the auth group (protected)
+  //   const isLoginRoute = segments[0] === 'login';
+  //   const isProtectedRoute = !isLoginRoute;
+  //   const isOnboardingRoute = segments[0] === '(onboarding)' || segments.some(segment => segment === 'get-started');
 
-    if (!isAuthenticated && isProtectedRoute) {
-      // User is not authenticated and trying to access protected routes
-      router.replace('/login');
-    } else if (isAuthenticated && isLoginRoute) {
-      // User is authenticated but on login page, redirect based on onboarding status
-      if (user?.hasCompletedOnboarding) {
-        router.replace('/');
-      } else {
-        router.replace('/get-started');
-      }
-    } else if (isAuthenticated && !user?.hasCompletedOnboarding && !isOnboardingRoute) {
-      // User is authenticated, not onboarded, trying to access non-onboarding route → force onboarding
-      router.replace('/get-started');
-    }
-    // Note: Allow onboarded users to manually view /get-started if they want
-  }, [isAuthenticated, isLoading, segments, router, isMounted, user]);
+  //   if (!isAuthenticated && isProtectedRoute) {
+  //     // User is not authenticated and trying to access protected routes
+  //     router.replace('/login');
+  //   } else if (isAuthenticated && isLoginRoute) {
+  //     // User is authenticated but on login page, redirect based on onboarding status
+  //     if (user?.hasCompletedOnboarding) {
+  //       router.replace('/');
+  //     } else {
+  //       router.replace('/get-started');
+  //     }
+  //   } else if (isAuthenticated && !user?.hasCompletedOnboarding && !isOnboardingRoute) {
+  //     // User is authenticated, not onboarded, trying to access non-onboarding route → force onboarding
+  //     router.replace('/get-started');
+  //   }
+  //   // Note: Allow onboarded users to manually view /get-started if they want
+  // }, [isAuthenticated, isLoading, segments, router, isMounted, user]);
 
-  // Show loading screen while auth is initializing
-  if (isLoading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#000" />
-      </View>
-    );
-  }
+  // Authentication disabled - skip loading screen
+  // if (isLoading) {
+  //   return (
+  //     <View style={styles.loadingContainer}>
+  //       <ActivityIndicator size="large" color="#000" />
+  //     </View>
+  //   );
+  // }
 
   return (
     <Stack
