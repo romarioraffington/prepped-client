@@ -15,7 +15,7 @@ import { Colors } from "@/libs/constants";
 
 import {
   LargeTitle,
-  PreviewCard,
+  RecipeCard,
   StaggeredGrid,
   WithPullToRefresh,
   LoadingStaggeredGrid,
@@ -107,10 +107,10 @@ export default function CollectionDetails() {
   // Memoize renderItem to prevent re-creations during scroll
   const renderItem = useCallback(
     (item: Recipe, index: number) => (
-      <PreviewCard
+      <RecipeCard
         key={item.id}
+        id={item.id}
         index={index}
-        assetId={item.id}
         title={item.title}
         cookTime={item.cookTime}
         thumbnailUri={item.coverUri}

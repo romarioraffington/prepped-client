@@ -21,26 +21,24 @@ const CARD_HEIGHTS = {
 };
 
 interface BaseImageCardProps {
-  assetId: string;
+  id: string;
   thumbnailUri: string;
   // Controls image height for masonry layout variation
   isLarge?: boolean;
   // Optional index for automatic height variation in masonry grids
   index?: number;
-  onPress: (assetId: string) => void;
-  renderOverlay?: () => React.ReactNode;
+  onPress: (id: string) => void;
   renderContent?: () => React.ReactNode;
   imageStyle?: StyleProp<ImageStyle>;
   backgroundColor?: string;
 }
 
 export const BaseImageCard: React.FC<BaseImageCardProps> = ({
-  assetId,
+  id,
   thumbnailUri,
   isLarge = false,
   index,
   onPress,
-  renderOverlay,
   renderContent,
   imageStyle,
   backgroundColor,
@@ -64,10 +62,10 @@ export const BaseImageCard: React.FC<BaseImageCardProps> = ({
 
   return (
     <TouchableOpacity
-      key={assetId}
+      key={id}
       activeOpacity={0.8}
       style={[styles.cardContainer, backgroundColor && { backgroundColor }]}
-      onPress={() => onPress(assetId)}
+      onPress={() => onPress(id)}
     >
       <View style={[styles.imageContainer, { height: cardHeight }]}>
         <ShimmerImage
@@ -79,7 +77,6 @@ export const BaseImageCard: React.FC<BaseImageCardProps> = ({
           style={[styles.thumbnail, imageStyle]}
           contentFit="cover"
         />
-        {renderOverlay?.()}
       </View>
 
       {/* Content below the image */}

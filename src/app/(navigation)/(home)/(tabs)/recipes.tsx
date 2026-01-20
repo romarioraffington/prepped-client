@@ -10,7 +10,7 @@ import type { Recipe } from "@/libs/types";
 import { createShortSlug } from "@/libs/utils";
 
 import {
-  PreviewCard,
+  RecipeCard,
   StaggeredGrid,
   EmptyImageState,
   WithPullToRefresh,
@@ -95,10 +95,10 @@ export default function Recipes({
   // Index is passed for masonry height variation
   const renderItem = useCallback(
     (item: Recipe, index: number) => (
-      <PreviewCard
+      <RecipeCard
         key={item.id}
+        id={item.id}
         index={index}
-        assetId={item.id}
         title={item.title}
         cookTime={item.cookTime}
         thumbnailUri={item.coverUri}

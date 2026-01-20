@@ -31,11 +31,11 @@ export const ImageCard: React.FC<ImageCardProps> = ({
 
   return (
     <BaseImageCard
-      assetId={item.id}
+      id={item.id}
       isLarge={isLarge}
-      thumbnailUri={item.asset.thumbnailUri}
       onPress={() => onPress(item)}
       renderContent={renderContent}
+      thumbnailUri={item.asset.thumbnailUri}
     />
   );
 };

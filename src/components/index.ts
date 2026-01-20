@@ -4,6 +4,7 @@ export * from "./Hero";
 export * from "./Hours";
 export * from "./Notes";
 export * from "./Entity";
+export * from "./Recipe";
 export * from "./ImageBg";
 export * from "./screens";
 export * from "./Marquee";
