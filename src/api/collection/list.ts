@@ -15,7 +15,7 @@ interface CollectionItem {
   id: string;
   name: string;
   imageUris: string[];
-  count: number;
+  recipesCount: number;
   lastUpdatedTimestamp: number;
 }
 
@@ -66,7 +66,7 @@ const fetchCollections = async (
       id: item.id,
       name: item.name,
       imageUris: item.imageUris || [],
-      count: item.count || 0,
+      count: item.recipesCount || 0,
       lastUpdatedTimestamp: item.lastUpdatedTimestamp || 0,
     }));
 

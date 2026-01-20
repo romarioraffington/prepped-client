@@ -6,11 +6,11 @@ import { DeviceEventEmitter } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // Internal Dependencies
-import { ProfileIcon } from "@/components";
 import { Colors } from "@/libs/constants";
 import { useAuth, useSubscription } from "@/contexts";
 import { useBottomNavigationAnimation } from "@/hooks";
 import { reportWarning } from "@/libs/utils/errorReporting";
+import { getBottomNavigationVisibility } from "@/libs/utils/bottomnavigation";
 
 const TAB_BAR_HEIGHT = 75;
 
@@ -25,6 +25,9 @@ export default function BottomNavigation() {
         screenOptions={({ route }) => {
           const { tabBarAnimation, scaleAnimation } = useBottomNavigationAnimation({ route });
           const totalHeight = TAB_BAR_HEIGHT + insets.bottom;
+
+          // Check if we should hide the tab bar using the utility function
+          const shouldHideTabBar = getBottomNavigationVisibility(route);
 
           return {
             tabBarItemStyle: {
@@ -63,30 +66,32 @@ export default function BottomNavigation() {
                 }}
               />
             ),
-            tabBarStyle: {
-              left: 0,
-              right: 0,
-              bottom: 0,
-              borderTopWidth: 0,
-              position: "absolute",
-              height: TAB_BAR_HEIGHT,
-              paddingBottom: insets.bottom,
-              paddingHorizontal: 30,
-              backgroundColor: "transparent",
-              opacity: tabBarAnimation,
-              overflow: "hidden",
-              transform: [
-                {
-                  translateY: tabBarAnimation.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [totalHeight, 0],
-                  }),
-                },
-                {
-                  scale: scaleAnimation,
-                },
-              ],
-            },
+            tabBarStyle: shouldHideTabBar
+              ? { display: "none" }
+              : {
+                left: 0,
+                right: 0,
+                bottom: 0,
+                borderTopWidth: 0,
+                position: "absolute",
+                height: TAB_BAR_HEIGHT,
+                paddingBottom: insets.bottom,
+                paddingHorizontal: 30,
+                backgroundColor: "transparent",
+                opacity: tabBarAnimation,
+                overflow: "hidden",
+                transform: [
+                  {
+                    translateY: tabBarAnimation.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [totalHeight, 0],
+                    }),
+                  },
+                  {
+                    scale: scaleAnimation,
+                  },
+                ],
+              },
           };
         }}
       >

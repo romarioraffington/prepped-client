@@ -36,8 +36,8 @@ export const QUERY_KEYS = {
 
   // Collection Details
   COLLECTION_DETAILS_BASE,
-  COLLECTION_DETAILS: (id: string, type?: string) =>
-    [COLLECTION_DETAILS_BASE, id, type] as const,
+  COLLECTION_DETAILS: (id: string) =>
+    [COLLECTION_DETAILS_BASE, id] as const,
 
   // Collection Recommendations
   COLLECTION_RECOMMENDATIONS_BASE,

@@ -17,13 +17,12 @@ import { parseSlug, capitalizeWords } from "@/libs/utils";
 
 type OptionsParams = {
   slug: string;
-  isCountry?: string;
 };
 
 export default function CookbookOptions() {
   const queryClient = useQueryClient();
   const { showToast } = useActionToast();
-  const { slug, isCountry } = useLocalSearchParams<OptionsParams>();
+  const { slug } = useLocalSearchParams<OptionsParams>();
 
   const {
     mutateAsync: deleteCollectionAsync,
@@ -34,18 +33,11 @@ export default function CookbookOptions() {
   const { id: collectionId, name: slugName } = parseSlug(slug);
   const displayName = capitalizeWords(slugName);
 
-  // Extract city from displayName (e.g., "Rome Italy" -> city: "Rome")
-  const nameParts = displayName.split(" ");
-  const city = nameParts.length > 1 ? nameParts.slice(0, -1).join(" ") : displayName;
-
-  // Get isCountry from route params (passed from detail page)
-  const isCountryCollection = isCountry === "true";
-
   // Helper function to get collection image from cache
   const getCollectionImage = (): string | null => {
     if (!collectionId) return null;
 
-    // First, try to find in collections list cache (for top-level collections)
+    // Find in collections list cache
     const collectionsData = queryClient.getQueryData<
       InfiniteData<{ data: ImageGridItem[]; meta: unknown }>
     >([QUERY_KEYS.COLLECTIONS]);
@@ -53,28 +45,6 @@ export default function CookbookOptions() {
     if (collectionsData) {
       for (const page of collectionsData.pages) {
         const collection = page.data.find((item) => item.id === collectionId);
-        if (collection?.imageUris && collection.imageUris.length > 0) {
-          return collection.imageUris[0];
-        }
-      }
-    }
-
-    // If not found, try collection details cache (for subcollections)
-    // We need to check all collection details queries
-    const allQueries = queryClient.getQueryCache().getAll();
-    for (const query of allQueries) {
-      const queryKey = query.queryKey;
-      if (
-        Array.isArray(queryKey) &&
-        queryKey[0] === QUERY_KEYS.COLLECTION_DETAILS_BASE &&
-        query.state.data
-      ) {
-        const detailsData = query.state.data as {
-          collections: ImageGridItem[];
-        };
-        const collection = detailsData.collections?.find(
-          (item) => item.id === collectionId,
-        );
         if (collection?.imageUris && collection.imageUris.length > 0) {
           return collection.imageUris[0];
         }
@@ -98,7 +68,7 @@ export default function CookbookOptions() {
         pathname: "/cookbooks/[slug]/recommendations",
         params: {
           slug,
-          previousTitle: city,
+          previousTitle: displayName,
         },
       });
     }, 100);
@@ -122,32 +92,6 @@ export default function CookbookOptions() {
             // Get collection image before deletion
             const collectionImage = getCollectionImage();
 
-            // Find parent collection query key before deletion (while cache still has the deleted collection)
-            // Search for a collection details query that contains this collection in its collections array
-            let parentCollectionQueryKey: unknown[] | null = null;
-            const allQueries = queryClient.getQueryCache().getAll();
-            for (const query of allQueries) {
-              const qKey = query.queryKey;
-              if (
-                Array.isArray(qKey) &&
-                qKey[0] === QUERY_KEYS.COLLECTION_DETAILS_BASE &&
-                query.state.data
-              ) {
-                const detailsData = query.state.data as {
-                  collections: ImageGridItem[];
-                };
-                // Check if this query's collections array contains the deleted collection
-                const containsDeletedCollection = detailsData.collections?.some(
-                  (item) => item.id === collectionId,
-                );
-                if (containsDeletedCollection) {
-                  // This is the parent collection, save its query key
-                  parentCollectionQueryKey = qKey;
-                  break;
-                }
-              }
-            }
-
             deleteCollectionAsync(slug)
               .then(() => {
                 // Haptic feedback
@@ -159,23 +103,13 @@ export default function CookbookOptions() {
                   thumbnailUri: collectionImage || null,
                 });
 
-                // Invalidate parent collection query to refetch and remove deleted collection from list
-                if (parentCollectionQueryKey) {
-                  queryClient.invalidateQueries({
-                    queryKey: parentCollectionQueryKey,
-                  });
-                }
+                // Invalidate collections list to refetch and remove deleted collection
+                queryClient.invalidateQueries({
+                  queryKey: [QUERY_KEYS.COLLECTIONS],
+                });
 
-                // Navigate back - closes this options modal
+                // Navigate back - closes this options modal and detail page
                 router.back();
-
-                // If it's a country collection, navigate back again to exit the detail page
-                if (isCountryCollection) {
-                  // Small delay to ensure the first router.back() completes
-                  setTimeout(() => {
-                    router.back();
-                  }, 100);
-                }
               })
               .catch((error) => {
                 // Haptic feedback for error
@@ -200,7 +134,7 @@ export default function CookbookOptions() {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle} numberOfLines={1}>
-          {city}
+          {displayName}
         </Text>
         <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
           <Ionicons name="close" size={22} color="#000" />

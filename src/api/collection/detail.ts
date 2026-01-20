@@ -1,43 +1,33 @@
+// External Dependencies
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
+// Internal Dependencies
 import { reportError } from "@/libs/utils";
+import type { Recipe, PaginationMeta } from "@/libs/types";
 import { API_ENDPOINTS, getApiClient, QUERY_KEYS } from "@/libs/constants";
-
-import type {
-  ImageGridItem,
-  CollectionType,
-  CollectionVariant,
-} from "@/libs/types";
 
 interface CollectionDetailsResponse {
   data: {
-    id: string;
     name: string;
-    type: CollectionType;
-    parentCollectionName: string;
-    recommendationsCount: number;
-    collections: Array<{
+    recipesCount: number;
+    recipes: Array<{
       id: string;
-      name: string;
-      type: CollectionType;
-      recommendationsCount: number;
-      lastUpdatedTimestamp: number;
-      imageUris: string[];
-      hasSubCollections: boolean;
-      variant?: CollectionVariant;
+      title: string;
+      coverUri: string | null;
+      caloriesPerServing: number | null;
+      cookTime: number | null;
     }>;
   };
+  meta: PaginationMeta;
 }
 
 const fetchCollectionDetails = async (
   id: string,
-  type?: string,
 ): Promise<{
   name: string;
-  type: string;
-  parentCollectionName?: string;
-  recommendationsCount: number;
-  collections: ImageGridItem[];
+  recipesCount: number;
+  recipes: Recipe[];
+  meta: PaginationMeta;
 }> => {
   try {
     if (!id) {
@@ -45,9 +35,7 @@ const fetchCollectionDetails = async (
     }
 
     const client = getApiClient();
-    const url = type
-      ? `${API_ENDPOINTS.COLLECTIONS_V1}/${id}?type=${type}`
-      : `${API_ENDPOINTS.COLLECTIONS_V1}/${id}`;
+    const url = `${API_ENDPOINTS.COLLECTIONS_V1}/${id}`;
 
     const result: CollectionDetailsResponse = await client.get(url);
     const data = result?.data;
@@ -56,31 +44,21 @@ const fetchCollectionDetails = async (
       throw new Error("Invalid response format: expected data object");
     }
 
-    // Transform the API response to match our ImageGridItem interface
-    const collections: ImageGridItem[] = data.collections.map((item) => ({
+    // Transform the API response to match our Recipe interface
+    const recipes: Recipe[] = data.recipes.map((item) => ({
       id: item.id,
-      name: item.name,
-      count: item.recommendationsCount || 0,
-      imageUris: item.imageUris || [],
-      hasSubCollections: item.hasSubCollections,
-      // Validate timestamp - ensure it's a valid number (not NaN)
-      lastUpdatedTimestamp: Number.isNaN(item.lastUpdatedTimestamp)
-        ? 0
-        : item.lastUpdatedTimestamp,
+      title: item.title,
+      coverUri: item.coverUri ?? null,
+      caloriesPerServing: item.caloriesPerServing ?? null,
+      cookTime: item.cookTime ?? null,
+      extractedUri: null,
     }));
 
-    // Sort by lastUpdatedTimestamp descending (most recently updated first)
-    // Create a new array to avoid mutation issues with React Query's structural sharing
-    const sortedCollections = [...collections].sort(
-      (a, b) => (b.lastUpdatedTimestamp || 0) - (a.lastUpdatedTimestamp || 0),
-    );
-
     return {
-      collections: sortedCollections,
-      type: data.type,
+      recipes,
       name: data.name,
-      parentCollectionName: data.parentCollectionName,
-      recommendationsCount: data.recommendationsCount,
+      recipesCount: data.recipesCount,
+      meta: result.meta,
     };
   } catch (error) {
     reportError(error, {
@@ -92,10 +70,10 @@ const fetchCollectionDetails = async (
   }
 };
 
-export const useCollectionDetails = (slug: string, type?: string) => {
+export const useCollectionDetails = (slug: string) => {
   return useQuery({
-    queryKey: QUERY_KEYS.COLLECTION_DETAILS(slug, type),
-    queryFn: () => fetchCollectionDetails(slug, type),
+    queryKey: QUERY_KEYS.COLLECTION_DETAILS(slug),
+    queryFn: () => fetchCollectionDetails(slug),
     enabled: !!slug,
   });
 };

@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
       android: "BricolageGrotesque_500Medium",
       ios: "BricolageGrotesque-Medium",
     }),
-    fontSize: 28,
+    fontSize: 34,
     color: "#000",
   },
   previousTitle: {
@@ -106,7 +106,7 @@ const styles = StyleSheet.create({
       android: "BricolageGrotesque_500Medium",
       ios: "BricolageGrotesque-Medium",
     }),
-    fontSize: 28,
+    fontSize: 34,
     opacity: 0.5,
     color: "#667",
     marginTop: -2,

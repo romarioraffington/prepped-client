@@ -2,20 +2,10 @@ import { getFocusedRouteNameFromRoute } from "@react-navigation/native";
 
 const HIDDEN_TAB_SCREENS = [
   "profile",
-  "imports/[slug]",
-  "wishlists/[slug]/index",
-  "imports/[slug]/index",
+  "cookbooks/[slug]",
   "(legal)/privacy-policy",
   "(legal)/terms-of-service",
-  "collections/[slug]/index",
-  "wishlists/[slug]/options",
-  "recommendations/[slug]/index",
-  "recommendations/[slug]/photos",
-  "wishlists/[slug]/edit-wishlist",
-  "imports/[slug]/recommendations",
-  "wishlists/[slug]/recommendations",
-  "recommendations/[slug]/amenities",
-  "collections/[slug]/recommendations",
+  "(home)/cookbooks/[slug]/index",
 ];
 
 export const getBottomNavigationVisibility = (route: any) => {
