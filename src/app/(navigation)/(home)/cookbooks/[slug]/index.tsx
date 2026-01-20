@@ -2,22 +2,24 @@
 import { Ionicons } from "@expo/vector-icons";
 import type Animated from "react-native-reanimated";
 import type { SharedValue } from "react-native-reanimated";
+import type { default as BottomSheet } from "@gorhom/bottom-sheet";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import { Platform, StyleSheet, Text, View, TouchableOpacity } from "react-native";
-import React, { useState, useMemo, forwardRef, useLayoutEffect, useCallback } from "react";
+import React, { useRef, useState, useMemo, forwardRef, useLayoutEffect, useCallback, useEffect } from "react";
 
 // Internal Dependencies
 import type { Recipe } from "@/libs/types";
-import { useLargeTitleCrossfade } from "@/hooks";
-import { createShortSlug } from "@/libs/utils";
 import { Colors } from "@/libs/constants";
+import { createShortSlug } from "@/libs/utils";
+import { useLargeTitleCrossfade } from "@/hooks";
 
 import {
   LargeTitle,
   RecipeCard,
   StaggeredGrid,
   WithPullToRefresh,
+  RecipeOptionsSheet,
   LoadingStaggeredGrid,
   PinterestRefreshIndicator,
 } from "@/components";
@@ -30,6 +32,8 @@ export default function CollectionDetails() {
   const headerHeight = useHeaderHeight();
   const [refreshing, setRefreshing] = useState(false);
   const { slug } = useLocalSearchParams<{ slug: string }>();
+  const bottomSheetRef = useRef<BottomSheet | null>(null);
+  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
 
   const {
     data,
@@ -104,21 +108,36 @@ export default function CollectionDetails() {
     });
   }, []);
 
+  // Handle menu press - open options sheet for the selected recipe
+  const handleMenuPress = useCallback(
+    (recipe: Recipe) => {
+      setSelectedRecipe(recipe);
+    },
+    [],
+  );
+
+  // Open bottom sheet when recipe is selected
+  useEffect(() => {
+    if (selectedRecipe) {
+      // Small delay to ensure component is mounted
+      setTimeout(() => {
+        bottomSheetRef.current?.snapToIndex(0);
+      }, 100);
+    }
+  }, [selectedRecipe]);
+
   // Memoize renderItem to prevent re-creations during scroll
   const renderItem = useCallback(
     (item: Recipe, index: number) => (
       <RecipeCard
         key={item.id}
-        id={item.id}
+        recipe={item}
         index={index}
-        title={item.title}
-        cookTime={item.cookTime}
-        thumbnailUri={item.coverUri}
-        caloriesPerServing={item.caloriesPerServing}
-        onCardPress={() => handleCardItemPress(item)}
+        onMenuPress={handleMenuPress}
+        onCardPress={handleCardItemPress}
       />
     ),
-    [handleCardItemPress],
+    [handleCardItemPress, handleMenuPress],
   );
 
   // List header component with title and recipe count
@@ -162,6 +181,23 @@ export default function CollectionDetails() {
           ListHeaderComponent={ListHeaderComponent}
         />
       </WithPullToRefresh>
+
+      {/* Recipe Options Bottom Sheet */}
+      {selectedRecipe && (
+        <RecipeOptionsSheet
+          variant="cookbook"
+          bottomSheetRef={bottomSheetRef}
+          recipeData={{
+            id: selectedRecipe.id,
+            title: selectedRecipe.title,
+            thumbnailUri: selectedRecipe.coverUri,
+          }}
+          onAnimationCompleted={() => {
+            // Clear selected recipe when sheet closes
+            setSelectedRecipe(null);
+          }}
+        />
+      )}
     </View>
   );
 }

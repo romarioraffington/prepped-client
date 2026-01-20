@@ -32,8 +32,8 @@ export type ActionBottomSheetProps = {
 };
 
 const PREVIEW_IMAGE_WIDTH = 110;
-const PREVIEW_IMAGE_MIN_TRANSLATE_Y = -150;
-const PREVIEW_IMAGE_INITIAL_TRANSLATE_Y = 60;
+const PREVIEW_IMAGE_HIDDEN_TRANSLATE_Y = 0;
+const PREVIEW_IMAGE_VISIBLE_TRANSLATE_Y = -90;
 const PREVIEW_IMAGE_TRANSLATE_X = -PREVIEW_IMAGE_WIDTH / 2;
 
 export const ActionBottomSheet = forwardRef<
@@ -51,16 +51,16 @@ export const ActionBottomSheet = forwardRef<
     onAnimationCompleted,
   } = props;
 
-  const imageTranslateY = useRef(new Animated.Value(PREVIEW_IMAGE_INITIAL_TRANSLATE_Y)).current;
+  const imageTranslateY = useRef(new Animated.Value(PREVIEW_IMAGE_VISIBLE_TRANSLATE_Y)).current;
   const closeAnimRef = useRef<Animated.CompositeAnimation | null>(null);
 
   const handleOnAnimate = (fromIndex: number, toIndex: number) => {
     if (toIndex === -1) {
       if (headerImageUri) {
-        // Run close animation and remember it so we can cancel if user reopens quickly
+        // Run close animation - slide image up out of view
         closeAnimRef.current = Animated.timing(imageTranslateY, {
-          toValue: 0,
-          duration: 500,
+          toValue: PREVIEW_IMAGE_HIDDEN_TRANSLATE_Y,
+          duration: 300,
           useNativeDriver: true,
         });
         closeAnimRef.current.start(() => {
@@ -70,13 +70,13 @@ export const ActionBottomSheet = forwardRef<
       } else {
         if (onAnimationCompleted) onAnimationCompleted();
       }
-    } else if (toIndex === 1) {
-      // Cancel any running close animation and reset position
+    } else if (toIndex >= 0) {
+      // Cancel any running close animation and set to visible position
       if (closeAnimRef.current) {
         closeAnimRef.current.stop();
         closeAnimRef.current = null;
       }
-      imageTranslateY.setValue(PREVIEW_IMAGE_MIN_TRANSLATE_Y);
+      imageTranslateY.setValue(PREVIEW_IMAGE_VISIBLE_TRANSLATE_Y);
     }
   };
 
@@ -128,7 +128,7 @@ export const ActionBottomSheet = forwardRef<
               closeAnimRef.current.stop();
               closeAnimRef.current = null;
             }
-            imageTranslateY.setValue(0);
+            imageTranslateY.setValue(PREVIEW_IMAGE_VISIBLE_TRANSLATE_Y);
           }
           if (onChange) onChange(index);
         }}
@@ -186,15 +186,12 @@ const styles = StyleSheet.create({
     display: "none",
   },
   previewImageContainer: {
+    top: 0,
     left: "50%",
     position: "absolute",
     transform: [{
       translateX: PREVIEW_IMAGE_TRANSLATE_X,
-    },
-    {
-      translateY: PREVIEW_IMAGE_INITIAL_TRANSLATE_Y
-    },
-    ],
+    }],
   },
   previewImage: {
     height: 160,

@@ -1,8 +1,9 @@
 // External Dependencies
 import { useRouter } from "expo-router";
 import { Alert, View, StyleSheet, FlatList } from "react-native";
+import type { default as BottomSheet } from "@gorhom/bottom-sheet";
 import type { useAnimatedScrollHandler } from "react-native-reanimated";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useRef, useCallback, useEffect, useMemo, useState } from "react";
 
 // Internal Dependencies
 import { useRecipes } from "@/api";
@@ -14,6 +15,7 @@ import {
   StaggeredGrid,
   EmptyImageState,
   WithPullToRefresh,
+  RecipeOptionsSheet,
   LoadingStaggeredGrid,
   PinterestRefreshIndicator,
 } from "@/components";
@@ -35,6 +37,8 @@ export default function Recipes({
 }: RecipesProps) {
   const router = useRouter();
   const [refreshing, setRefreshing] = useState(false);
+  const bottomSheetRef = useRef<BottomSheet | null>(null);
+  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
 
   const {
     error,
@@ -91,22 +95,37 @@ export default function Recipes({
     [router],
   );
 
+  // Handle menu press - open options sheet for the selected recipe
+  const handleMenuPress = useCallback(
+    (recipe: Recipe) => {
+      setSelectedRecipe(recipe);
+    },
+    [],
+  );
+
+  // Open bottom sheet when recipe is selected
+  useEffect(() => {
+    if (selectedRecipe) {
+      // Small delay to ensure component is mounted
+      setTimeout(() => {
+        bottomSheetRef.current?.snapToIndex(0);
+      }, 100);
+    }
+  }, [selectedRecipe]);
+
   // Memoize renderItem to prevent re-creations during scroll
   // Index is passed for masonry height variation
   const renderItem = useCallback(
     (item: Recipe, index: number) => (
       <RecipeCard
         key={item.id}
-        id={item.id}
+        recipe={item}
         index={index}
-        title={item.title}
-        cookTime={item.cookTime}
-        thumbnailUri={item.coverUri}
-        caloriesPerServing={item.caloriesPerServing}
-        onCardPress={() => handleCardItemPress(item)}
+        onCardPress={handleCardItemPress}
+        onMenuPress={handleMenuPress}
       />
     ),
-    [handleCardItemPress],
+    [handleCardItemPress, handleMenuPress],
   );
 
   if (isLoading) {
@@ -172,6 +191,26 @@ export default function Recipes({
           animatedScrollHandler={scrollHandler}
         />
       </WithPullToRefresh>
+
+      {/* Recipe Options Bottom Sheet */}
+      {selectedRecipe && (
+        <RecipeOptionsSheet
+          variant="recipes"
+          bottomSheetRef={bottomSheetRef}
+          recipeData={{
+            id: selectedRecipe.id,
+            title: selectedRecipe.title,
+            thumbnailUri: selectedRecipe.coverUri,
+            sourceUri: selectedRecipe.extractedUri,
+            siteName: null, // Not available in Recipe type
+            author: null, // Not available in Recipe type
+          }}
+          onAnimationCompleted={() => {
+            // Clear selected recipe when sheet closes
+            setSelectedRecipe(null);
+          }}
+        />
+      )}
     </View>
   );
 }

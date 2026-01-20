@@ -51,7 +51,7 @@ import {
   ImageCarousel,
   EmptyImageState,
   SwipeableWrapper,
-  ImportOptionsSheet,
+  RecipeOptionsSheet,
   WishlistButtonWithCount,
   RecommendationOptionsButton,
 } from "@/components";
@@ -163,22 +163,18 @@ export default function RecipeDetails() {
     [recommendations.length, isLoading]
   );
 
-  // Memoize optionsSheetData to avoid recreating object on every render
-  const optionsSheetData = useMemo(() => {
+  // Memoize recipeOptionsData to avoid recreating object on every render
+  const recipeOptionsData = useMemo(() => {
     if (!importedData) return null;
     return {
       id: importedData.id,
       title: importedData.title,
-      asset: {
-        type: importedData.asset.type,
-        thumbnailUri: importedData.asset.thumbnailUri,
-        uri: importedData.asset.uri,
-      },
+      thumbnailUri: importedData.asset.thumbnailUri,
+      sourceUri: importedData.sourceUri,
+      siteName: importedData.siteName,
       author: {
         profileUri: importedData.author?.profileUri,
       },
-      sourceUri: importedData.sourceUri,
-      recommendations: importedData.recommendations,
     };
   }, [importedData]);
 
@@ -348,12 +344,6 @@ export default function RecipeDetails() {
       bottomSheetRef.current.close();
     }
 
-    router.push({
-      pathname: "/recipes/[slug]/recommendations",
-      params: {
-        slug,
-      },
-    });
   }, [router, slug, bottomSheetRef]);
 
   const handleMorePress = () => {
@@ -450,9 +440,10 @@ export default function RecipeDetails() {
       </Animated.View>
 
       {/* Bottom Sheet */}
-      {optionsSheetData && (
-        <ImportOptionsSheet
-          importData={optionsSheetData}
+      {recipeOptionsData && (
+        <RecipeOptionsSheet
+          variant="detail"
+          recipeData={recipeOptionsData}
           bottomSheetRef={bottomSheetRef}
           onDeleteSuccess={handleDeleteSuccess}
         />
