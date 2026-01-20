@@ -186,12 +186,8 @@ export default function CollectionDetails() {
       {selectedRecipe && (
         <RecipeOptionsSheet
           variant="cookbook"
+          recipeData={selectedRecipe}
           bottomSheetRef={bottomSheetRef}
-          recipeData={{
-            id: selectedRecipe.id,
-            title: selectedRecipe.title,
-            thumbnailUri: selectedRecipe.coverUri,
-          }}
           onAnimationCompleted={() => {
             // Clear selected recipe when sheet closes
             setSelectedRecipe(null);

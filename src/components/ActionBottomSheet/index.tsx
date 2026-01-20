@@ -13,8 +13,9 @@ import { Colors } from "@/libs/constants";
 type IoniconName = ComponentProps<typeof Ionicons>["name"];
 
 export type ActionBottomSheetMenuItem = {
-  icon: IoniconName;
   label: string;
+  iconUri?: string;
+  icon?: IoniconName;
   onPress: () => void;
   hidden?: boolean;
   disabled?: boolean;
@@ -153,11 +154,19 @@ export const ActionBottomSheet = forwardRef<
                   onPress={item.onPress}
                   disabled={item.disabled}
                 >
-                  <Ionicons
-                    size={20}
-                    name={item.icon}
-                    color={item.destructive ? Colors.destructive : "#667"}
-                  />
+                  {item.iconUri ? (
+                    <Image
+                      source={{ uri: item.iconUri }}
+                      style={styles.menuItemIconImage}
+                      contentFit="cover"
+                    />
+                  ) : item.icon ? (
+                    <Ionicons
+                      size={20}
+                      name={item.icon}
+                      color={item.destructive ? Colors.destructive : "#667"}
+                    />
+                  ) : null}
                   <Text style={[
                     styles.menuItemText,
                     item.destructive && styles.menuItemTextDestructive
@@ -235,6 +244,11 @@ const styles = StyleSheet.create({
   },
   menuItemTextDestructive: {
     color: Colors.destructive,
+  },
+  menuItemIconImage: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
   },
 });
 

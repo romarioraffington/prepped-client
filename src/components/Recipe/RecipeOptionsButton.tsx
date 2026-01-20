@@ -7,13 +7,13 @@ import { StyleSheet, TouchableOpacity } from "react-native";
 import type { default as BottomSheet } from "@gorhom/bottom-sheet";
 
 // Internal Dependencies
-import type { RecipeOptionsData, RecipeOptionsVariant } from "@/libs/types";
+import type { Recipe, RecipeOptionsVariant } from "@/libs/types";
 import { RecipeOptionsSheet } from "./RecipeOptionsSheet";
 
 export interface RecipeOptionsButtonProps {
   size?: number;
   onPress?: () => void;
-  recipeData: RecipeOptionsData;
+  recipeData: Recipe;
   variant: RecipeOptionsVariant;
   onDeleteSuccess?: () => void;
   orientation?: "horizontal" | "vertical";

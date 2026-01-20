@@ -10,13 +10,7 @@ interface CollectionDetailsResponse {
   data: {
     name: string;
     recipesCount: number;
-    recipes: Array<{
-      id: string;
-      title: string;
-      coverUri: string | null;
-      caloriesPerServing: number | null;
-      cookTime: number | null;
-    }>;
+    recipes: Recipe[];
   };
   meta: PaginationMeta;
 }
@@ -44,19 +38,9 @@ const fetchCollectionDetails = async (
       throw new Error("Invalid response format: expected data object");
     }
 
-    // Transform the API response to match our Recipe interface
-    const recipes: Recipe[] = data.recipes.map((item) => ({
-      id: item.id,
-      title: item.title,
-      coverUri: item.coverUri ?? null,
-      caloriesPerServing: item.caloriesPerServing ?? null,
-      cookTime: item.cookTime ?? null,
-      extractedUri: null,
-    }));
-
     return {
-      recipes,
       name: data.name,
+      recipes: data.recipes,
       recipesCount: data.recipesCount,
       meta: result.meta,
     };

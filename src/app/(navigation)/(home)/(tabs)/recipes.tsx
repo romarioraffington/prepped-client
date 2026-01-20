@@ -197,14 +197,7 @@ export default function Recipes({
         <RecipeOptionsSheet
           variant="recipes"
           bottomSheetRef={bottomSheetRef}
-          recipeData={{
-            id: selectedRecipe.id,
-            title: selectedRecipe.title,
-            thumbnailUri: selectedRecipe.coverUri,
-            sourceUri: selectedRecipe.extractedUri,
-            siteName: null, // Not available in Recipe type
-            author: null, // Not available in Recipe type
-          }}
+          recipeData={selectedRecipe}
           onAnimationCompleted={() => {
             // Clear selected recipe when sheet closes
             setSelectedRecipe(null);

@@ -169,11 +169,17 @@ export default function RecipeDetails() {
     return {
       id: importedData.id,
       title: importedData.title,
-      thumbnailUri: importedData.asset.thumbnailUri,
-      sourceUri: importedData.sourceUri,
-      siteName: importedData.siteName,
+      coverUri: importedData.asset.thumbnailUri || "",
+      contentUri: importedData.sourceUri || "",
+      caloriesPerServing: 0,
+      cookTime: 0,
+      platformId: (importedData as any).platformId || 1,
       author: {
-        profileUri: importedData.author?.profileUri,
+        name: importedData.author?.name && importedData.author.name.trim() !== ""
+          ? importedData.author.name
+          : "",
+        avatarUri: importedData.author?.photoUri || "",
+        profileUri: importedData.author?.profileUri || "",
       },
     };
   }, [importedData]);

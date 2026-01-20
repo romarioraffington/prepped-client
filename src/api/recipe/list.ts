@@ -20,39 +20,32 @@ const fetchRecipes = async (cursor?: string): Promise<RecipePageResult> => {
 
     const response = (await client.get(url)) as
       | {
-          data: any[];
+          data: Recipe[];
           links: PaginationLinks;
           meta: PaginationMeta;
         }
       | undefined;
 
     if (!response || !Array.isArray(response.data)) {
-      reportError(new Error("Invalid response structure when fetching recipes"), {
-        component: "RecipeList",
-        action: "Fetch Recipes",
-        extra: {
-          response,
-          hasData: !!response?.data,
-          isArray: Array.isArray(response?.data),
+      reportError(
+        new Error("Invalid response structure when fetching recipes"),
+        {
+          component: "RecipeList",
+          action: "Fetch Recipes",
+          extra: {
+            response,
+            hasData: !!response?.data,
+            isArray: Array.isArray(response?.data),
+          },
         },
-      });
+      );
       throw new Error(
         "Invalid response format: expected paginated recipes response",
       );
     }
 
-    // Transform the API response to match our Recipe interface
-    const recipes: Recipe[] = response.data.map((item: any) => ({
-      id: item.id,
-      title: item.title,
-      coverUri: item.coverUri ?? null,
-      caloriesPerServing: item.caloriesPerServing ?? null,
-      cookTime: item.cookTime ?? null,
-      extractedUri: item.extractedUri ?? null,
-    }));
-
     return {
-      data: recipes,
+      data: response.data,
       meta: response.meta,
     };
   } catch (error) {
@@ -70,6 +63,7 @@ export const useRecipes = () => {
     queryFn: ({ pageParam }) => fetchRecipes(pageParam),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => lastPage.meta.next_cursor ?? undefined,
+
     // Optimize for faster pagination
     staleTime: 5 * 60 * 1000, // 5 minutes - matches global config
     gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime) - keep pages in cache longer

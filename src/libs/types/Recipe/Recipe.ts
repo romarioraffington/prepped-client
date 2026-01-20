@@ -4,8 +4,19 @@
 export interface Recipe {
   id: string;
   title: string;
-  coverUri: string | null;
-  caloriesPerServing: number | null;
-  cookTime: number | null;
-  extractedUri: string | null;
+  coverUri: string;
+  caloriesPerServing: number;
+  cookTime: number;
+  contentUri: string;
+  platformId: number;
+  author: {
+    name: string;
+    avatarUri: string;
+    profileUri: string;
+  };
 }
+
+/**
+ * Recipe options variant for the RecipeOptionsSheet
+ */
+export type RecipeOptionsVariant = "recipes" | "cookbook" | "detail";

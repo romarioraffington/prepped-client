@@ -9,41 +9,19 @@ import type BottomSheet from "@gorhom/bottom-sheet";
 
 // Internal Dependencies
 import { useActionToast } from "@/contexts";
-import { reportError, createFullSlug } from "@/libs/utils";
 import { useDeleteImportMutation } from "@/api";
-import type { RecipeOptionsData, RecipeOptionsVariant } from "@/libs/types";
+import { reportError, createFullSlug } from "@/libs/utils";
+import type { Recipe, RecipeOptionsVariant } from "@/libs/types";
 import { ActionBottomSheet, type ActionBottomSheetMenuItem } from "@/components/ActionBottomSheet";
 
 type IoniconName = ComponentProps<typeof Ionicons>["name"];
 
 export interface RecipeOptionsSheetProps {
-  recipeData: RecipeOptionsData;
+  recipeData: Recipe;
   variant: RecipeOptionsVariant;
-  bottomSheetRef: React.RefObject<BottomSheet | null>;
-  onAnimationCompleted?: () => void;
   onDeleteSuccess?: () => void;
-}
-
-/**
- * Get the social platform icon based on the site name
- */
-function getSocialIcon(siteName?: string | null): IoniconName {
-  const lower = siteName?.toLowerCase() ?? "";
-  if (lower.includes("tiktok")) return "logo-tiktok";
-  if (lower.includes("instagram")) return "logo-instagram";
-  if (lower.includes("youtube")) return "logo-youtube";
-  return "play-outline";
-}
-
-/**
- * Get the social platform label based on the site name
- */
-function getSocialLabel(siteName?: string | null): string {
-  const lower = siteName?.toLowerCase() ?? "";
-  if (lower.includes("tiktok")) return "View on TikTok";
-  if (lower.includes("instagram")) return "View on Instagram";
-  if (lower.includes("youtube")) return "View on YouTube";
-  return "View Source";
+  onAnimationCompleted?: () => void;
+  bottomSheetRef: React.RefObject<BottomSheet | null>;
 }
 
 export function RecipeOptionsSheet({
@@ -57,9 +35,11 @@ export function RecipeOptionsSheet({
   const { showToast } = useActionToast();
   const { mutateAsync: deleteRecipeAsync, isPending: isDeletePending } = useDeleteImportMutation();
 
-  const id = recipeData.id;
+  const recipeId = recipeData.id;
 
-  // Calculate snap points based on variant (different number of menu items)
+  /**
+   * Calculate snap points based on variant (different number of menu items)
+   */
   const snapPoints = useMemo(() => {
     if (variant === "cookbook") {
       return ["38%"]; // 4 items: View, Creator Profile, Remove from Cookbook, Delete
@@ -70,14 +50,53 @@ export function RecipeOptionsSheet({
     return ["38%"]; // 4 items: View, Creator Profile, Add to Cookbook, Delete
   }, [variant]);
 
-  // Handle View on [Social Platform] press
-  const handleViewPress = useCallback(async () => {
-    const uri = recipeData.sourceUri;
+  /**
+ * Get the social platform icon based on platformId
+ * Platform IDs: WEB = 1, TIKTOK = 2, YOUTUBE = 3, INSTAGRAM = 4, PINTEREST = 5
+ */
+  function getSocialIcon(platformId?: number | null): IoniconName {
+    switch (platformId) {
+      case 2: // TIKTOK
+        return "logo-tiktok";
+      case 3: // YOUTUBE
+        return "logo-youtube";
+      case 4: // INSTAGRAM
+        return "logo-instagram";
+      case 5: // PINTEREST
+        return "logo-pinterest";
+      default: // WEB (1) or unknown
+        return "play-outline";
+    }
+  }
+
+  /**
+   * Get the social platform label based on platformId
+   */
+  function getSocialLabel(platformId?: number | null): string {
+    switch (platformId) {
+      case 2: // TIKTOK
+        return "Watch on TikTok";
+      case 3: // YOUTUBE
+        return "Watch on YouTube";
+      case 4: // INSTAGRAM
+        return "Watch on Instagram";
+      case 5: // PINTEREST
+        return "Watch on Pinterest";
+      default: // WEB (1) or unknown
+        return "Watch on Web";
+    }
+  }
+
+  /**
+   * Handle Watch Content
+   */
+  const handleWatchContent = useCallback(async () => {
+    const uri = recipeData.contentUri;
     if (!uri) {
       reportError(new Error("No source URI found for recipe"), {
         component: "RecipeOptionsSheet",
-        action: "View Recipe",
-        extra: { recipeId: recipeData.id },
+        action: "Watch Content",
+        extra: { recipeId, contentUri: uri },
       });
       return;
     }
@@ -88,14 +107,16 @@ export function RecipeOptionsSheet({
     }, 100);
   }, [recipeData, bottomSheetRef]);
 
-  // Handle Creator Profile press
+  /**
+   * Handle Creator Profile press
+   */
   const handleCreatorProfilePress = useCallback(() => {
-    const profileUri = recipeData.author?.profileUri;
+    const profileUri = recipeData.author.profileUri;
     if (!profileUri) {
       reportError(new Error("No profile URI found for recipe"), {
         component: "RecipeOptionsSheet",
         action: "Open Creator Profile",
-        extra: { recipeId: recipeData.id },
+        extra: { recipeId },
       });
       return;
     }
@@ -106,36 +127,44 @@ export function RecipeOptionsSheet({
     }, 100);
   }, [recipeData, bottomSheetRef]);
 
-  // Handle Add to Cookbook press (placeholder)
+  /**
+   * Handle Add to Cookbook press (placeholder)
+   */
   const handleAddToCookbookPress = useCallback(() => {
     bottomSheetRef.current?.close();
     Alert.alert("Coming Soon", "Add to Cookbook functionality is coming soon!");
   }, [bottomSheetRef]);
 
-  // Handle Remove from Cookbook press (placeholder)
+  /**
+   * Handle Remove from Cookbook press (placeholder)
+   */
   const handleRemoveFromCookbookPress = useCallback(() => {
     bottomSheetRef.current?.close();
     Alert.alert("Coming Soon", "Remove from Cookbook functionality is coming soon!");
   }, [bottomSheetRef]);
 
-  // Handle Report Issue press
+  /**
+   * Handle Report Issue press
+   */
   const handleReportIssuePress = useCallback(() => {
     bottomSheetRef.current?.close();
     setTimeout(() => {
-      const recipeSlug = createFullSlug(recipeData.title, id);
+      const recipeSlug = createFullSlug(recipeData.title, recipeId);
       router.push({
         pathname: "/feedback",
         params: {
-          extractionId: id,
+          recipeId,
           returnTo: `/recipes/${recipeSlug}`,
         },
       });
     }, 100);
-  }, [bottomSheetRef, router, id, recipeData.title]);
+  }, [bottomSheetRef, router, recipeId, recipeData.title]);
 
-  // Handle Delete press
+  /**
+   * Handle Delete press
+   */
   const handleDeletePress = useCallback(() => {
-    if (isDeletePending || !id) return;
+    if (isDeletePending || !recipeId) return;
 
     const displayName = recipeData.title || "This recipe";
 
@@ -151,7 +180,7 @@ export function RecipeOptionsSheet({
           text: "Delete",
           style: "destructive",
           onPress: () => {
-            deleteRecipeAsync(id)
+            deleteRecipeAsync(recipeId)
               .then(async () => {
                 // Haptic feedback
                 Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -159,7 +188,7 @@ export function RecipeOptionsSheet({
                 // Show success toast
                 showToast({
                   text: `Deleted "${displayName}"`,
-                  thumbnailUri: recipeData.thumbnailUri || null,
+                  thumbnailUri: recipeData.coverUri
                 });
 
                 // Close bottom sheet
@@ -187,7 +216,7 @@ export function RecipeOptionsSheet({
       { cancelable: true },
     );
   }, [
-    id,
+    recipeId,
     showToast,
     recipeData,
     isDeletePending,
@@ -196,22 +225,29 @@ export function RecipeOptionsSheet({
     deleteRecipeAsync,
   ]);
 
-  // Build menu items based on variant
+  /**
+   * Build menu items based on variant
+   */
+  const author = recipeData.author;
+  const platformId = recipeData.platformId;
+
   const menuItems = useMemo<ActionBottomSheetMenuItem[]>(() => {
-    const socialIcon = getSocialIcon(recipeData.siteName);
-    const socialLabel = getSocialLabel(recipeData.siteName);
+    const socialIcon = getSocialIcon(platformId);
+    const socialLabel = getSocialLabel(platformId);
+    const firstName = author.name.trim() !== "" ? author.name.split(" ")[0] : null;
+    const creatorLabel = firstName ? `${firstName}'s Profile` : "Creator Profile";
 
     const items: ActionBottomSheetMenuItem[] = [
-      // View on [Social Platform]
+      // Watch on [Social Platform]
       {
         icon: socialIcon,
         label: socialLabel,
-        onPress: handleViewPress,
+        onPress: handleWatchContent,
       },
-      // Creator Profile
+      // Creator Profile with avatar
       {
-        icon: "person-outline" as const,
-        label: "Creator Profile",
+        iconUri: recipeData.author.avatarUri,
+        label: creatorLabel,
         onPress: handleCreatorProfilePress,
       },
     ];
@@ -253,8 +289,10 @@ export function RecipeOptionsSheet({
     return items;
   }, [
     variant,
-    recipeData.siteName,
-    handleViewPress,
+    platformId,
+    author.name,
+    author.avatarUri,
+    handleWatchContent,
     handleDeletePress,
     handleReportIssuePress,
     handleAddToCookbookPress,
@@ -263,8 +301,8 @@ export function RecipeOptionsSheet({
   ]);
 
   // Determine header based on variant
-  const headerImageUri = variant !== "detail" ? (recipeData.thumbnailUri || undefined) : undefined;
   const headerTitle = variant === "detail" ? recipeData.title : undefined;
+  const headerImageUri = variant !== "detail" ? recipeData.coverUri : undefined;
 
   return (
     <ActionBottomSheet
