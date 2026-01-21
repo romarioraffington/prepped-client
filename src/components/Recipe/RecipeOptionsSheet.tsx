@@ -128,12 +128,20 @@ export function RecipeOptionsSheet({
   }, [recipeData, bottomSheetRef]);
 
   /**
-   * Handle Add to Cookbook press (placeholder)
+   * Handle Add to Cookbook press
    */
   const handleAddToCookbookPress = useCallback(() => {
     bottomSheetRef.current?.close();
-    Alert.alert("Coming Soon", "Add to Cookbook functionality is coming soon!");
-  }, [bottomSheetRef]);
+    setTimeout(() => {
+      const recipeSlug = createFullSlug(recipeData.title, recipeId);
+      router.push({
+        pathname: "/(modal)/manage-cookbooks/index" as any,
+        params: {
+          recipeSlug,
+        },
+      });
+    }, 100);
+  }, [bottomSheetRef, router, recipeId, recipeData.title]);
 
   /**
    * Handle Remove from Cookbook press (placeholder)

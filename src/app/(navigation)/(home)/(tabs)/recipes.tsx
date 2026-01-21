@@ -1,6 +1,7 @@
 // External Dependencies
 import { useRouter } from "expo-router";
 import { Alert, View, StyleSheet, FlatList } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { default as BottomSheet } from "@gorhom/bottom-sheet";
 import type { useAnimatedScrollHandler } from "react-native-reanimated";
 import React, { useRef, useCallback, useEffect, useMemo, useState } from "react";
@@ -36,9 +37,13 @@ export default function Recipes({
   listRef,
 }: RecipesProps) {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const [refreshing, setRefreshing] = useState(false);
   const bottomSheetRef = useRef<BottomSheet | null>(null);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+
+  // Calculate bottom padding: tab bar height (75) + safe area bottom + extra space
+  const contentBottomPadding = 75 + insets.bottom + 20;
 
   const {
     error,
@@ -189,6 +194,7 @@ export default function Recipes({
           isLoading={isFetchingNextPage}
           onEndReached={handleEndReached}
           animatedScrollHandler={scrollHandler}
+          contentBottomPadding={contentBottomPadding}
         />
       </WithPullToRefresh>
 

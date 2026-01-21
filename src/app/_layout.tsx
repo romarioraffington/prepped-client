@@ -298,21 +298,7 @@ function RootLayoutNavigator() {
         }}
       />
       <Stack.Screen
-        name="(modal)/save-to-wishlist/index"
-        options={{
-          headerShown: false,
-          presentation: 'modal',
-        }}
-      />
-      <Stack.Screen
-        name="(modal)/delete-from-wishlist/index"
-        options={{
-          headerShown: false,
-          presentation: 'modal',
-        }}
-      />
-      <Stack.Screen
-        name="(modal)/manage-wishlists/index"
+        name="(modal)/manage-cookbooks/index"
         options={{
           headerShown: false,
           presentation: 'modal',

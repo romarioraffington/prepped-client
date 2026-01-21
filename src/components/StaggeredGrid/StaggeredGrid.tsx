@@ -28,6 +28,7 @@ interface StaggeredGridProps {
   items?: any[];
   isLoading?: boolean;
   headerHeight?: number;
+  contentBottomPadding?: number;
   refreshControl?: React.ReactElement<RefreshControlProps>;
 
   // Render function receives item and index for masonry height variation
@@ -59,6 +60,7 @@ export const StaggeredGrid = forwardRef<FlashListInstance | null, StaggeredGridP
       isLoading,
       headerHeight = 0,
       refreshControl,
+      contentBottomPadding = 0,
       ListHeaderComponent,
       onEndReachedThreshold = 0.5,
       scrollEventThrottle = 16,
@@ -78,8 +80,12 @@ export const StaggeredGrid = forwardRef<FlashListInstance | null, StaggeredGridP
     );
 
     const contentContainerStyle = useMemo(
-      () => ({ paddingHorizontal: HORIZONTAL_PADDING, paddingTop: headerHeight + 16 }),
-      [headerHeight],
+      () => ({
+        paddingHorizontal: HORIZONTAL_PADDING,
+        paddingTop: headerHeight + 16,
+        paddingBottom: contentBottomPadding,
+      }),
+      [headerHeight, contentBottomPadding],
     );
 
     // Footer component for loading indicator
