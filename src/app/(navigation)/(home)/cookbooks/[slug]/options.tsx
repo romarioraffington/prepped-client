@@ -1,7 +1,7 @@
 // External Dependencies
 import React from "react";
 import * as Haptics from "expo-haptics";
-import { Ionicons } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import { useQueryClient } from "@tanstack/react-query";
 import type { InfiniteData } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
@@ -58,19 +58,19 @@ export default function CookbookOptions() {
     router.back();
   };
 
-  const handleMapPress = () => {
+  const handleEditTitlePress = () => {
     // Close this screen first, then navigate to recommendations
     router.back();
 
     // Small delay to ensure clean navigation
     setTimeout(() => {
-      router.push({
-        pathname: "/cookbooks/[slug]/recommendations",
-        params: {
-          slug,
-          previousTitle: displayName,
-        },
-      });
+      // router.push({
+      //   pathname: "/cookbooks/[slug]/recommendations",
+      //   params: {
+      //     slug,
+      //     previousTitle: displayName,
+      //   },
+      // });
     }, 100);
   };
 
@@ -134,7 +134,7 @@ export default function CookbookOptions() {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle} numberOfLines={1}>
-          {displayName}
+          Options
         </Text>
         <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
           <Ionicons name="close" size={22} color="#000" />
@@ -143,17 +143,17 @@ export default function CookbookOptions() {
 
       {/* Options List */}
       <View style={styles.optionsContainer}>
-        {/* Map Option */}
-        <TouchableOpacity style={styles.optionItem} onPress={handleMapPress}>
-          <Ionicons name="map-outline" size={20} color="#667" />
-          <Text style={styles.optionText}>Map</Text>
+        {/* Edit Title Option */}
+        <TouchableOpacity style={styles.optionItem} onPress={handleEditTitlePress}>
+          <Feather name="edit-2" size={18} color="#667" />
+          <Text style={styles.optionText}>Edit Title</Text>
         </TouchableOpacity>
 
         {/* Delete Option */}
         <TouchableOpacity style={styles.optionItem} onPress={handleDeletePress}>
-          <Ionicons name="trash-outline" size={20} color={Colors.destructive} />
+          <Ionicons name="trash-outline" size={18} color={Colors.destructive} />
           <Text style={[styles.optionText, styles.optionTextDestructive]}>
-            Delete
+            Delete Cookbook
           </Text>
         </TouchableOpacity>
       </View>
@@ -164,7 +164,7 @@ export default function CookbookOptions() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: Colors.background,
   },
   header: {
     paddingTop: 20,
@@ -180,7 +180,6 @@ const styles = StyleSheet.create({
     color: "#000",
     fontWeight: "600",
     textAlign: "center",
-    paddingHorizontal: 40,
   },
   closeButton: {
     top: 20,
@@ -191,6 +190,7 @@ const styles = StyleSheet.create({
   optionsContainer: {
     gap: 25,
     paddingTop: 10,
+    paddingBottom: 20,
     paddingHorizontal: 20,
   },
   optionItem: {

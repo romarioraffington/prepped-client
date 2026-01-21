@@ -9,6 +9,7 @@ import { API_ENDPOINTS, getApiClient, QUERY_KEYS } from "@/libs/constants";
 interface CollectionDetailsResponse {
   data: {
     name: string;
+    type: number;
     recipesCount: number;
     recipes: Recipe[];
   };
@@ -19,6 +20,7 @@ const fetchCollectionDetails = async (
   id: string,
 ): Promise<{
   name: string;
+  type: number;
   recipesCount: number;
   recipes: Recipe[];
   meta: PaginationMeta;
@@ -40,6 +42,7 @@ const fetchCollectionDetails = async (
 
     return {
       name: data.name,
+      type: data.type,
       recipes: data.recipes,
       recipesCount: data.recipesCount,
       meta: result.meta,

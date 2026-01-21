@@ -43,6 +43,7 @@ export default function CollectionDetails() {
 
   // Extract the needed data
   const recipes = data?.recipes ?? [];
+  const collectionType = data?.type;
   const collectionName = data?.name ?? "";
   const recipesCount = data?.recipesCount ?? 0;
 
@@ -69,18 +70,26 @@ export default function CollectionDetails() {
   }, [slug]);
 
   // Memoize headerRight component to prevent unnecessary recreations
+  // Hide options button for UNORGANIZED collections (type === 2)
   const HeaderRightComponent = useMemo(
-    () => (
-      <View style={styles.headerRightContainer}>
-        <TouchableOpacity
-          style={styles.headerOptionsButton}
-          onPress={handleOptionsPress}
-        >
-          <Ionicons name="ellipsis-horizontal" size={20} color="#667" />
-        </TouchableOpacity>
-      </View>
-    ),
-    [handleOptionsPress],
+    () => {
+      // Don't show options button for UNORGANIZED collections
+      if (collectionType === 2) {
+        return null;
+      }
+
+      return (
+        <View style={styles.headerRightContainer}>
+          <TouchableOpacity
+            style={styles.headerOptionsButton}
+            onPress={handleOptionsPress}
+          >
+            <Ionicons name="ellipsis-horizontal" size={20} color="#667" />
+          </TouchableOpacity>
+        </View>
+      );
+    },
+    [handleOptionsPress, collectionType],
   );
 
   // Single setOptions call using hook-provided options
