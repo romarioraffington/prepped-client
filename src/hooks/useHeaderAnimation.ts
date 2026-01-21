@@ -50,8 +50,16 @@ export const useHeaderAnimation = ({
   const headerTranslateY = useSharedValue(0);
   const headerTranslateYRefPoint = useSharedValue(0);
 
+  // Small threshold to detect when we're at the top (for pull-to-refresh protection)
+  const TOP_THRESHOLD = 5;
+
   // Derived values for header animation - computed on UI thread without mutations
   const derivedOpacity = useDerivedValue(() => {
+    // Always show header when at the top (prevents pull-to-refresh from affecting it)
+    if (listOffsetY.value <= TOP_THRESHOLD) {
+      return 1;
+    }
+
     let nextOpacity = headerOpacity.value;
 
     if (
@@ -93,6 +101,11 @@ export const useHeaderAnimation = ({
   });
 
   const derivedTranslateY = useDerivedValue(() => {
+    // Always show header at top position when at the top (prevents pull-to-refresh from affecting it)
+    if (listOffsetY.value <= TOP_THRESHOLD) {
+      return 0;
+    }
+
     let nextTranslateY = headerTranslateY.value;
 
     if (
@@ -176,8 +189,8 @@ export const useHeaderAnimation = ({
     headerOpacityRefPoint.value = currentOpacity;
     headerTranslateYRefPoint.value = currentTranslateY;
 
-    // Only show header if we're at the very top of the list
-    const shouldShowHeader = listOffsetY.value <= 0;
+    // Only show header if we're at the very top of the list (with small threshold)
+    const shouldShowHeader = listOffsetY.value <= TOP_THRESHOLD;
 
     if (shouldShowHeader && currentOpacity < 1) {
       headerOpacity.value = withTiming(1, {
@@ -207,7 +220,10 @@ export const useHeaderAnimation = ({
     onScroll: (e) => {
       if (isHorizontalScrolling?.value) return;
 
-      listOffsetY.value = e.contentOffset.y;
+      // Clamp scroll offset to >= 0 to prevent pull-to-refresh from affecting header animation
+      // Negative offsets occur when pull-to-refresh header expands, which shouldn't trigger header hide/show
+      const clampedOffsetY = Math.max(0, e.contentOffset.y);
+      listOffsetY.value = clampedOffsetY;
       handleTabScroll(e);
 
       // Track content dimensions to detect end-of-list bounce

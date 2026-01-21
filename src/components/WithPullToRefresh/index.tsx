@@ -204,22 +204,27 @@ export function WithPullToRefresh({
       const deltaY = e.translationY - lastDragY.get();
       lastDragY.set(e.translationY);
 
-      // Why: Only allow pulling when list is scrolled to top (with generous tolerance for consecutive pulls).
-      // Once we start pulling (deltaY > 0), continue responding regardless of listOffsetY.
+      // Why: Only allow pulling when list is scrolled to top (with minimal tolerance).
+      // Require minimum pull distance before responding to prevent accidental activation.
+      // Once we start pulling, continue responding regardless of listOffsetY.
       // Clamp to screen height to prevent runaway values on long drags.
       const currentListOffset = listOffsetY.get();
       const currentRefreshOffset = refreshOffsetY.get();
-
-      // Allow pull if: list is at top (with 100px tolerance for consecutive pulls) OR
-      // we're already pulling down OR user is actively pulling down from near-top
-      // The key is to allow the gesture once the user starts pulling down, even if listOffsetY isn't exactly 0
-      // Increased tolerance to handle cases where listOffsetY doesn't reset perfectly after refresh
-      const isNearTop = currentListOffset <= 100;
-      const isAlreadyPulling = currentRefreshOffset > 0;
       const isPullingDown = deltaY > 0;
+      const isAlreadyPulling = currentRefreshOffset > 0;
 
-      // More permissive: allow if near top and pulling down, or if already in a pull state
-      if ((isNearTop && isPullingDown) || isAlreadyPulling) {
+      // Only allow pull if list is at top (2px tolerance for floating point precision)
+      const isAtTop = currentListOffset <= 2;
+
+      // If already pulling, continue responding (allows smooth continuation of gesture)
+      if (isAlreadyPulling) {
+        // Always respond when already in pull state
+        const next = Math.max(0, Math.min(currentRefreshOffset + deltaY, screenHeight));
+        refreshOffsetY.set(next);
+        scrollDirectionOnScroll(next);
+        singleHapticOnScroll(next);
+      } else if (isAtTop && isPullingDown) {
+        // Start responding immediately when at top and pulling down
         const next = Math.max(0, Math.min(currentRefreshOffset + deltaY, screenHeight));
         refreshOffsetY.set(next);
         scrollDirectionOnScroll(next);

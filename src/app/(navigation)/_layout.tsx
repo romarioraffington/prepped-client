@@ -52,9 +52,10 @@ export default function BottomNavigation() {
                   right: 0,
                   bottom: -insets.bottom,
                   backgroundColor: Colors.background,
-                  borderTopLeftRadius: 20,
-                  borderTopRightRadius: 20,
-                  opacity: tabBarAnimation,
+                  opacity: tabBarAnimation.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0, 0.95],
+                  }),
                   transform: [
                     {
                       translateY: tabBarAnimation.interpolate({

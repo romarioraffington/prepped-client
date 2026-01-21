@@ -32,7 +32,7 @@ import {
 
 type Wishlist = WishlistCardData;
 
-export default function ManageWishlists() {
+export default function ManageCookbooks() {
   const queryClient = useQueryClient();
   const { showToast } = useActionToast();
   const { recommendationSlug } = useLocalSearchParams<{ recommendationSlug: string }>();
@@ -186,7 +186,7 @@ export default function ManageWishlists() {
         text: "Undo",
         onPress: () => {
           router.push({
-            pathname: "/(modal)/manage-wishlists",
+            pathname: "/(modal)/manage-cookbooks",
             params: { recommendationSlug },
           });
         },
@@ -257,7 +257,7 @@ export default function ManageWishlists() {
         text: "Undo",
         onPress: () => {
           router.push({
-            pathname: "/(modal)/manage-wishlists",
+            pathname: "/(modal)/manage-cookbooks",
             params: { recommendationSlug },
           });
         },

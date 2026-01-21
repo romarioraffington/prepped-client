@@ -1,6 +1,7 @@
 // External Components
 import { useRouter } from "expo-router";
 import { Alert, View, StyleSheet, FlatList } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { useAnimatedScrollHandler } from "react-native-reanimated";
 import React, { useCallback, useEffect, useState, useMemo, useRef } from "react";
 
@@ -31,9 +32,12 @@ export default function Cookbooks({
   listRef,
 }: CookbooksProps) {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   // Add small extra top padding so content clears
   // the translucent header without overlap
   const contentTopPadding = headerHeight + 20;
+  // Calculate bottom padding: tab bar height (75) + safe area bottom + extra space
+  const contentBottomPadding = 75 + insets.bottom + 20;
   const [refreshing, setRefreshing] = useState(false);
 
   const {
@@ -138,9 +142,10 @@ export default function Cookbooks({
   // Memoize contentContainerStyle to prevent unnecessary re-renders
   const contentContainerStyle = useMemo(
     () => ({
-      paddingTop: contentTopPadding
+      paddingTop: contentTopPadding,
+      paddingBottom: contentBottomPadding,
     }),
-    [contentTopPadding]
+    [contentTopPadding, contentBottomPadding]
   );
 
   if (!collections.length && !isLoading) {

@@ -6,6 +6,7 @@ import type { default as BottomSheet } from "@gorhom/bottom-sheet";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import { Platform, StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import React, { useRef, useState, useMemo, forwardRef, useLayoutEffect, useCallback, useEffect } from "react";
 
 // Internal Dependencies
@@ -30,10 +31,14 @@ import { useCollectionDetails } from "@/api";
 export default function CollectionDetails() {
   const navigation = useNavigation();
   const headerHeight = useHeaderHeight();
+  const insets = useSafeAreaInsets();
   const [refreshing, setRefreshing] = useState(false);
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const bottomSheetRef = useRef<BottomSheet | null>(null);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+
+  // Calculate bottom padding: safe area bottom + extra space for comfortable scrolling
+  const contentBottomPadding = insets.bottom + 20;
 
   const {
     data,
@@ -186,6 +191,7 @@ export default function CollectionDetails() {
           items={recipes}
           renderItem={renderItem}
           headerHeight={headerHeight}
+          contentBottomPadding={contentBottomPadding}
           animatedScrollHandler={scrollHandler}
           ListHeaderComponent={ListHeaderComponent}
         />

@@ -124,7 +124,9 @@ export const ImageGridList = forwardRef<FlatList<ImageGridItemType> | null, Imag
     }
 
     // Use Animated.FlatList when animatedScrollHandler is provided
-    if (animatedScrollHandler) {
+    // Prefer onScroll if provided (from WithPullToRefresh), otherwise use animatedScrollHandler
+    if (animatedScrollHandler || onScroll) {
+      const scrollHandler = onScroll || animatedScrollHandler;
       return (
         <Animated.FlatList
           ref={ref as React.Ref<FlatList<ImageGridItemType>>}
@@ -134,7 +136,7 @@ export const ImageGridList = forwardRef<FlatList<ImageGridItemType> | null, Imag
           renderItem={renderItem}
           keyExtractor={keyExtractor}
           onEndReached={onEndReached}
-          onScroll={animatedScrollHandler}
+          onScroll={scrollHandler}
           refreshControl={refreshControl}
           columnWrapperStyle={styles.itemRow}
           showsVerticalScrollIndicator={false}
