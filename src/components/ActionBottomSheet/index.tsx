@@ -3,7 +3,7 @@ import { Image } from "expo-image";
 import type { ComponentProps } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { Portal } from "react-native-portalize";
-import React, { forwardRef, useMemo, useRef } from "react";
+import React, { forwardRef, useMemo, useRef, useState } from "react";
 import { Animated, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet";
 
@@ -54,10 +54,16 @@ export const ActionBottomSheet = forwardRef<
 
   const imageTranslateY = useRef(new Animated.Value(PREVIEW_IMAGE_VISIBLE_TRANSLATE_Y)).current;
   const closeAnimRef = useRef<Animated.CompositeAnimation | null>(null);
+  const [hasImageError, setHasImageError] = useState(false);
+
+  // Determine if we should show the image (has URI and no error)
+  const showImage = headerImageUri && !hasImageError;
+  // Show title when: explicitly provided AND (no image URI OR image errored)
+  const showTitle = headerTitle && (!headerImageUri || hasImageError);
 
   const handleOnAnimate = (fromIndex: number, toIndex: number) => {
     if (toIndex === -1) {
-      if (headerImageUri) {
+      if (showImage) {
         // Run close animation - slide image up out of view
         closeAnimRef.current = Animated.timing(imageTranslateY, {
           toValue: PREVIEW_IMAGE_HIDDEN_TRANSLATE_Y,
@@ -102,7 +108,7 @@ export const ActionBottomSheet = forwardRef<
         enablePanDownToClose
         backgroundStyle={styles.bottomSheetBackground}
         handleIndicatorStyle={styles.handleIndicator}
-        handleComponent={headerImageUri ? () => (
+        handleComponent={showImage ? () => (
           <View style={styles.previewImageContainer}>
             <Animated.View style={[styles.previewImage, { transform: [{ translateY: imageTranslateY }] }]}>
               <Image
@@ -110,6 +116,7 @@ export const ActionBottomSheet = forwardRef<
                 transition={200}
                 source={{ uri: headerImageUri }}
                 style={StyleSheet.absoluteFill}
+                onError={() => setHasImageError(true)}
               />
             </Animated.View>
           </View>
@@ -136,8 +143,8 @@ export const ActionBottomSheet = forwardRef<
       >
         <BottomSheetView>
           <View style={styles.headerRow}>
-            {headerTitle && (<Text style={styles.headerTitle}>{headerTitle}</Text>)}
-            <TouchableOpacity onPress={handleClose} style={[styles.closeButton, headerImageUri && { top: 30 }]}>
+            {showTitle && (<Text style={styles.headerTitle}>{headerTitle}</Text>)}
+            <TouchableOpacity onPress={handleClose} style={[styles.closeButton, showImage && { top: 30 }]}>
               <Ionicons name="close" size={22} color="#000" />
             </TouchableOpacity>
           </View>
@@ -145,7 +152,7 @@ export const ActionBottomSheet = forwardRef<
           {hasMenu && (
             <View style={[
               styles.menuItemContainer,
-              headerTitle ? { paddingTop: 30 } : headerImageUri && { paddingTop: 90 },
+              showTitle ? { paddingTop: 30 } : showImage && { paddingTop: 90 },
             ]}>
               {itemsToRender.map((item, idx) => (
                 <TouchableOpacity

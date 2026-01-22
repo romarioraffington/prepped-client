@@ -366,7 +366,8 @@ export function RecipeOptionsSheet({
   ]);
 
   // Determine header based on variant
-  const headerTitle = variant === "detail" ? recipeData.title : undefined;
+  // Always pass headerTitle as a fallback in case the image fails to load
+  const headerTitle = recipeData.title;
   const headerImageUri = variant !== "detail" ? recipeData.coverUri : undefined;
 
   return (
