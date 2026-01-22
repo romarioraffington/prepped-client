@@ -1,7 +1,7 @@
 // External Dependencies
 import React from "react";
 import * as Haptics from "expo-haptics";
-import { Feather, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Feather, Ionicons } from "@expo/vector-icons";
 import { useQueryClient } from "@tanstack/react-query";
 import type { InfiniteData } from "@tanstack/react-query";
 import { router, useLocalSearchParams } from "expo-router";
@@ -149,7 +149,7 @@ export default function CookbookOptions() {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle} numberOfLines={1}>
-          Options
+          Cookbook Options
         </Text>
         <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
           <Ionicons name="close" size={22} color="#000" />
@@ -166,8 +166,8 @@ export default function CookbookOptions() {
 
         {/* Edit Recipes Option */}
         <TouchableOpacity style={styles.optionItem} onPress={handleEditRecipesPress}>
-          <MaterialCommunityIcons name="circle-edit-outline" size={24} color="#667" />
-          <Text style={styles.optionText}>Edit Recipes</Text>
+          <Feather name="mouse-pointer" size={19} color="#667" />
+          <Text style={styles.optionText}>Bulk Edit Recipes</Text>
         </TouchableOpacity>
 
         {/* Delete Option */}

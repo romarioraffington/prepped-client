@@ -3,6 +3,7 @@ export * from "./Hours";
 export * from "./Import";
 export * from "./Recipe";
 export * from "./Review";
+export * from "./Cookbook";
 export * from "./Platform";
 export * from "./AssetType";
 export * from "./Feedback";

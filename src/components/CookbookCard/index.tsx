@@ -6,7 +6,7 @@ import { Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
 // Internal Dependencies
 import { Colors } from "@/libs/constants";
 import { useImageErrorFilter } from "@/hooks";
-import type { WishlistCardData } from "@/libs/types";
+import type { CookbookCardData } from "@/libs/types";
 import { ProfileIcon } from "@/components/ProfileIcon";
 import { ShimmerImage } from "@/components/ShimmerImage";
 import { ImagePlaceholder } from "../ImagePlaceholder";
@@ -18,18 +18,18 @@ const CARD_RADIUS = 18;
 const CARD_WIDTH = (Dimensions.get("window").width - (CARD_GAP * 3.5)) / 2;
 const CARD_HEIGHT = CARD_WIDTH * 0.90;
 
-export interface WishlistCardProps {
-  item: WishlistCardData;
+export interface CookbookCardProps {
+  item: CookbookCardData;
   isEditing?: boolean;
   showRecentlyViewed?: boolean;
   isSelectedForRemoval?: boolean;
   isSelectedForAddition?: boolean;
   onPress: () => void;
   onDelete?: () => void;
-  renderMeta?: (item: WishlistCardData) => string | undefined;
+  renderMeta?: (item: CookbookCardData) => string | undefined;
 }
 
-export const WishlistCard: FC<WishlistCardProps> = ({
+export const CookbookCard: FC<CookbookCardProps> = ({
   item,
   isEditing = false,
   showRecentlyViewed = false,
@@ -50,7 +50,7 @@ export const WishlistCard: FC<WishlistCardProps> = ({
   const hasImages = Boolean(item.coverImageUri);
   const extraCount = Math.max(0, item.members.length - displayMembers.length);
   const isRecentlyViewed = Boolean(item.isRecentlyViewed) && showRecentlyViewed;
-  const containsRecommendation = Boolean(item.containsRecommendation);
+  const containsRecipe = Boolean(item.containsRecipe);
 
   const getMetaText = (): string => {
     if (renderMeta) {
@@ -106,18 +106,18 @@ export const WishlistCard: FC<WishlistCardProps> = ({
           <Ionicons name="close" size={18} color="#222" />
         </Pressable>
       ) : null}
-      {(containsRecommendation || isSelectedForAddition) && (
+      {(containsRecipe || isSelectedForAddition) && (
         <View style={[
-          styles.recommendationBadge,
-          isSelectedForRemoval && styles.recommendationBadgeSelected,
-          isSelectedForAddition && styles.recommendationBadgeAddition,
+          styles.recipeBadge,
+          isSelectedForRemoval && styles.recipeBadgeSelected,
+          isSelectedForAddition && styles.recipeBadgeAddition,
         ]}>
           {isSelectedForRemoval ? (
             <>
               <Ionicons name="remove-circle" size={14} color={Colors.pinkAccentColor} />
               <Text style={[
-                styles.recommendationBadgeText,
-                styles.recommendationBadgeTextSelected,
+                styles.recipeBadgeText,
+                styles.recipeBadgeTextSelected,
               ]}>
                 Remove
               </Text>
@@ -126,14 +126,14 @@ export const WishlistCard: FC<WishlistCardProps> = ({
             <>
               <Ionicons name="add-circle" size={14} color={Colors.successColor} />
               <Text style={[
-                styles.recommendationBadgeText,
-                styles.recommendationBadgeTextAddition,
+                styles.recipeBadgeText,
+                styles.recipeBadgeTextAddition,
               ]}>Add</Text>
             </>
           ) : (
             <>
               <Ionicons name="checkmark-circle" size={14} color={Colors.primary} />
-              <Text style={styles.recommendationBadgeText}>Included</Text>
+              <Text style={styles.recipeBadgeText}>Included</Text>
             </>
           )}
         </View>
@@ -289,7 +289,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     elevation: 2,
   },
-  recommendationBadge: {
+  recipeBadge: {
     position: "absolute",
     top: 10,
     left: 10,
@@ -307,21 +307,21 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     elevation: 2,
   },
-  recommendationBadgeText: {
+  recipeBadgeText: {
     fontSize: 11,
     fontWeight: "600",
     color: Colors.primary,
   },
-  recommendationBadgeSelected: {
+  recipeBadgeSelected: {
     backgroundColor: "#FFF1F1",
   },
-  recommendationBadgeAddition: {
+  recipeBadgeAddition: {
     backgroundColor: "#F0F8F0",
   },
-  recommendationBadgeTextSelected: {
+  recipeBadgeTextSelected: {
     color: Colors.pinkAccentColor,
   },
-  recommendationBadgeTextAddition: {
+  recipeBadgeTextAddition: {
     color: Colors.successColor,
   },
   imageWrapperSelected: {

@@ -5,17 +5,17 @@ import { StyleSheet, View } from "react-native";
 
 // Internal Dependencies
 import { Colors } from "~/src/libs/constants";
-import type { WishlistCardData } from "@/libs/types";
-import { WishlistCard } from "@/components/WishlistCard";
+import type { CookbookCardData } from "@/libs/types";
+import { CookbookCard } from "@/components/CookbookCard";
 
-export interface SelectableWishlistCardProps {
-  item: WishlistCardData;
+export interface SelectableCookbookCardProps {
+  item: CookbookCardData;
   isSelected: boolean;
   onSelect: () => void;
   disabled?: boolean;
 }
 
-export const SelectableWishlistCard: FC<SelectableWishlistCardProps> = ({
+export const SelectableCookbookCard: FC<SelectableCookbookCardProps> = ({
   item,
   isSelected,
   onSelect,
@@ -28,7 +28,7 @@ export const SelectableWishlistCard: FC<SelectableWishlistCardProps> = ({
       accessibilityState={{ checked: isSelected, disabled }}
       accessibilityLabel={`${item.name}, ${isSelected ? "selected" : "not selected"}`}
     >
-      <WishlistCard
+      <CookbookCard
         item={item}
         onPress={disabled ? () => { } : onSelect}
       />
@@ -70,4 +70,3 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
 });
-

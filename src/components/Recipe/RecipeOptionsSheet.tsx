@@ -133,12 +133,12 @@ export function RecipeOptionsSheet({
   /**
    * Handle Add to Cookbook press
    */
-  const handleAddToCookbookPress = useCallback(() => {
+  const handleManageCookbookPress = useCallback(() => {
     bottomSheetRef.current?.close();
     setTimeout(() => {
       const recipeSlug = createFullSlug(recipeData.title, recipeId);
       router.push({
-        pathname: "/(modal)/manage-cookbooks/index" as any,
+        pathname: "/manage-cookbooks",
         params: {
           recipeSlug,
         },
@@ -329,8 +329,8 @@ export function RecipeOptionsSheet({
     if (variant === "recipes" || variant === "detail") {
       items.push({
         icon: "book-outline" as const,
-        label: "Add to Cookbook",
-        onPress: handleAddToCookbookPress,
+        label: "Manage Cookbooks",
+        onPress: handleManageCookbookPress,
       });
     }
 
@@ -368,7 +368,7 @@ export function RecipeOptionsSheet({
     handleWatchContent,
     handleDeletePress,
     handleReportIssuePress,
-    handleAddToCookbookPress,
+    handleManageCookbookPress,
     handleCreatorProfilePress,
     handleRemoveFromCookbookPress,
   ]);

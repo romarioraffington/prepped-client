@@ -1,7 +1,6 @@
 // External Dependencies
 import * as Haptics from "expo-haptics";
 import { AntDesign } from "@expo/vector-icons";
-import { useQueryClient } from "@tanstack/react-query";
 import { useFocusEffect } from "@react-navigation/native";
 import { router, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -18,67 +17,57 @@ import {
 
 // Internal Dependencies
 import { useActionToast } from "@/contexts";
-import { QUERY_KEYS } from "@/libs/constants";
-import { useImageErrorFilter } from "@/hooks";
+import { Colors } from "@/libs/constants";
 import { parseSlug, reportError } from "@/libs/utils";
-import { DotsLoader, EmptyImageState, WishlistCard } from "@/components";
-import type { RecommendationDetail, WishlistCardData } from "@/libs/types";
+import type { CookbookCardData } from "@/libs/types";
+import { DotsLoader, EmptyImageState, CookbookCard } from "@/components";
 
 import {
-  useWishlists,
-  useSaveRecommendationToWishlistMutation,
-  useDeleteRecommendationFromWishlistMutation,
+  useCookbooksForCards,
+  useSaveRecipeToCookbookMutation,
+  useRemoveRecipeFromCookbookMutation,
 } from "@/api";
 
-type Wishlist = WishlistCardData;
+type Cookbook = CookbookCardData;
 
 export default function ManageCookbooks() {
-  const queryClient = useQueryClient();
   const { showToast } = useActionToast();
-  const { recommendationSlug } = useLocalSearchParams<{ recommendationSlug: string }>();
+  const { recipeSlug } = useLocalSearchParams<{ recipeSlug: string }>();
 
-  // Parse slug to extract ID for cache key
-  const { id: recommendationId, name: slugName } = parseSlug(recommendationSlug);
+  // Parse slug to extract ID and name
+  const { id: recipeId, name: recipeName } = parseSlug(recipeSlug);
 
-  // Get cached data
-  const recommendation = queryClient.getQueryData<RecommendationDetail>(
-    QUERY_KEYS.RECOMMENDATION_DETAILS(recommendationId),
-  );
-
-  // Get the recommendation name from the cached data or the slug
-  const recommendationName = recommendation?.name || slugName || "This recommendation";
-
-  const { mutate: saveToWishlist, isPending: isSaving } = useSaveRecommendationToWishlistMutation();
-  const { mutate: deleteFromWishlist, isPending: isDeleting } = useDeleteRecommendationFromWishlistMutation();
+  const { mutate: saveToCookbook, isPending: isSaving } = useSaveRecipeToCookbookMutation();
+  const { mutate: removeFromCookbook, isPending: isDeleting } = useRemoveRecipeFromCookbookMutation();
 
   const isPending = isSaving || isDeleting;
 
-  // Track selected wishlist (for removal flow)
-  const [selectedWishlistId, setSelectedWishlistId] = useState<string | null>(null);
+  // Track selected cookbook (for removal flow)
+  const [selectedCookbookId, setSelectedCookbookId] = useState<string | null>(null);
 
-  // Fetch all wishlists and use the includeStatusForRecommendationId
-  // option to get the status of the recommendation in the wishlists
-  // This helps us to hightlight whether each wishlist already contains
-  // the recommendation or not being managed
+  // Fetch all cookbooks and use the includeStatusForRecipeId
+  // option to get the status of the recipe in the cookbooks
+  // This helps us to highlight whether each cookbook already contains
+  // the recipe or not being managed
   const {
     refetch,
     isLoading,
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
-    data: wishlistsData,
-  } = useWishlists({
-    includeStatusForRecommendationId: recommendationId,
+    data: cookbooksData,
+  } = useCookbooksForCards({
+    includeStatusForRecipeId: recipeId,
   });
 
   // Track if initial data has loaded to avoid refetching on first mount
   const hasInitialDataRef = useRef(false);
 
   useEffect(() => {
-    if (wishlistsData && !isLoading) {
+    if (cookbooksData && !isLoading) {
       hasInitialDataRef.current = true;
     }
-  }, [wishlistsData, isLoading]);
+  }, [cookbooksData, isLoading]);
 
   // Refetch when modal gains focus (after initial load)
   // This ensures data is fresh when navigating back to this modal
@@ -93,82 +82,69 @@ export default function ManageCookbooks() {
   );
 
   // Flatten paginated data
-  const wishlists = useMemo(
-    () => wishlistsData?.pages.flatMap((page) => page.data) ?? [],
-    [wishlistsData?.pages],
+  const cookbooks = useMemo(
+    () => cookbooksData?.pages.flatMap((page) => page.data) ?? [],
+    [cookbooksData?.pages],
   );
 
-  // Get success thumbnail from recommendation data and validate it
-  const recommendationImageUrls = recommendation?.images?.[0] ? [recommendation.images[0]] : [];
-  const { validImages: validRecommendationImages } = useImageErrorFilter(recommendationImageUrls);
-  const successThumbnailUri = validRecommendationImages.length > 0 ? validRecommendationImages[0] : null;
+  // Sort cookbooks: those with recipe first, then others
+  const sortedCookbooks = useMemo(() => {
+    if (!cookbooks) return [];
+    const withRecipe = cookbooks.filter((c) => c.containsRecipe === true);
+    const withoutRecipe = cookbooks.filter((c) => c.containsRecipe !== true);
+    return [...withRecipe, ...withoutRecipe];
+  }, [cookbooks]);
 
-  // Sort wishlists: those with recommendation first, then others
-  const sortedWishlists = useMemo(() => {
-    if (!wishlists) return [];
-    const withRecommendation = wishlists.filter((w) => w.containsRecommendation === true);
-    const withoutRecommendation = wishlists.filter((w) => w.containsRecommendation !== true);
-    return [...withRecommendation, ...withoutRecommendation];
-  }, [wishlists]);
-
-  // Find the selected wishlist object (for removal - only if it contains recommendation)
-  const selectedWishlistForRemoval = sortedWishlists.find(
-    (w) => w.id === selectedWishlistId && w.containsRecommendation === true,
+  // Find the selected cookbook object (for removal - only if it contains recipe)
+  const selectedCookbookForRemoval = sortedCookbooks.find(
+    (c) => c.id === selectedCookbookId && c.containsRecipe === true,
   );
-  // Find the selected wishlist object (for addition - only if it doesn't contain recommendation)
-  const selectedWishlistForAddition = sortedWishlists.find(
-    (w) => w.id === selectedWishlistId && w.containsRecommendation !== true,
+  // Find the selected cookbook object (for addition - only if it doesn't contain recipe)
+  const selectedCookbookForAddition = sortedCookbooks.find(
+    (c) => c.id === selectedCookbookId && c.containsRecipe !== true,
   );
 
-  const handleWishlistSelect = useCallback(
-    (wishlist: Wishlist) => {
-      if (!recommendationSlug || isPending) {
+  const handleCookbookSelect = useCallback(
+    (cookbook: Cookbook) => {
+      if (!recipeSlug || isPending) {
         return;
       }
 
       // Set as selected (for addition or removal)
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      setSelectedWishlistId((prev) => (prev === wishlist.id ? null : wishlist.id));
+      setSelectedCookbookId((prev) => (prev === cookbook.id ? null : cookbook.id));
     },
-    [
-      showToast,
-      isPending,
-      queryClient,
-      recommendationSlug,
-      successThumbnailUri,
-      saveToWishlist,
-    ],
+    [recipeSlug, isPending],
   );
 
   const handleAdd = useCallback(() => {
-    if (!recommendationSlug || !selectedWishlistForAddition || isPending) {
+    if (!recipeSlug || !selectedCookbookForAddition || isPending) {
       return;
     }
 
     // Create callback function that will execute the save API call
-    // The mutation will handle optimistic updates in onMutate
     const confirmAdd = () => {
-      saveToWishlist(
+      saveToCookbook(
         {
-          recommendationSlug,
-          wishlistId: selectedWishlistForAddition.id,
-          wishlistName: selectedWishlistForAddition.name,
+          recipeSlug,
+          cookbookId: selectedCookbookForAddition.id,
+          cookbookName: selectedCookbookForAddition.name,
         },
         {
           onError: (error) => {
             // Haptic feedback for error
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
             reportError(error, {
-              component: "ManageWishlists",
-              action: "Add Recommendation To Wishlist",
+              component: "ManageCookbooks",
+              action: "Add Recipe To Cookbook",
               extra: {
-                wishlistId: selectedWishlistForAddition?.id,
-                recommendationSlug,
+                cookbookId: selectedCookbookForAddition?.id,
+                recipeSlug,
               },
             });
             Alert.alert(
-              "Oops! 🥲",
-              "Failed to add to wishlist. Please try again.",
+              "Oops!",
+              "Failed to add to cookbook. Please try again.",
               [{ text: "OK" }],
             );
           },
@@ -177,17 +153,15 @@ export default function ManageCookbooks() {
     };
 
     // Show toast with callbacks
-    // Note: The mutation handles optimistic updates, so we don't need manual rollback
-    // Note: selectedWishlistForAddition.coverImageUri is validated by WishlistCard component using useImageErrorFilter
     showToast({
-      text: `Adding to ${selectedWishlistForAddition?.name ?? 'wishlist'}`,
-      thumbnailUri: successThumbnailUri || selectedWishlistForAddition.coverImageUri || null,
+      text: `Adding to ${selectedCookbookForAddition?.name ?? 'cookbook'}`,
+      thumbnailUri: selectedCookbookForAddition.coverImageUri || null,
       cta: {
         text: "Undo",
         onPress: () => {
           router.push({
             pathname: "/(modal)/manage-cookbooks",
-            params: { recommendationSlug },
+            params: { recipeSlug },
           });
         },
       },
@@ -199,30 +173,28 @@ export default function ManageCookbooks() {
   }, [
     showToast,
     isPending,
-    queryClient,
-    saveToWishlist,
-    recommendationSlug,
-    successThumbnailUri,
-    selectedWishlistForAddition,
+    recipeSlug,
+    saveToCookbook,
+    selectedCookbookForAddition,
   ]);
 
   const handleRemove = useCallback(() => {
-    if (!recommendationSlug || !selectedWishlistForRemoval || isPending) {
+    if (!recipeSlug || !selectedCookbookForRemoval || isPending) {
       return;
     }
 
+    // Parse slug to get recipe ID for the API call
+    const { id: recipeIdForRemoval } = parseSlug(recipeSlug);
+
     // Create callback function that will execute the delete API call
-    // The mutation will handle optimistic updates in onMutate
     const confirmDelete = () => {
-      deleteFromWishlist(
+      removeFromCookbook(
         {
-          wishlistId: selectedWishlistForRemoval.id,
-          recommendationSlug,
+          cookbookId: selectedCookbookForRemoval.id,
+          recipeId: recipeIdForRemoval,
         },
         {
           onSuccess: () => {
-            // Query invalidation is handled by the mutation's onSuccess handler
-
             // Haptic feedback
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
           },
@@ -230,16 +202,16 @@ export default function ManageCookbooks() {
             // Haptic feedback for error
             Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
             reportError(error, {
-              component: "ManageWishlists",
-              action: "Remove Recommendation From Wishlist",
+              component: "ManageCookbooks",
+              action: "Remove Recipe From Cookbook",
               extra: {
-                wishlistId: selectedWishlistForRemoval?.id,
-                recommendationSlug,
+                cookbookId: selectedCookbookForRemoval?.id,
+                recipeSlug,
               },
             });
             Alert.alert(
               "Oops!",
-              "Failed to remove from wishlist. Please try again.",
+              "Failed to remove from cookbook. Please try again.",
               [{ text: "OK" }],
             );
           },
@@ -248,17 +220,15 @@ export default function ManageCookbooks() {
     };
 
     // Show toast with callbacks
-    // Note: The mutation handles optimistic updates, so we don't need manual rollback
-    // Note: selectedWishlistForRemoval.coverImageUri is validated by WishlistCard component using useImageErrorFilter
     showToast({
-      text: `Removing from ${selectedWishlistForRemoval?.name ?? 'wishlist'}`,
-      thumbnailUri: successThumbnailUri || selectedWishlistForRemoval.coverImageUri || null,
+      text: `Removing from ${selectedCookbookForRemoval?.name ?? 'cookbook'}`,
+      thumbnailUri: selectedCookbookForRemoval.coverImageUri || null,
       cta: {
         text: "Undo",
         onPress: () => {
           router.push({
             pathname: "/(modal)/manage-cookbooks",
-            params: { recommendationSlug },
+            params: { recipeSlug },
           });
         },
       },
@@ -270,49 +240,47 @@ export default function ManageCookbooks() {
   }, [
     isPending,
     showToast,
-    queryClient,
-    recommendationSlug,
-    deleteFromWishlist,
-    successThumbnailUri,
-    selectedWishlistForRemoval,
+    recipeSlug,
+    removeFromCookbook,
+    selectedCookbookForRemoval,
   ]);
 
   const handleClose = useCallback(() => {
     router.back();
   }, []);
 
-  const handleCreateWishlist = useCallback(() => {
+  const handleCreateCookbook = useCallback(() => {
     router.back();
     // Small delay to ensure the modal
     // closes before opening the new one
     setTimeout(() => {
       router.push({
-        pathname: "/(modal)/create-wishlist",
+        pathname: "/(modal)/create-cookbook",
         params: {
-          recommendationSlug,
+          recipeSlug,
         },
       });
     }, 100);
-  }, [recommendationSlug]);
+  }, [recipeSlug]);
 
-  const renderWishlistCard = useCallback(
-    ({ item }: { item: Wishlist }) => {
-      const isSelected = selectedWishlistId === item.id;
-      const isSelectedForRemoval = isSelected && item.containsRecommendation === true;
-      const isSelectedForAddition = isSelected && item.containsRecommendation !== true;
+  const renderCookbookCard = useCallback(
+    ({ item }: { item: Cookbook }) => {
+      const isSelected = selectedCookbookId === item.id;
+      const isSelectedForRemoval = isSelected && item.containsRecipe === true;
+      const isSelectedForAddition = isSelected && item.containsRecipe !== true;
       return (
         <View style={[isPending && styles.disabledCard]}>
-          <WishlistCard
+          <CookbookCard
             item={item}
             showRecentlyViewed={false}
             isSelectedForRemoval={isSelectedForRemoval}
             isSelectedForAddition={isSelectedForAddition}
-            onPress={isPending ? () => { } : () => handleWishlistSelect(item)}
+            onPress={isPending ? () => { } : () => handleCookbookSelect(item)}
           />
         </View>
       );
     },
-    [handleWishlistSelect, selectedWishlistId, isPending],
+    [handleCookbookSelect, selectedCookbookId, isPending],
   );
 
   const handleEndReached = useCallback(() => {
@@ -326,9 +294,9 @@ export default function ManageCookbooks() {
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <View style={styles.headerContent}>
-            <Text style={styles.headerTitle}>Manage Wishlists</Text>
+            <Text style={styles.headerTitle}>Manage Cookbooks</Text>
             <Text style={styles.headerSubtitle}>
-              Add or remove <Text style={styles.subtextBold}>{recommendationName}</Text> from a wishlist
+              {/* Managing the <Text style={styles.subtextBold}>{recipeName}</Text> recipe */}
             </Text>
           </View>
           <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
@@ -340,22 +308,22 @@ export default function ManageCookbooks() {
     );
   }
 
-  // Check if there are no wishlists available
-  const hasNoWishlists = (sortedWishlists?.length ?? 0) === 0;
+  // Check if there are no cookbooks available
+  const hasNoCookbooks = (sortedCookbooks?.length ?? 0) === 0;
 
-  // Determine action type based on selected wishlist
-  const isSelectedForRemoval = selectedWishlistForRemoval !== undefined;
+  // Determine action type based on selected cookbook
+  const isSelectedForRemoval = selectedCookbookForRemoval !== undefined;
 
-  // Button is disabled until a wishlist is selected
-  const isActionButtonDisabled = !selectedWishlistId || isPending;
+  // Button is disabled until a cookbook is selected
+  const isActionButtonDisabled = !selectedCookbookId || isPending;
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>Manage Wishlists</Text>
+          <Text style={styles.headerTitle}>Cookbooks</Text>
           <Text style={styles.headerSubtitle}>
-            Add or remove <Text style={styles.subtextBold}>{recommendationName}</Text> from a wishlist
+            Manage the <Text style={styles.subtextBold}>{recipeName}</Text> Recipe
           </Text>
         </View>
         <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
@@ -363,19 +331,19 @@ export default function ManageCookbooks() {
         </TouchableOpacity>
       </View>
 
-      {hasNoWishlists ? (
+      {hasNoCookbooks ? (
         <View style={styles.emptyStateContainer}>
           <EmptyImageState
-            title="No wishlists yet!"
-            description={`Create your first wishlist to save ${recommendationName}.`}
+            title="No cookbooks yet!"
+            description={`Create your first cookbook to save ${recipeName}.`}
           />
         </View>
       ) : (
         <FlatList
           numColumns={2}
-          data={sortedWishlists}
+          data={sortedCookbooks}
           onEndReachedThreshold={0.5}
-          renderItem={renderWishlistCard}
+          renderItem={renderCookbookCard}
           keyExtractor={(item) => item.id}
           columnWrapperStyle={styles.row}
           onEndReached={handleEndReached}
@@ -386,7 +354,7 @@ export default function ManageCookbooks() {
       )}
 
       <View style={styles.footer}>
-        {selectedWishlistId ? (
+        {selectedCookbookId ? (
           <TouchableOpacity
             activeOpacity={0.8}
             disabled={isActionButtonDisabled}
@@ -401,9 +369,9 @@ export default function ManageCookbooks() {
           <TouchableOpacity
             activeOpacity={0.8}
             style={styles.createButton}
-            onPress={handleCreateWishlist}
+            onPress={handleCreateCookbook}
           >
-            <Text style={styles.createButtonText}>Create wishlist</Text>
+            <Text style={styles.createButtonText}>Create cookbook</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -414,7 +382,7 @@ export default function ManageCookbooks() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: Colors.background,
   },
   header: {
     paddingTop: 20,
@@ -509,4 +477,3 @@ const styles = StyleSheet.create({
     color: "#999",
   },
 });
-
