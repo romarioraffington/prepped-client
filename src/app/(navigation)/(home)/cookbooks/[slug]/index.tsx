@@ -183,9 +183,9 @@ export default function CookbookDetails() {
         ref={titleRef}
         offsetY={offsetY}
         onLayout={measureTitle}
+        recipesCount={recipesCount}
         opacity={largeTitleOpacity}
         currentTitle={collectionName}
-        recipesCount={recipesCount}
       />
     ),
     [titleRef, offsetY, measureTitle, largeTitleOpacity, collectionName, recipesCount],
