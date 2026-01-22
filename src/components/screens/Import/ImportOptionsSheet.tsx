@@ -2,15 +2,14 @@
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import { useMemo, useCallback } from "react";
-import { Ionicons } from "@expo/vector-icons";
+import { Alert, Linking } from "react-native";
 import type BottomSheet from "@gorhom/bottom-sheet";
-import { Alert, Linking, Text, View } from "react-native";
 
 // Internal Dependencies
 import { useActionToast } from "@/contexts";
-import { useDeleteImportMutation } from "@/api";
+import { useDeleteRecipeMutation } from "@/api";
 import type { ImportRecommendation } from "@/libs/types";
-import { createShortSlug, truncate, reportError } from "@/libs/utils";
+import { createShortSlug, reportError } from "@/libs/utils";
 import { ActionBottomSheet } from "@/components/ActionBottomSheet";
 
 type ImportData = {
@@ -44,7 +43,7 @@ export function ImportOptionsSheet({
 }: ImportOptionsSheetProps) {
   const router = useRouter();
   const { showToast } = useActionToast();
-  const { mutateAsync: deleteImportAsync, isPending: isDeletePending } = useDeleteImportMutation();
+  const { mutateAsync: deleteImportAsync, isPending: isDeletePending } = useDeleteRecipeMutation();
 
   const id = importData.id;
   const recommendations = importData.recommendations || [];

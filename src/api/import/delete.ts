@@ -49,9 +49,9 @@ interface MutationContext {
 }
 
 /**
- * React Query mutation hook for deleting imports with optimistic updates
+ * React Query mutation hook for deleting recipes with optimistic updates
  */
-export const useDeleteImportMutation = () => {
+export const useDeleteRecipeMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -97,21 +97,17 @@ export const useDeleteImportMutation = () => {
       }
     },
     onSuccess: () => {
-      // Refetch active queries that may be affected by import deletion
-      queryClient.refetchQueries({
+      queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.COOKBOOKS],
         exact: false,
-        type: "active",
       });
-      queryClient.refetchQueries({
+      queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.COOKBOOK_DETAILS_BASE],
         exact: false,
-        type: "active",
       });
-      queryClient.refetchQueries({
+      queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.RECIPES],
         exact: false,
-        type: "active",
       });
     },
   });

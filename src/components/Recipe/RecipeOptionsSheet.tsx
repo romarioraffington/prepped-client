@@ -11,7 +11,7 @@ import type BottomSheet from "@gorhom/bottom-sheet";
 import { useActionToast } from "@/contexts";
 import { reportError, createFullSlug } from "@/libs/utils";
 import type { Recipe, RecipeOptionsVariant } from "@/libs/types";
-import { useDeleteImportMutation, useRemoveRecipeFromCookbookMutation } from "@/api";
+import { useDeleteRecipeMutation, useRemoveRecipeFromCookbookMutation } from "@/api";
 import { ActionBottomSheet, type ActionBottomSheetMenuItem } from "@/components/ActionBottomSheet";
 
 type IoniconName = ComponentProps<typeof Ionicons>["name"];
@@ -35,7 +35,7 @@ export function RecipeOptionsSheet({
 }: RecipeOptionsSheetProps) {
   const router = useRouter();
   const { showToast } = useActionToast();
-  const { mutateAsync: deleteRecipeAsync, isPending: isDeletePending } = useDeleteImportMutation();
+  const { mutateAsync: deleteRecipeAsync, isPending: isDeletePending } = useDeleteRecipeMutation();
   const { mutateAsync: removeFromCookbookAsync, isPending: isRemovePending } = useRemoveRecipeFromCookbookMutation();
 
   const recipeId = recipeData.id;
