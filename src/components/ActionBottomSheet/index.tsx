@@ -52,14 +52,16 @@ export const ActionBottomSheet = forwardRef<
     onAnimationCompleted,
   } = props;
 
-  const imageTranslateY = useRef(new Animated.Value(PREVIEW_IMAGE_VISIBLE_TRANSLATE_Y)).current;
   const closeAnimRef = useRef<Animated.CompositeAnimation | null>(null);
-  const [hasImageError, setHasImageError] = useState(false);
+  const imageTranslateY = useRef(new Animated.Value(PREVIEW_IMAGE_VISIBLE_TRANSLATE_Y)).current;
+  const [imageStatus, setImageStatus] = useState<"loading" | "loaded" | "error">("loading");
 
-  // Determine if we should show the image (has URI and no error)
-  const showImage = headerImageUri && !hasImageError;
-  // Show title when: explicitly provided AND (no image URI OR image errored)
-  const showTitle = headerTitle && (!headerImageUri || hasImageError);
+  // Determine if we should show the image (has URI, loaded successfully, no error)
+  const showImage = headerImageUri && imageStatus === "loaded";
+
+  // Show title when: explicitly provided AND (no image URI OR image errored OR still loading)
+  // This prevents flash - title shows until image is confirmed loaded
+  const showTitle = headerTitle && (!headerImageUri || imageStatus !== "loaded");
 
   const handleOnAnimate = (fromIndex: number, toIndex: number) => {
     if (toIndex === -1) {
@@ -108,15 +110,16 @@ export const ActionBottomSheet = forwardRef<
         enablePanDownToClose
         backgroundStyle={styles.bottomSheetBackground}
         handleIndicatorStyle={styles.handleIndicator}
-        handleComponent={showImage ? () => (
-          <View style={styles.previewImageContainer}>
+        handleComponent={headerImageUri && imageStatus !== "error" ? () => (
+          <View style={[styles.previewImageContainer, imageStatus === "loading" && { opacity: 0 }]}>
             <Animated.View style={[styles.previewImage, { transform: [{ translateY: imageTranslateY }] }]}>
               <Image
                 contentFit="cover"
                 transition={200}
                 source={{ uri: headerImageUri }}
                 style={StyleSheet.absoluteFill}
-                onError={() => setHasImageError(true)}
+                onLoad={() => setImageStatus("loaded")}
+                onError={() => setImageStatus("error")}
               />
             </Animated.View>
           </View>
