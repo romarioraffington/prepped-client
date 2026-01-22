@@ -281,7 +281,7 @@ function RootLayoutNavigator() {
         }}
       />
       <Stack.Screen
-        name="(modal)/create"
+        name="(modal)/create/index"
         options={{
           sheetCornerRadius: 20,
           presentation: 'formSheet',
