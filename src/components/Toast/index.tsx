@@ -3,7 +3,7 @@ import { Animated, StyleSheet, Text, View } from "react-native";
 
 interface ToastProps {
   visible: boolean;
-  message: string;
+  message: string | React.ReactNode;
   duration?: number;
   onHide: () => void;
   icon?: React.ReactNode;
@@ -37,7 +37,11 @@ export const Toast: React.FC<ToastProps> = ({ visible, message, duration = 2500,
       <View style={styles.toastBox}>
         <View style={styles.contentRow}>
           {icon && <View style={styles.iconContainer}>{icon}</View>}
-          <Text style={styles.toastText}>{message}</Text>
+          {typeof message === "string" ? (
+            <Text style={styles.toastText}>{message}</Text>
+          ) : (
+            <View style={styles.messageContainer}>{message}</View>
+          )}
         </View>
       </View>
     </Animated.View>
@@ -73,10 +77,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  messageContainer: {
+    flex: 1,
+  },
   toastText: {
     color: "#fff",
     fontSize: 15,
-    fontWeight: "600",
+    fontWeight: "400",
     textAlign: "center",
   },
 });

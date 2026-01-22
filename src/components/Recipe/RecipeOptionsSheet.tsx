@@ -3,7 +3,7 @@ import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import type { ComponentProps } from "react";
 import { useMemo, useCallback } from "react";
-import { Alert, Linking } from "react-native";
+import { Alert, Linking, Text } from "react-native";
 import type { Ionicons } from "@expo/vector-icons";
 import type BottomSheet from "@gorhom/bottom-sheet";
 
@@ -175,7 +175,11 @@ export function RecipeOptionsSheet({
 
                 // Show success toast with recipe image
                 showToast({
-                  text: `Removed ${displayName}`,
+                  text: (
+                    <Text>
+                      Removed <Text style={{ fontWeight: 'bold' }}>{displayName}</Text>
+                    </Text>
+                  ),
                   thumbnailUri: recipeData.coverUri,
                 });
 
