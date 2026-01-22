@@ -274,7 +274,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     flexShrink: 1,
     marginRight: 8,
-    fontWeight: "600",
+    fontWeight: "400",
   },
   ctaButton: {
     paddingVertical: 4,
