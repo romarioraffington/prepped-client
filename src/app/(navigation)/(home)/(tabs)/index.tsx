@@ -3,7 +3,7 @@ import { useRouter } from "expo-router";
 import { Alert, View, StyleSheet, FlatList } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { useAnimatedScrollHandler } from "react-native-reanimated";
-import React, { useCallback, useEffect, useState, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useState, useMemo } from "react";
 
 // Internal Components
 import { createFullSlug } from "@/libs/utils";
@@ -50,43 +50,9 @@ export default function Cookbooks({
     isFetchingNextPage,
   } = useCookbooks();
 
-  // Flatten pages data - append new pages in order without re-sorting
-  // Use ref to maintain stable array reference and only update when items actually change
-  const cookbooksRef = useRef<ImageGridItem[]>([]);
-  const lastPagesLengthRef = useRef(0);
-  const lastFlattenedLengthRef = useRef(0);
-
+  // Flatten pages data for display
   const cookbooks = useMemo(() => {
-    const flattened = data?.pages.flatMap((page) => page.data) ?? [];
-    const currentLength = cookbooksRef.current.length;
-    const pagesLength = data?.pages.length ?? 0;
-    const flattenedLength = flattened.length;
-
-    // Update if new pages were added (pages length increased)
-    if (pagesLength > lastPagesLengthRef.current) {
-      // Append only new items to preserve reference stability
-      const newItems = flattened.slice(currentLength);
-      cookbooksRef.current = [...cookbooksRef.current, ...newItems];
-      lastPagesLengthRef.current = pagesLength;
-      lastFlattenedLengthRef.current = flattenedLength;
-    } else if (pagesLength === 0 && cookbooksRef.current.length > 0) {
-      // Reset if data is cleared
-      cookbooksRef.current = [];
-      lastPagesLengthRef.current = 0;
-      lastFlattenedLengthRef.current = 0;
-    } else if (pagesLength > 0 && lastPagesLengthRef.current === 0) {
-      // Initial load
-      cookbooksRef.current = flattened;
-      lastPagesLengthRef.current = pagesLength;
-      lastFlattenedLengthRef.current = flattenedLength;
-    } else if (flattenedLength !== lastFlattenedLengthRef.current) {
-      // Items were added or removed (optimistic updates, deletions, etc.)
-      // Update the entire list to reflect the current state
-      cookbooksRef.current = flattened;
-      lastFlattenedLengthRef.current = flattenedLength;
-    }
-
-    return cookbooksRef.current;
+    return data?.pages.flatMap((page) => page.data) ?? [];
   }, [data?.pages]);
 
   // Auto-open create modal for users with no cookbooks

@@ -2,17 +2,17 @@
 import { Ionicons } from "@expo/vector-icons";
 import type Animated from "react-native-reanimated";
 import type { SharedValue } from "react-native-reanimated";
-import type { default as BottomSheet } from "@gorhom/bottom-sheet";
 import { useHeaderHeight } from "@react-navigation/elements";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import type { default as BottomSheet } from "@gorhom/bottom-sheet";
 import { router, useLocalSearchParams, useNavigation } from "expo-router";
 import { Platform, StyleSheet, Text, View, TouchableOpacity } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import React, { useRef, useState, useMemo, forwardRef, useLayoutEffect, useCallback, useEffect } from "react";
 
 // Internal Dependencies
 import type { Recipe } from "@/libs/types";
-import { createShortSlug, parseSlug } from "@/libs/utils";
 import { useLargeTitleCrossfade } from "@/hooks";
+import { createShortSlug, parseSlug } from "@/libs/utils";
 import { Colors, COLLECTION_TYPE } from "@/libs/constants";
 
 import {
@@ -30,8 +30,8 @@ import { useCookbookDetails } from "@/api";
 
 export default function CookbookDetails() {
   const navigation = useNavigation();
-  const headerHeight = useHeaderHeight();
   const insets = useSafeAreaInsets();
+  const headerHeight = useHeaderHeight();
   const [refreshing, setRefreshing] = useState(false);
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const bottomSheetRef = useRef<BottomSheet | null>(null);
