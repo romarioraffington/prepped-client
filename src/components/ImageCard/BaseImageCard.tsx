@@ -1,6 +1,6 @@
-// External Imports
+// External Dependencies
 import type React from "react";
-
+import { useState, useCallback, useEffect } from "react";
 import {
   View,
   StyleSheet,
@@ -9,8 +9,9 @@ import {
   type StyleProp,
 } from "react-native";
 
-// Import directly to avoid circular dependency with @/components
+// Internal Dependencies
 import { ShimmerImage } from "@/components/ShimmerImage";
+import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 
 // Height options for masonry variation (creates staggered effect)
 // Matches Pinterest-style dramatic height differences
@@ -43,6 +44,8 @@ export const BaseImageCard: React.FC<BaseImageCardProps> = ({
   imageStyle,
   backgroundColor,
 }) => {
+  const [hasError, setHasError] = useState(false);
+
   // Use index-based height pattern for masonry variation
   // Pattern creates Pinterest-style stagger: tall, medium, short, tall...
   const getHeightFromIndex = (idx: number): number => {
@@ -60,6 +63,15 @@ export const BaseImageCard: React.FC<BaseImageCardProps> = ({
         ? CARD_HEIGHTS.tall
         : CARD_HEIGHTS.medium;
 
+  // Reset error state when thumbnailUri changes
+  useEffect(() => {
+    setHasError(false);
+  }, [thumbnailUri]);
+
+  const handleImageError = useCallback(() => {
+    setHasError(true);
+  }, []);
+
   return (
     <TouchableOpacity
       key={id}
@@ -68,15 +80,24 @@ export const BaseImageCard: React.FC<BaseImageCardProps> = ({
       onPress={() => onPress(id)}
     >
       <View style={[styles.imageContainer, { height: cardHeight }]}>
-        <ShimmerImage
-          source={
-            typeof thumbnailUri === "string"
-              ? { uri: thumbnailUri }
-              : thumbnailUri
-          }
-          style={[styles.thumbnail, imageStyle]}
-          contentFit="cover"
-        />
+        {hasError || !thumbnailUri ? (
+          <ImagePlaceholder
+            height={cardHeight}
+            iconSize={48}
+            style={{ backgroundColor: "#e5e5e5" }}
+          />
+        ) : (
+          <ShimmerImage
+            source={
+              typeof thumbnailUri === "string"
+                ? { uri: thumbnailUri }
+                : thumbnailUri
+            }
+            contentFit="cover"
+            onError={handleImageError}
+            style={[styles.thumbnail, imageStyle]}
+          />
+        )}
       </View>
 
       {/* Content below the image */}

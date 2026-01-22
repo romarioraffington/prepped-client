@@ -60,12 +60,12 @@ const fetchCookbooks = async (cursor?: string): Promise<CookbookPageResult> => {
     }
 
     // Transform the API response to match our ImageGridItem interface
-    const cookbooks: ImageGridItem[] = response.data.map((item) => ({
-      id: item.id,
-      name: item.name,
-      imageUris: item.imageUris || [],
-      count: item.recipesCount || 0,
-      lastUpdatedTimestamp: item.lastUpdatedTimestamp || 0,
+    const cookbooks: ImageGridItem[] = response?.data?.map((item) => ({
+      id: item?.id,
+      name: item?.name,
+      imageUris: item?.imageUris || [],
+      count: item?.recipesCount || 0,
+      lastUpdatedTimestamp: item?.lastUpdatedTimestamp || 0,
     }));
 
     return {
