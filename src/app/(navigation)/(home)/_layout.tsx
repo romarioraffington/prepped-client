@@ -54,8 +54,15 @@ export default function HomeLayout() {
         options={{
           headerShown: false,
           presentation: 'formSheet',
-          sheetAllowedDetents: [0.19],
+          sheetAllowedDetents: [0.23],
           sheetCornerRadius: 30,
+        }}
+      />
+      <Stack.Screen
+        name="cookbooks/[slug]/edit"
+        options={{
+          headerShown: true,
+          headerTransparent: true,
         }}
       />
     </Stack>

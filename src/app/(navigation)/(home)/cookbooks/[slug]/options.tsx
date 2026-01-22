@@ -74,6 +74,21 @@ export default function CookbookOptions() {
     }, 100);
   };
 
+  const handleEditRecipesPress = () => {
+    // Close this screen first
+    router.back();
+
+    // Small delay to ensure clean navigation
+    setTimeout(() => {
+      router.push({
+        pathname: "/cookbooks/[slug]/edit" as any,
+        params: {
+          slug,
+        },
+      });
+    }, 100);
+  };
+
   const handleDeletePress = () => {
     if (isDeletePending || !slug) return;
 
@@ -147,6 +162,12 @@ export default function CookbookOptions() {
         <TouchableOpacity style={styles.optionItem} onPress={handleEditTitlePress}>
           <Feather name="edit-2" size={18} color="#667" />
           <Text style={styles.optionText}>Edit Title</Text>
+        </TouchableOpacity>
+
+        {/* Edit Recipes Option */}
+        <TouchableOpacity style={styles.optionItem} onPress={handleEditRecipesPress}>
+          <Ionicons name="create-outline" size={20} color="#667" />
+          <Text style={styles.optionText}>Edit Recipes</Text>
         </TouchableOpacity>
 
         {/* Delete Option */}

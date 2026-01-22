@@ -8,4 +8,5 @@ export * from "./Colors";
 export * from "./Images";
 export * from "./queryKeys";
 export * from "./ImportStatus";
+export * from "./CollectionType";
 export * from "./APIErrorCodes";

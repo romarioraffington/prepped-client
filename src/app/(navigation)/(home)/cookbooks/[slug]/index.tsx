@@ -11,9 +11,9 @@ import React, { useRef, useState, useMemo, forwardRef, useLayoutEffect, useCallb
 
 // Internal Dependencies
 import type { Recipe } from "@/libs/types";
-import { Colors } from "@/libs/constants";
 import { createShortSlug } from "@/libs/utils";
 import { useLargeTitleCrossfade } from "@/hooks";
+import { Colors, COLLECTION_TYPE } from "@/libs/constants";
 
 import {
   LargeTitle,
@@ -74,15 +74,35 @@ export default function CollectionDetails() {
     });
   }, [slug]);
 
+  // Handle edit press - navigate to edit recipes screen (only for unorganized collections)
+  const handleEditPress = useCallback(() => {
+    router.push({
+      pathname: "/cookbooks/[slug]/edit" as any,
+      params: {
+        slug,
+      },
+    });
+  }, [slug]);
+
   // Memoize headerRight component to prevent unnecessary recreations
-  // Hide options button for UNORGANIZED collections (type === 2)
+  // Show edit button for UNORGANIZED collections, options button for others
   const HeaderRightComponent = useMemo(
     () => {
-      // Don't show options button for UNORGANIZED collections
-      if (collectionType === 2) {
-        return null;
+      // Show edit button for UNORGANIZED collections
+      if (collectionType === COLLECTION_TYPE.UNORGANIZED) {
+        return (
+          <View style={styles.headerRightContainer}>
+            <TouchableOpacity
+              style={styles.headerOptionsButton}
+              onPress={handleEditPress}
+            >
+              <Text style={styles.headerOptionsButtonText}>Edit</Text>
+            </TouchableOpacity>
+          </View>
+        );
       }
 
+      // Show options button for organized collections
       return (
         <View style={styles.headerRightContainer}>
           <TouchableOpacity
@@ -94,7 +114,7 @@ export default function CollectionDetails() {
         </View>
       );
     },
-    [handleOptionsPress, collectionType],
+    [handleOptionsPress, handleEditPress, collectionType],
   );
 
   // Single setOptions call using hook-provided options
@@ -296,5 +316,10 @@ const styles = StyleSheet.create({
     }),
     color: "#999",
     fontSize: 13,
+  },
+  headerOptionsButtonText: {
+    fontSize: 15,
+    fontWeight: "500",
+    paddingHorizontal: 4,
   },
 });
