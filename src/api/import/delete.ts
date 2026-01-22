@@ -96,20 +96,22 @@ export const useDeleteImportMutation = () => {
         queryClient.setQueryData([QUERY_KEYS.RECIPES], context.previousData);
       }
     },
-
-    // On success, don't refetch - the optimistic update is already correct
-    // The query will naturally refresh on next mount or when it becomes stale
     onSuccess: () => {
-      // No refetch needed - optimistic update is already applied
-      // Data will refresh naturally when query becomes stale (5 minutes)
-    },
-
-    // Only invalidate import details (not the list) to clear deleted import's detail cache
-    // We avoid invalidating the list query to prevent triggering a refetch and shimmer
-    onSettled: () => {
-      // Only invalidate import details, not the list (to avoid shimmer flash)
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.RECIPE_DETAILS_BASE],
+      // Refetch active queries that may be affected by import deletion
+      queryClient.refetchQueries({
+        queryKey: [QUERY_KEYS.COOKBOOKS],
+        exact: false,
+        type: "active",
+      });
+      queryClient.refetchQueries({
+        queryKey: [QUERY_KEYS.COOKBOOK_DETAILS_BASE],
+        exact: false,
+        type: "active",
+      });
+      queryClient.refetchQueries({
+        queryKey: [QUERY_KEYS.RECIPES],
+        exact: false,
+        type: "active",
       });
     },
   });

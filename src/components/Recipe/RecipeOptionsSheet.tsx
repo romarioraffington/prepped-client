@@ -156,7 +156,7 @@ export function RecipeOptionsSheet({
 
     Alert.alert(
       "Remove from Cookbook?",
-      `${displayName} will be removed from this cookbook.`,
+      `"${displayName}" will be removed from this cookbook.`,
       [
         {
           text: "Cancel",
@@ -255,7 +255,11 @@ export function RecipeOptionsSheet({
 
                 // Show success toast
                 showToast({
-                  text: `Deleted "${displayName}"`,
+                  text: (
+                    <Text>
+                      Deleted <Text style={{ fontWeight: "600" }}>{displayName}</Text>
+                    </Text>
+                  ),
                   thumbnailUri: recipeData.coverUri
                 });
 

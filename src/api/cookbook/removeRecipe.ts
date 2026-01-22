@@ -3,7 +3,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 // Internal Dependencies
 import { reportError } from "@/libs/utils";
-import type { Recipe } from "@/libs/types";
 import { API_ENDPOINTS, getApiClient, QUERY_KEYS } from "@/libs/constants";
 
 /**
@@ -52,9 +51,12 @@ export const useRemoveRecipeFromCookbookMutation = () => {
     onSuccess: (_data, variables) => {
       queryClient.refetchQueries({
         queryKey: QUERY_KEYS.COOKBOOK_DETAILS(variables.cookbookId),
+        type: "active",
       });
       queryClient.refetchQueries({
         queryKey: [QUERY_KEYS.COOKBOOKS],
+        exact: false,
+        type: "active",
       });
     },
   });
