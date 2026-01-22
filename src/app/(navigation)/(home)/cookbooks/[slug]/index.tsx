@@ -11,7 +11,7 @@ import React, { useRef, useState, useMemo, forwardRef, useLayoutEffect, useCallb
 
 // Internal Dependencies
 import type { Recipe } from "@/libs/types";
-import { createShortSlug } from "@/libs/utils";
+import { createShortSlug, parseSlug } from "@/libs/utils";
 import { useLargeTitleCrossfade } from "@/hooks";
 import { Colors, COLLECTION_TYPE } from "@/libs/constants";
 
@@ -26,9 +26,9 @@ import {
 } from "@/components";
 
 // API
-import { useCollectionDetails } from "@/api";
+import { useCookbookDetails } from "@/api";
 
-export default function CollectionDetails() {
+export default function CookbookDetails() {
   const navigation = useNavigation();
   const headerHeight = useHeaderHeight();
   const insets = useSafeAreaInsets();
@@ -37,6 +37,9 @@ export default function CollectionDetails() {
   const bottomSheetRef = useRef<BottomSheet | null>(null);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
 
+  // Parse slug to extract ID for API call
+  const { id: cookbookId } = parseSlug(slug);
+
   // Calculate bottom padding: safe area bottom + extra space for comfortable scrolling
   const contentBottomPadding = insets.bottom + 20;
 
@@ -44,7 +47,7 @@ export default function CollectionDetails() {
     data,
     refetch,
     isLoading,
-  } = useCollectionDetails(slug);
+  } = useCookbookDetails(cookbookId);
 
   // Extract the needed data
   const recipes = data?.recipes ?? [];
@@ -122,7 +125,6 @@ export default function CollectionDetails() {
     navigation.setOptions({
       ...getHeaderOptions(),
       headerRight: () => HeaderRightComponent,
-      headerBackTitle: "Collections",
     });
   }, [navigation, getHeaderOptions, HeaderRightComponent]);
 
@@ -177,7 +179,7 @@ export default function CollectionDetails() {
   // List header component with title and recipe count
   const ListHeaderComponent = useMemo(
     () => (
-      <CollectionHeader
+      <CookbookHeader
         ref={titleRef}
         offsetY={offsetY}
         onLayout={measureTitle}
@@ -221,6 +223,7 @@ export default function CollectionDetails() {
       {selectedRecipe && (
         <RecipeOptionsSheet
           variant="cookbook"
+          cookbookId={cookbookId}
           recipeData={selectedRecipe}
           bottomSheetRef={bottomSheetRef}
           onAnimationCompleted={() => {
@@ -233,7 +236,7 @@ export default function CollectionDetails() {
   );
 }
 
-interface CollectionHeaderProps {
+interface CookbookHeaderProps {
   currentTitle: string;
   recipesCount: number;
   offsetY: SharedValue<number>;
@@ -241,8 +244,8 @@ interface CollectionHeaderProps {
   onLayout?: () => void;
 }
 
-const CollectionHeader = forwardRef<Animated.View, CollectionHeaderProps>(
-  function CollectionHeader(
+const CookbookHeader = forwardRef<Animated.View, CookbookHeaderProps>(
+  function CookbookHeader(
     {
       offsetY,
       opacity,

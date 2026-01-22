@@ -2,7 +2,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 // Internal Dependencies
-import { reportError } from "@/libs/utils";
+import { parseSlug, reportError } from "@/libs/utils";
 import type { RecommendationDetail } from "@/libs/types";
 import { API_ENDPOINTS, getApiClient, QUERY_KEYS } from "@/libs/constants";
 
@@ -11,16 +11,16 @@ interface RecommendationDetailsResponse {
 }
 
 const fetchRecommendationDetails = async (
-  slug: string,
+  id: string,
 ): Promise<RecommendationDetail> => {
   try {
-    if (!slug) {
-      throw new Error("Recommendation slug is required");
+    if (!id) {
+      throw new Error("Recommendation ID is required");
     }
 
     const client = getApiClient();
     const result: RecommendationDetailsResponse = await client.get(
-      `${API_ENDPOINTS.RECOMMENDATIONS_V1}/${slug}`,
+      `${API_ENDPOINTS.RECOMMENDATIONS_V1}/${id}`,
     );
     const data = result?.data;
 
@@ -33,7 +33,7 @@ const fetchRecommendationDetails = async (
     reportError(error, {
       component: "RecommendationDetail",
       action: "Fetch Recommendation Details",
-      extra: { slug },
+      extra: { recommendationId: id },
     });
     throw new Error("An unexpected error occurred");
   }
@@ -43,10 +43,13 @@ export const useRecommendationDetails = (
   slug: string,
   options?: { enabled?: boolean },
 ) => {
+  // Parse slug to extract ID for API call and cache key
+  const { id: recommendationId } = parseSlug(slug);
+
   return useQuery({
-    queryKey: QUERY_KEYS.RECOMMENDATION_DETAILS(slug),
-    queryFn: () => fetchRecommendationDetails(slug),
-    enabled: options?.enabled !== undefined ? options.enabled : !!slug,
+    queryKey: QUERY_KEYS.RECOMMENDATION_DETAILS(recommendationId),
+    queryFn: () => fetchRecommendationDetails(recommendationId),
+    enabled: options?.enabled !== undefined ? options.enabled : !!recommendationId,
   });
 };
 
@@ -54,10 +57,10 @@ export const useRecommendationDetails = (
 export const useInvalidateRecommendationDetails = () => {
   const queryClient = useQueryClient();
 
-  return (slug?: string) => {
-    if (slug) {
+  return (id?: string) => {
+    if (id) {
       queryClient.invalidateQueries({
-        queryKey: QUERY_KEYS.RECOMMENDATION_DETAILS(slug),
+        queryKey: QUERY_KEYS.RECOMMENDATION_DETAILS(id),
       });
     } else {
       queryClient.invalidateQueries({

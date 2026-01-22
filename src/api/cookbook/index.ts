@@ -1,4 +1,4 @@
 export * from "./list";
 export * from "./delete";
 export * from "./detail";
-export * from "./recommendations";
+export * from "./removeRecipe";

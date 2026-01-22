@@ -6,7 +6,7 @@ import { reportError } from "@/libs/utils";
 import type { Recipe, PaginationMeta } from "@/libs/types";
 import { API_ENDPOINTS, getApiClient, QUERY_KEYS } from "@/libs/constants";
 
-interface CollectionDetailsResponse {
+interface CookbookDetailsResponse {
   data: {
     name: string;
     type: number;
@@ -16,7 +16,7 @@ interface CollectionDetailsResponse {
   meta: PaginationMeta;
 }
 
-const fetchCollectionDetails = async (
+const fetchCookbookDetails = async (
   id: string,
 ): Promise<{
   name: string;
@@ -27,13 +27,13 @@ const fetchCollectionDetails = async (
 }> => {
   try {
     if (!id) {
-      throw new Error("Collection ID is required");
+      throw new Error("Cookbook ID is required");
     }
 
     const client = getApiClient();
-    const url = `${API_ENDPOINTS.COLLECTIONS_V1}/${id}`;
+    const url = `${API_ENDPOINTS.COOKBOOKS_V1}/${id}`;
 
-    const result: CollectionDetailsResponse = await client.get(url);
+    const result: CookbookDetailsResponse = await client.get(url);
     const data = result?.data;
 
     if (!data) {
@@ -49,34 +49,34 @@ const fetchCollectionDetails = async (
     };
   } catch (error) {
     reportError(error, {
-      component: "CollectionDetail",
-      action: "Fetch Collection Details",
-      extra: { collectionId: id },
+      component: "CookbookDetail",
+      action: "Fetch Cookbook Details",
+      extra: { cookbookId: id },
     });
     throw new Error("An unexpected error occurred");
   }
 };
 
-export const useCollectionDetails = (slug: string) => {
+export const useCookbookDetails = (id: string) => {
   return useQuery({
-    queryKey: QUERY_KEYS.COLLECTION_DETAILS(slug),
-    queryFn: () => fetchCollectionDetails(slug),
-    enabled: !!slug,
+    queryKey: QUERY_KEYS.COOKBOOK_DETAILS(id),
+    queryFn: () => fetchCookbookDetails(id),
+    enabled: !!id,
   });
 };
 
 // Hook to replace invalidateCache
-export const useInvalidateCollectionDetails = () => {
+export const useInvalidateCookbookDetails = () => {
   const queryClient = useQueryClient();
 
-  return (slug?: string) => {
-    if (slug) {
+  return (id?: string) => {
+    if (id) {
       queryClient.invalidateQueries({
-        queryKey: QUERY_KEYS.COLLECTION_DETAILS(slug),
+        queryKey: QUERY_KEYS.COOKBOOK_DETAILS(id),
       });
     } else {
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.COLLECTION_DETAILS_BASE],
+        queryKey: [QUERY_KEYS.COOKBOOK_DETAILS_BASE],
       });
     }
   };

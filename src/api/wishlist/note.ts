@@ -2,7 +2,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 // Internal Dependencies
-import { reportError } from "@/libs/utils";
+import { parseSlug, reportError } from "@/libs/utils";
 import type { WishlistNote } from "@/libs/types/Wishlists/Wishlist";
 import { API_ENDPOINTS, getApiClient, QUERY_KEYS } from "@/libs/constants";
 
@@ -53,18 +53,17 @@ const transformNote = (note: {
  * Create a note for a recommendation in a wishlist
  */
 export const createNote = async (
-  wishlistSlug: string,
-  recommendationSlug: string,
+  wishlistId: string,
+  recommendationId: string,
   request: CreateNoteRequest,
 ): Promise<CreateNoteResponse> => {
   try {
     const client = getApiClient();
 
-    // The backend accepts slugs or IDs for the wishlist and recommendation.
     const endpoint = API_ENDPOINTS.WISHLIST_NOTE_V1.replace(
       "{wishlistId}",
-      wishlistSlug,
-    ).replace("{recommendationId}", recommendationSlug);
+      wishlistId,
+    ).replace("{recommendationId}", recommendationId);
 
     const result: { data: WishlistNote } = await client.post(endpoint, request);
     if (!result?.data) {
@@ -78,7 +77,7 @@ export const createNote = async (
     reportError(error, {
       component: "NoteCreate",
       action: "Create Note",
-      extra: { wishlistSlug, recommendationSlug, note: request.note },
+      extra: { wishlistId, recommendationId, note: request.note },
     });
 
     let errorMessage = "Failed to create note";
@@ -190,7 +189,10 @@ export const useCreateNoteMutation = () => {
       wishlistSlug: string;
       recommendationSlug: string;
     }) => {
-      return createNote(wishlistSlug, recommendationSlug, { note: noteText });
+      // Parse slugs to extract IDs for API call
+      const { id: wishlistId } = parseSlug(wishlistSlug);
+      const { id: recommendationId } = parseSlug(recommendationSlug);
+      return createNote(wishlistId, recommendationId, { note: noteText });
     },
     onError: (error) => {
       reportError(error, {

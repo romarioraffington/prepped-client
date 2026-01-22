@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { reportError } from "@/libs/utils";
+import { parseSlug, reportError } from "@/libs/utils";
 import { API_ENDPOINTS, getApiClient, QUERY_KEYS } from "@/libs/constants";
 
 export interface PhotoAuthorAttribution {
@@ -24,16 +24,16 @@ interface PhotosResponse {
 }
 
 const fetchRecommendationPhotos = async (
-  slug: string,
+  id: string,
 ): Promise<PhotosResponse> => {
   try {
-    if (!slug) {
-      throw new Error("Recommendation slug is required");
+    if (!id) {
+      throw new Error("Recommendation ID is required");
     }
 
     const client = getApiClient();
     const result: PhotosResponse = await client.get(
-      `${API_ENDPOINTS.RECOMMENDATIONS_V1}/${slug}/photos`,
+      `${API_ENDPOINTS.RECOMMENDATIONS_V1}/${id}/photos`,
     );
     if (!result?.data) {
       throw new Error("Invalid response format: expected data array");
@@ -44,16 +44,19 @@ const fetchRecommendationPhotos = async (
     reportError(error, {
       component: "RecommendationPhotos",
       action: "Fetch Recommendation Photos",
-      extra: { slug },
+      extra: { recommendationId: id },
     });
     throw new Error("An unexpected error occurred while fetching photos");
   }
 };
 
 export const useRecommendationPhotos = (slug: string) => {
+  // Parse slug to extract ID for API call and cache key
+  const { id: recommendationId } = parseSlug(slug);
+
   return useQuery({
-    queryKey: QUERY_KEYS.RECOMMENDATION_PHOTOS(slug),
-    queryFn: () => fetchRecommendationPhotos(slug),
-    enabled: !!slug,
+    queryKey: QUERY_KEYS.RECOMMENDATION_PHOTOS(recommendationId),
+    queryFn: () => fetchRecommendationPhotos(recommendationId),
+    enabled: !!recommendationId,
   });
 };

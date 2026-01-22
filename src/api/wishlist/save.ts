@@ -58,11 +58,11 @@ export interface SaveRecommendationToWishlistResponse {
  */
 export const saveRecommendationToWishlist = async (
   wishlistId: string,
-  recommendationSlug: string,
+  recommendationId: string,
 ): Promise<SaveRecommendationToWishlistResponse> => {
   try {
     const client = getApiClient();
-    const endpoint = `${API_ENDPOINTS.WISHLISTS_V1}/${wishlistId}/recommendations/${recommendationSlug}`;
+    const endpoint = `${API_ENDPOINTS.WISHLISTS_V1}/${wishlistId}/recommendations/${recommendationId}`;
     const result: SaveRecommendationToWishlistResponse = await client.post(
       endpoint,
       {},
@@ -73,7 +73,7 @@ export const saveRecommendationToWishlist = async (
     reportError(error, {
       component: "WishlistSave",
       action: "Save Recommendation To Wishlist",
-      extra: { wishlistId, recommendationSlug },
+      extra: { wishlistId, recommendationId },
     });
 
     let errorMessage = "Failed to save recommendation to wishlist";
@@ -111,7 +111,11 @@ export const useSaveRecommendationToWishlistMutation = () => {
       wishlistId: string;
       recommendationSlug: string;
       wishlistName?: string;
-    }) => saveRecommendationToWishlist(wishlistId, recommendationSlug),
+    }) => {
+      // Parse slug to extract ID for API call
+      const { id: recommendationId } = parseSlug(recommendationSlug);
+      return saveRecommendationToWishlist(wishlistId, recommendationId);
+    },
 
     // Store previous state for automatic rollback on error
     onMutate: async ({
@@ -119,10 +123,9 @@ export const useSaveRecommendationToWishlistMutation = () => {
       wishlistName,
       recommendationSlug,
     }): Promise<MutationContext> => {
-      const queryKey = QUERY_KEYS.RECOMMENDATION_DETAILS(recommendationSlug);
-
-      // Extract the item ID from the slug (recommendationSlug is in format "name--id")
+      // Parse slug to extract ID for cache key
       const { id: recommendationItemId } = parseSlug(recommendationSlug);
+      const queryKey = QUERY_KEYS.RECOMMENDATION_DETAILS(recommendationItemId);
 
       // Cancel any outgoing refetches to prevent them from overwriting our optimistic update
       await queryClient.cancelQueries({ queryKey });

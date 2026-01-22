@@ -18,7 +18,7 @@ import {
 } from "@/components";
 
 // API
-import { useCollections } from "@/api";
+import { useCookbooks } from "@/api";
 
 interface CookbooksProps {
   scrollHandler: ReturnType<typeof useAnimatedScrollHandler>;
@@ -48,17 +48,17 @@ export default function Cookbooks({
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
-  } = useCollections();
+  } = useCookbooks();
 
   // Flatten pages data - append new pages in order without re-sorting
   // Use ref to maintain stable array reference and only update when items actually change
-  const collectionsRef = useRef<ImageGridItem[]>([]);
+  const cookbooksRef = useRef<ImageGridItem[]>([]);
   const lastPagesLengthRef = useRef(0);
   const lastFlattenedLengthRef = useRef(0);
 
-  const collections = useMemo(() => {
+  const cookbooks = useMemo(() => {
     const flattened = data?.pages.flatMap((page) => page.data) ?? [];
-    const currentLength = collectionsRef.current.length;
+    const currentLength = cookbooksRef.current.length;
     const pagesLength = data?.pages.length ?? 0;
     const flattenedLength = flattened.length;
 
@@ -66,32 +66,32 @@ export default function Cookbooks({
     if (pagesLength > lastPagesLengthRef.current) {
       // Append only new items to preserve reference stability
       const newItems = flattened.slice(currentLength);
-      collectionsRef.current = [...collectionsRef.current, ...newItems];
+      cookbooksRef.current = [...cookbooksRef.current, ...newItems];
       lastPagesLengthRef.current = pagesLength;
       lastFlattenedLengthRef.current = flattenedLength;
-    } else if (pagesLength === 0 && collectionsRef.current.length > 0) {
+    } else if (pagesLength === 0 && cookbooksRef.current.length > 0) {
       // Reset if data is cleared
-      collectionsRef.current = [];
+      cookbooksRef.current = [];
       lastPagesLengthRef.current = 0;
       lastFlattenedLengthRef.current = 0;
     } else if (pagesLength > 0 && lastPagesLengthRef.current === 0) {
       // Initial load
-      collectionsRef.current = flattened;
+      cookbooksRef.current = flattened;
       lastPagesLengthRef.current = pagesLength;
       lastFlattenedLengthRef.current = flattenedLength;
     } else if (flattenedLength !== lastFlattenedLengthRef.current) {
       // Items were added or removed (optimistic updates, deletions, etc.)
       // Update the entire list to reflect the current state
-      collectionsRef.current = flattened;
+      cookbooksRef.current = flattened;
       lastFlattenedLengthRef.current = flattenedLength;
     }
 
-    return collectionsRef.current;
+    return cookbooksRef.current;
   }, [data?.pages]);
 
-  // Auto-open create modal for users with no collections
+  // Auto-open create modal for users with no cookbooks
   useEffect(() => {
-    if (!isLoading && !collections.length) {
+    if (!isLoading && !cookbooks.length) {
       // Add a delay to allow the screen to render first
       const timer = setTimeout(() => {
         router.push("/(modal)/create");
@@ -99,7 +99,7 @@ export default function Cookbooks({
 
       return () => clearTimeout(timer);
     }
-  }, [isLoading, collections.length, router]);
+  }, [isLoading, cookbooks.length, router]);
 
   useEffect(() => {
     if (error) {
@@ -148,7 +148,7 @@ export default function Cookbooks({
     [contentTopPadding, contentBottomPadding]
   );
 
-  if (!collections.length && !isLoading) {
+  if (!cookbooks.length && !isLoading) {
     return (
       <View style={styles.container}>
         <WithPullToRefresh
@@ -198,7 +198,7 @@ export default function Cookbooks({
       >
         <ImageGridList
           ref={listRef}
-          items={collections}
+          items={cookbooks}
           isLoading={isLoading}
           onEndReachedThreshold={0.5}
           onEndReached={handleEndReached}

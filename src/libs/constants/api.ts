@@ -21,10 +21,10 @@ export const API_ENDPOINTS = {
   // Recommendations
   RECOMMENDATIONS_V1: `${API_SERVER_BASE_URL}/api/v1/recommendations`,
 
-  // Collections
-  COLLECTIONS_V1: `${API_SERVER_BASE_URL}/api/v1/collections`,
-  EXTRACTIONS_STATUS_V1: `${API_SERVER_BASE_URL}/api/v1/extractions/{slug}/status`,
-  RECOMMENDATIONS_V1_AMENITIES: `${API_SERVER_BASE_URL}/api/v1/recommendations/{slug}/amenities`,
+  // Cookbooks
+  COOKBOOKS_V1: `${API_SERVER_BASE_URL}/api/v1/cookbooks`,
+  EXTRACTIONS_STATUS_V1: `${API_SERVER_BASE_URL}/api/v1/extractions/{id}/status`,
+  RECOMMENDATIONS_V1_AMENITIES: `${API_SERVER_BASE_URL}/api/v1/recommendations/{id}/amenities`,
 
   // Reports
   USER_FEEDBACK_V1: `${API_SERVER_BASE_URL}/api/v1/user-feedback`,

@@ -8,16 +8,16 @@ import { API_ENDPOINTS, getApiClient } from "@/libs/constants";
 /**
  * Delete a recommendation
  */
-export const deleteRecommendation = async (slug: string): Promise<void> => {
+export const deleteRecommendation = async (id: string): Promise<void> => {
   try {
     const client = getApiClient();
-    const endpoint = `${API_ENDPOINTS.RECOMMENDATIONS_V1}/${slug}`;
+    const endpoint = `${API_ENDPOINTS.RECOMMENDATIONS_V1}/${id}`;
     await client.delete(endpoint);
   } catch (error) {
     reportError(error, {
       component: "RecommendationDelete",
       action: "Delete Recommendation",
-      extra: { slug },
+      extra: { recommendationId: id },
     });
 
     let errorMessage = "Failed to delete recommendation";
@@ -34,6 +34,6 @@ export const deleteRecommendation = async (slug: string): Promise<void> => {
  */
 export const useDeleteRecommendationMutation = () => {
   return useMutation({
-    mutationFn: (slug: string) => deleteRecommendation(slug),
+    mutationFn: (id: string) => deleteRecommendation(id),
   });
 };

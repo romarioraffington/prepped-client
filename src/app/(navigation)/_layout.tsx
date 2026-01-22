@@ -1,9 +1,9 @@
 // External Dependencies
-import { Tabs } from "expo-router";
 import { Animated } from "react-native";
-import { AntDesign, Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import { Tabs, useRouter } from "expo-router";
 import { DeviceEventEmitter } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 
 // Internal Dependencies
 import { Colors } from "@/libs/constants";
@@ -18,6 +18,7 @@ export default function BottomNavigation() {
   const { user } = useAuth();
   const { refreshSubscriptionStatus } = useSubscription();
   const insets = useSafeAreaInsets();
+  const router = useRouter();
 
   return (
     <>

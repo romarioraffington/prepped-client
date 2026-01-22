@@ -7,7 +7,7 @@ import {
 import * as Haptics from "expo-haptics";
 
 // Internal Dependencies
-import { reportError } from "@/libs/utils";
+import { parseSlug, reportError } from "@/libs/utils";
 import { clearCachedWishlistId } from "./storage";
 import { API_ENDPOINTS, getApiClient, QUERY_KEYS } from "@/libs/constants";
 import type { RecommendationDetail, WishlistPageResult } from "@/libs/types";
@@ -28,11 +28,11 @@ export interface DeleteRecommendationFromWishlistResponse {
  */
 export const deleteRecommendationFromWishlist = async (
   wishlistId: string,
-  recommendationSlug: string,
+  recommendationId: string,
 ): Promise<DeleteRecommendationFromWishlistResponse> => {
   try {
     const client = getApiClient();
-    const endpoint = `${API_ENDPOINTS.WISHLISTS_V1}/${wishlistId}/recommendations/${recommendationSlug}`;
+    const endpoint = `${API_ENDPOINTS.WISHLISTS_V1}/${wishlistId}/recommendations/${recommendationId}`;
 
     // Delete the recommendation from the wishlist
     const result: DeleteRecommendationFromWishlistResponse =
@@ -43,7 +43,7 @@ export const deleteRecommendationFromWishlist = async (
     reportError(error, {
       component: "WishlistDelete",
       action: "Delete Recommendation From Wishlist",
-      extra: { wishlistId, recommendationSlug },
+      extra: { wishlistId, recommendationId },
     });
 
     let errorMessage = "Failed to delete recommendation from wishlist";
@@ -68,10 +68,16 @@ export const useDeleteRecommendationFromWishlistMutation = () => {
     }: {
       wishlistId: string;
       recommendationSlug: string;
-    }) => deleteRecommendationFromWishlist(wishlistId, recommendationSlug),
+    }) => {
+      // Parse slug to extract ID for API call
+      const { id: recommendationId } = parseSlug(recommendationSlug);
+      return deleteRecommendationFromWishlist(wishlistId, recommendationId);
+    },
 
     onMutate: async ({ recommendationSlug, wishlistId }) => {
-      const queryKey = QUERY_KEYS.RECOMMENDATION_DETAILS(recommendationSlug);
+      // Parse slug to extract ID for cache key
+      const { id: recommendationId } = parseSlug(recommendationSlug);
+      const queryKey = QUERY_KEYS.RECOMMENDATION_DETAILS(recommendationId);
 
       // Cancel any in-flight refetches
       await queryClient.cancelQueries({ queryKey });

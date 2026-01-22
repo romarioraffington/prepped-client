@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 // Internal Dependencies
 import type { RecommendationListItem } from "@/libs/types";
-import { calculateRegion, reportError } from "@/libs/utils";
+import { calculateRegion, parseSlug, reportError } from "@/libs/utils";
 import { API_ENDPOINTS, getApiClient, QUERY_KEYS } from "@/libs/constants";
 
 interface WishlistRecommendationsResponse {
@@ -44,12 +44,12 @@ interface WishlistRecommendationsResult {
 }
 
 const fetchWishlistRecommendations = async (
-  wishlistSlug: string,
+  wishlistId: string,
 ): Promise<WishlistRecommendationsResult> => {
   try {
     const client = getApiClient();
     const result: WishlistRecommendationsResponse = await client.get(
-      `${API_ENDPOINTS.WISHLISTS_V1}/${wishlistSlug}/recommendations`,
+      `${API_ENDPOINTS.WISHLISTS_V1}/${wishlistId}/recommendations`,
     );
     const data = result?.data;
 
@@ -102,17 +102,20 @@ const fetchWishlistRecommendations = async (
     reportError(error, {
       component: "WishlistRecommendations",
       action: "Fetch Wishlist Recommendations",
-      extra: { wishlistSlug },
+      extra: { wishlistId },
     });
     throw new Error("An unexpected error occurred");
   }
 };
 
 export const useWishlistRecommendations = (wishlistSlug: string) => {
+  // Parse slug to extract ID for API call and cache key
+  const { id: wishlistId } = parseSlug(wishlistSlug);
+
   return useQuery({
-    queryKey: QUERY_KEYS.WISHLIST_RECOMMENDATIONS(wishlistSlug),
-    queryFn: () => fetchWishlistRecommendations(wishlistSlug),
-    enabled: !!wishlistSlug,
+    queryKey: QUERY_KEYS.WISHLIST_RECOMMENDATIONS(wishlistId),
+    queryFn: () => fetchWishlistRecommendations(wishlistId),
+    enabled: !!wishlistId,
     staleTime: 0, // Always consider data stale - others can add items at any time
     gcTime: 0, // Immediately remove from cache when inactive - memory optimization
   });

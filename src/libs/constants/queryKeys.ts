@@ -8,12 +8,12 @@ const NOTES_BASE = "notes";
 const AMENITIES_BASE = "amenities";
 const RECIPE_DETAILS_BASE = "recipe-details";
 const EXTRACTION_STATUS_BASE = "extraction-status";
-const COLLECTION_DETAILS_BASE = "collection-details";
+const COOKBOOK_DETAILS_BASE = "cookbook-details";
 const RECOMMENDATION_PHOTOS_BASE = "recommendation-photos";
 const RECOMMENDATION_DETAILS_BASE = "recommendation-details";
 const RECIPE_RECOMMENDATIONS_BASE = "recipe-recommendations";
 const WISHLIST_RECOMMENDATIONS_BASE = "wishlist-recommendations";
-const COLLECTION_RECOMMENDATIONS_BASE = "collection-recommendations";
+const COOKBOOK_RECOMMENDATIONS_BASE = "cookbook-recommendations";
 
 export const QUERY_KEYS = {
   // Recipe
@@ -31,32 +31,31 @@ export const QUERY_KEYS = {
   RECIPE_RECOMMENDATIONS: (recipeId: string) =>
     [RECIPE_RECOMMENDATIONS_BASE, recipeId] as const,
 
-  // Collection
-  COLLECTIONS: "collections",
+  // Cookbook
+  COOKBOOKS: "cookbooks",
 
-  // Collection Details
-  COLLECTION_DETAILS_BASE,
-  COLLECTION_DETAILS: (id: string) =>
-    [COLLECTION_DETAILS_BASE, id] as const,
+  // Cookbook Details
+  COOKBOOK_DETAILS_BASE,
+  COOKBOOK_DETAILS: (id: string) => [COOKBOOK_DETAILS_BASE, id] as const,
 
-  // Collection Recommendations
-  COLLECTION_RECOMMENDATIONS_BASE,
-  COLLECTION_RECOMMENDATIONS: (collectionId: string, category?: string) =>
-    [COLLECTION_RECOMMENDATIONS_BASE, collectionId, category] as const,
+  // Cookbook Recommendations
+  COOKBOOK_RECOMMENDATIONS_BASE,
+  COOKBOOK_RECOMMENDATIONS: (cookbookId: string, category?: string) =>
+    [COOKBOOK_RECOMMENDATIONS_BASE, cookbookId, category] as const,
 
   // Recommendation Details
   RECOMMENDATION_DETAILS_BASE,
-  RECOMMENDATION_DETAILS: (slug: string) =>
-    [RECOMMENDATION_DETAILS_BASE, slug] as const,
+  RECOMMENDATION_DETAILS: (id: string) =>
+    [RECOMMENDATION_DETAILS_BASE, id] as const,
 
   // Recommendation Photos
   RECOMMENDATION_PHOTOS_BASE,
-  RECOMMENDATION_PHOTOS: (slug: string) =>
-    [RECOMMENDATION_PHOTOS_BASE, slug] as const,
+  RECOMMENDATION_PHOTOS: (id: string) =>
+    [RECOMMENDATION_PHOTOS_BASE, id] as const,
 
   // Amenities
   AMENITIES_BASE,
-  AMENITIES: (slug: string) => [AMENITIES_BASE, slug] as const,
+  AMENITIES: (id: string) => [AMENITIES_BASE, id] as const,
 
   // Auth
   USER_ME: ["user", "me"] as const,

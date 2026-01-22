@@ -37,13 +37,16 @@ export default function ManageCookbooks() {
   const { showToast } = useActionToast();
   const { recommendationSlug } = useLocalSearchParams<{ recommendationSlug: string }>();
 
+  // Parse slug to extract ID for cache key
+  const { id: recommendationId, name: slugName } = parseSlug(recommendationSlug);
+
   // Get cached data
   const recommendation = queryClient.getQueryData<RecommendationDetail>(
-    QUERY_KEYS.RECOMMENDATION_DETAILS(recommendationSlug),
+    QUERY_KEYS.RECOMMENDATION_DETAILS(recommendationId),
   );
 
-  // Get the recommendation name from the slug or the cached data
-  const recommendationName = recommendation?.name || parseSlug(recommendationSlug)?.name || "This recommendation";
+  // Get the recommendation name from the cached data or the slug
+  const recommendationName = recommendation?.name || slugName || "This recommendation";
 
   const { mutate: saveToWishlist, isPending: isSaving } = useSaveRecommendationToWishlistMutation();
   const { mutate: deleteFromWishlist, isPending: isDeleting } = useDeleteRecommendationFromWishlistMutation();
@@ -52,9 +55,6 @@ export default function ManageCookbooks() {
 
   // Track selected wishlist (for removal flow)
   const [selectedWishlistId, setSelectedWishlistId] = useState<string | null>(null);
-
-  // Extract ID from slug for API call (backend expects ID, not slug)
-  const recommendationId = parseSlug(recommendationSlug).id;
 
   // Fetch all wishlists and use the includeStatusForRecommendationId
   // option to get the status of the recommendation in the wishlists

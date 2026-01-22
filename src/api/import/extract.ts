@@ -94,7 +94,7 @@ export const getExtractionStatus = async (
   try {
     const client = getApiClient();
     const result = (await client.get(
-      API_ENDPOINTS.EXTRACTIONS_STATUS_V1.replace("{slug}", extractionId),
+      API_ENDPOINTS.EXTRACTIONS_STATUS_V1.replace("{id}", extractionId),
     )) as ExtractResponse | ExtractErrorResponse;
 
     // Check for error response
@@ -191,7 +191,7 @@ const checkAndShowApproachingQuotaLimit = (creditBalanceRemaining: number) => {
 const refetchImportData = (queryClient: ReturnType<typeof useQueryClient>) => {
   // Use refetchQueries for infinite queries to force immediate refetch from the beginning
   // This ensures the UI updates immediately after import completion
-  queryClient.refetchQueries({ queryKey: [QUERY_KEYS.COLLECTIONS] });
+  queryClient.refetchQueries({ queryKey: [QUERY_KEYS.COOKBOOKS] });
   queryClient.refetchQueries({ queryKey: [QUERY_KEYS.RECIPES] });
 
   // Use refetchQueries for non-infinite queries to get the latest data

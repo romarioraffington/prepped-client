@@ -40,6 +40,7 @@ export default function HomeLayout() {
         name="cookbooks/[slug]/index"
         options={{
           headerTransparent: true,
+          headerBackTitle: "Cookbooks",
         }}
       />
       <Stack.Screen

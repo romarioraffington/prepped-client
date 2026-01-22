@@ -11,7 +11,7 @@ import { View, Text, Alert, StyleSheet, TouchableOpacity } from "react-native";
 // Internal Dependencies
 import { useActionToast } from "@/contexts";
 import type { ImageGridItem } from "@/libs/types";
-import { useDeleteCollectionMutation } from "@/api";
+import { useDeleteCookbookMutation } from "@/api";
 import { Colors, QUERY_KEYS } from "@/libs/constants";
 import { parseSlug, capitalizeWords } from "@/libs/utils";
 
@@ -25,28 +25,28 @@ export default function CookbookOptions() {
   const { slug } = useLocalSearchParams<OptionsParams>();
 
   const {
-    mutateAsync: deleteCollectionAsync,
+    mutateAsync: deleteCookbookAsync,
     isPending: isDeletePending
-  } = useDeleteCollectionMutation();
+  } = useDeleteCookbookMutation();
 
   // Parse the slug to get ID and name
-  const { id: collectionId, name: slugName } = parseSlug(slug);
+  const { id: cookbookId, name: slugName } = parseSlug(slug);
   const displayName = capitalizeWords(slugName);
 
-  // Helper function to get collection image from cache
-  const getCollectionImage = (): string | null => {
-    if (!collectionId) return null;
+  // Helper function to get cookbook image from cache
+  const getCookbookImage = (): string | null => {
+    if (!cookbookId) return null;
 
-    // Find in collections list cache
-    const collectionsData = queryClient.getQueryData<
+    // Find in cookbooks list cache
+    const cookbooksData = queryClient.getQueryData<
       InfiniteData<{ data: ImageGridItem[]; meta: unknown }>
-    >([QUERY_KEYS.COLLECTIONS]);
+    >([QUERY_KEYS.COOKBOOKS]);
 
-    if (collectionsData) {
-      for (const page of collectionsData.pages) {
-        const collection = page.data.find((item) => item.id === collectionId);
-        if (collection?.imageUris && collection.imageUris.length > 0) {
-          return collection.imageUris[0];
+    if (cookbooksData) {
+      for (const page of cookbooksData.pages) {
+        const cookbook = page.data.find((item) => item.id === cookbookId);
+        if (cookbook?.imageUris && cookbook.imageUris.length > 0) {
+          return cookbook.imageUris[0];
         }
       }
     }
@@ -104,10 +104,10 @@ export default function CookbookOptions() {
           text: "Delete",
           style: "destructive",
           onPress: () => {
-            // Get collection image before deletion
-            const collectionImage = getCollectionImage();
+            // Get cookbook image before deletion
+            const cookbookImage = getCookbookImage();
 
-            deleteCollectionAsync(slug)
+            deleteCookbookAsync(slug)
               .then(() => {
                 // Haptic feedback
                 Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -115,12 +115,12 @@ export default function CookbookOptions() {
                 // Show success toast with green checkmark
                 showToast({
                   text: `Deleted ${displayName}`,
-                  thumbnailUri: collectionImage || null,
+                  thumbnailUri: cookbookImage || null,
                 });
 
-                // Invalidate collections list to refetch and remove deleted collection
+                // Invalidate cookbooks list to refetch and remove deleted cookbook
                 queryClient.invalidateQueries({
-                  queryKey: [QUERY_KEYS.COLLECTIONS],
+                  queryKey: [QUERY_KEYS.COOKBOOKS],
                 });
 
                 // Navigate back - closes this options modal and detail page

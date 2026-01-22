@@ -9,9 +9,9 @@ import type BottomSheet from "@gorhom/bottom-sheet";
 
 // Internal Dependencies
 import { useActionToast } from "@/contexts";
-import { useDeleteImportMutation } from "@/api";
 import { reportError, createFullSlug } from "@/libs/utils";
 import type { Recipe, RecipeOptionsVariant } from "@/libs/types";
+import { useDeleteImportMutation, useRemoveRecipeFromCookbookMutation } from "@/api";
 import { ActionBottomSheet, type ActionBottomSheetMenuItem } from "@/components/ActionBottomSheet";
 
 type IoniconName = ComponentProps<typeof Ionicons>["name"];
@@ -19,6 +19,7 @@ type IoniconName = ComponentProps<typeof Ionicons>["name"];
 export interface RecipeOptionsSheetProps {
   recipeData: Recipe;
   variant: RecipeOptionsVariant;
+  cookbookId?: string;
   onDeleteSuccess?: () => void;
   onAnimationCompleted?: () => void;
   bottomSheetRef: React.RefObject<BottomSheet | null>;
@@ -26,14 +27,16 @@ export interface RecipeOptionsSheetProps {
 
 export function RecipeOptionsSheet({
   recipeData,
-  bottomSheetRef,
   variant,
+  cookbookId,
+  bottomSheetRef,
   onAnimationCompleted,
   onDeleteSuccess,
 }: RecipeOptionsSheetProps) {
   const router = useRouter();
   const { showToast } = useActionToast();
   const { mutateAsync: deleteRecipeAsync, isPending: isDeletePending } = useDeleteImportMutation();
+  const { mutateAsync: removeFromCookbookAsync, isPending: isRemovePending } = useRemoveRecipeFromCookbookMutation();
 
   const recipeId = recipeData.id;
 
@@ -111,7 +114,7 @@ export function RecipeOptionsSheet({
    * Handle Creator Profile press
    */
   const handleCreatorProfilePress = useCallback(() => {
-    const profileUri = recipeData.author.profileUri;
+    const profileUri = recipeData?.author?.profileUri;
     if (!profileUri) {
       reportError(new Error("No profile URI found for recipe"), {
         component: "RecipeOptionsSheet",
@@ -144,12 +147,65 @@ export function RecipeOptionsSheet({
   }, [bottomSheetRef, router, recipeId, recipeData.title]);
 
   /**
-   * Handle Remove from Cookbook press (placeholder)
+   * Handle Remove from Cookbook press
    */
   const handleRemoveFromCookbookPress = useCallback(() => {
-    bottomSheetRef.current?.close();
-    Alert.alert("Coming Soon", "Remove from Cookbook functionality is coming soon!");
-  }, [bottomSheetRef]);
+    if (isRemovePending || !cookbookId || !recipeId) return;
+
+    const displayName = recipeData.title || "This recipe";
+
+    Alert.alert(
+      "Remove from Cookbook?",
+      `${displayName} will be removed from this cookbook.`,
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        {
+          text: "Remove",
+          onPress: () => {
+            removeFromCookbookAsync({ cookbookId, recipeId })
+              .then(() => {
+                // Close bottom sheet
+                bottomSheetRef.current?.close();
+
+                // Haptic feedback
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+                // Show success toast with recipe image
+                showToast({
+                  text: `Removed ${displayName}`,
+                  thumbnailUri: recipeData.coverUri,
+                });
+
+
+              })
+              .catch((error) => {
+                // Haptic feedback for error
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+
+                // Show error alert
+                Alert.alert(
+                  "Oops!",
+                  error?.message || "Failed to remove recipe from cookbook. Please try again.",
+                  [{ text: "OK" }],
+                );
+              });
+          },
+        },
+      ],
+      { cancelable: true },
+    );
+  }, [
+    recipeId,
+    showToast,
+    recipeData,
+    cookbookId,
+    isRemovePending,
+    bottomSheetRef,
+    removeFromCookbookAsync,
+  ]);
 
   /**
    * Handle Report Issue press
@@ -242,7 +298,8 @@ export function RecipeOptionsSheet({
   const menuItems = useMemo<ActionBottomSheetMenuItem[]>(() => {
     const socialIcon = getSocialIcon(platformId);
     const socialLabel = getSocialLabel(platformId);
-    const firstName = author.name.trim() !== "" ? author.name.split(" ")[0] : null;
+    const trimmedName = author?.name?.trim();
+    const firstName = trimmedName && trimmedName !== "" ? trimmedName.split(" ")[0] : null;
     const creatorLabel = firstName ? `${firstName}'s Profile` : "Creator Profile";
 
     const items: ActionBottomSheetMenuItem[] = [

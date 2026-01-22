@@ -6,7 +6,7 @@ import { useCallback, useRef } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
 // Internal Dependencies
-import { reportError } from "@/libs/utils";
+import { parseSlug, reportError } from "@/libs/utils";
 import { useActionToast } from "@/contexts";
 import { QUERY_KEYS } from "@/libs/constants";
 import { useImageErrorFilter } from "@/hooks";
@@ -80,7 +80,9 @@ export const useRecommendationWishlistHandler = ({
     const cachedWishlist = await getCachedWishlist();
 
     if (cachedWishlist) {
-      const queryKey = QUERY_KEYS.RECOMMENDATION_DETAILS(recommendationSlug);
+      // Parse slug to extract ID for cache key
+      const { id: recommendationId } = parseSlug(recommendationSlug);
+      const queryKey = QUERY_KEYS.RECOMMENDATION_DETAILS(recommendationId);
       const currentData = queryClient.getQueryData<RecommendationDetail>(queryKey);
       const previousWishlistIds = currentData?.wishlistIds ?? [];
 

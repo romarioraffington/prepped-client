@@ -11,7 +11,7 @@ import type {
   PaginationMeta,
 } from "@/libs/types";
 
-interface CollectionItem {
+interface CookbookItem {
   id: string;
   name: string;
   imageUris: string[];
@@ -19,36 +19,34 @@ interface CollectionItem {
   lastUpdatedTimestamp: number;
 }
 
-interface CollectionListResponse {
-  data: CollectionItem[];
+interface CookbookListResponse {
+  data: CookbookItem[];
   links: PaginationLinks;
   meta: PaginationMeta;
 }
 
-interface CollectionPageResult {
+interface CookbookPageResult {
   data: ImageGridItem[];
   meta: PaginationMeta;
 }
 
-const fetchCollections = async (
-  cursor?: string,
-): Promise<CollectionPageResult> => {
+const fetchCookbooks = async (cursor?: string): Promise<CookbookPageResult> => {
   try {
     const client = getApiClient();
     const url = cursor
-      ? `${API_ENDPOINTS.COLLECTIONS_V1}?cursor=${encodeURIComponent(cursor)}`
-      : API_ENDPOINTS.COLLECTIONS_V1;
+      ? `${API_ENDPOINTS.COOKBOOKS_V1}?cursor=${encodeURIComponent(cursor)}`
+      : API_ENDPOINTS.COOKBOOKS_V1;
 
     const response = (await client.get(url)) as
-      | CollectionListResponse
+      | CookbookListResponse
       | undefined;
 
     if (!response || !Array.isArray(response.data)) {
       reportError(
-        new Error("Invalid response structure when fetching collections"),
+        new Error("Invalid response structure when fetching cookbooks"),
         {
-          component: "CollectionList",
-          action: "Fetch Collections",
+          component: "CookbookList",
+          action: "Fetch Cookbooks",
           extra: {
             response,
             hasData: !!response?.data,
@@ -57,12 +55,12 @@ const fetchCollections = async (
         },
       );
       throw new Error(
-        "Invalid response format: expected paginated collections response",
+        "Invalid response format: expected paginated cookbooks response",
       );
     }
 
     // Transform the API response to match our ImageGridItem interface
-    const collections: ImageGridItem[] = response.data.map((item) => ({
+    const cookbooks: ImageGridItem[] = response.data.map((item) => ({
       id: item.id,
       name: item.name,
       imageUris: item.imageUris || [],
@@ -71,32 +69,32 @@ const fetchCollections = async (
     }));
 
     return {
-      data: collections,
+      data: cookbooks,
       meta: response.meta,
     };
   } catch (error) {
     reportError(error, {
-      component: "CollectionList",
-      action: "Fetch Collections",
+      component: "CookbookList",
+      action: "Fetch Cookbooks",
     });
     throw new Error("An unexpected error occurred");
   }
 };
 
-export const useCollections = () => {
+export const useCookbooks = () => {
   return useInfiniteQuery({
-    queryKey: [QUERY_KEYS.COLLECTIONS],
-    queryFn: ({ pageParam }) => fetchCollections(pageParam),
+    queryKey: [QUERY_KEYS.COOKBOOKS],
+    queryFn: ({ pageParam }) => fetchCookbooks(pageParam),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => lastPage.meta.next_cursor ?? undefined,
   });
 };
 
 // Hook to replace invalidateCache
-export const useInvalidateCollections = () => {
+export const useInvalidateCookbooks = () => {
   const queryClient = useQueryClient();
 
   return () => {
-    queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.COLLECTIONS] });
+    queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.COOKBOOKS] });
   };
 };

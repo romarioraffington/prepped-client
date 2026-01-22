@@ -6,6 +6,7 @@ import { Text, View, Alert } from "react-native";
 import { useQueryClient } from "@tanstack/react-query";
 
 // Internal Dependencies
+import { parseSlug } from "@/libs/utils";
 import { useActionToast } from "@/contexts";
 import { QUERY_KEYS } from "@/libs/constants";
 import { useImageErrorFilter } from "@/hooks";
@@ -34,13 +35,16 @@ export const useRecommendationDeleteHandler = ({
   const { showToast } = useActionToast();
   const { mutateAsync: deleteRecommendationAsync, isPending } = useDeleteRecommendationMutation();
 
+  // Parse slug to extract ID for API call and cache key
+  const { id: recommendationId } = parseSlug(recommendationSlug);
+
   // Validate thumbnailUri using useImageErrorFilter
   const imageUrls = thumbnailUri ? [thumbnailUri] : [];
   const { validImages } = useImageErrorFilter(imageUrls);
   const validThumbnailUri = validImages.length > 0 ? validImages[0] : null;
 
   const handleDelete = useCallback(() => {
-    if (isPending) return;
+    if (isPending || !recommendationId) return;
 
     // Show confirmation dialog
     Alert.alert(
@@ -55,7 +59,7 @@ export const useRecommendationDeleteHandler = ({
           text: "Delete",
           style: "destructive",
           onPress: () => {
-            deleteRecommendationAsync(recommendationSlug)
+            deleteRecommendationAsync(recommendationId)
               .then(async () => {
                 // Haptic feedback
                 Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -76,13 +80,13 @@ export const useRecommendationDeleteHandler = ({
                 // - React Query will automatically refetch active ones
                 await Promise.all([
                   queryClient.invalidateQueries({
-                    queryKey: QUERY_KEYS.RECOMMENDATION_DETAILS(recommendationSlug),
+                    queryKey: QUERY_KEYS.RECOMMENDATION_DETAILS(recommendationId),
                   }),
                   queryClient.invalidateQueries({
                     queryKey: [QUERY_KEYS.RECIPE_RECOMMENDATIONS_BASE],
                   }),
                   queryClient.invalidateQueries({
-                    queryKey: [QUERY_KEYS.COLLECTION_RECOMMENDATIONS_BASE],
+                    queryKey: [QUERY_KEYS.COOKBOOK_RECOMMENDATIONS_BASE],
                   }),
                   queryClient.invalidateQueries({
                     queryKey: [QUERY_KEYS.RECIPE_DETAILS_BASE],
@@ -107,7 +111,7 @@ export const useRecommendationDeleteHandler = ({
     );
   }, [
     isPending,
-    recommendationSlug,
+    recommendationId,
     recommendationName,
     validThumbnailUri,
     queryClient,
