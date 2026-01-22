@@ -47,16 +47,13 @@ export const useRemoveRecipeFromCookbookMutation = () => {
       recipeId: string;
     }) => removeRecipeFromCookbook(cookbookId, recipeId),
 
-    // On success, refetch the cookbook details and cookbooks list
     onSuccess: (_data, variables) => {
-      queryClient.refetchQueries({
+      queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.COOKBOOK_DETAILS(variables.cookbookId),
-        type: "active",
       });
-      queryClient.refetchQueries({
+      queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.COOKBOOKS],
         exact: false,
-        type: "active",
       });
     },
   });
