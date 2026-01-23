@@ -356,6 +356,8 @@ export default function CookbookDetails() {
         recipesCount={recipesCount}
         opacity={largeTitleOpacity}
         currentTitle={collectionName}
+        isBulkEditMode={isBulkEditMode}
+        selectedCount={selectedRecipeIds.size}
       />
     ),
     [
@@ -365,6 +367,8 @@ export default function CookbookDetails() {
       recipesCount,
       collectionName,
       largeTitleOpacity,
+      isBulkEditMode,
+      selectedRecipeIds.size,
     ],
   );
 
@@ -479,6 +483,8 @@ interface CookbookHeaderProps {
   offsetY: SharedValue<number>;
   opacity: SharedValue<number>;
   onLayout?: () => void;
+  isBulkEditMode?: boolean;
+  selectedCount?: number;
 }
 
 const CookbookHeader = forwardRef<Animated.View, CookbookHeaderProps>(
@@ -489,11 +495,17 @@ const CookbookHeader = forwardRef<Animated.View, CookbookHeaderProps>(
       onLayout,
       currentTitle,
       recipesCount,
+      selectedCount = 0,
+      isBulkEditMode = false,
     },
     ref,
   ) {
     const hasRecipes = recipesCount > 0;
+    const hasSelections = selectedCount > 0;
     const recipesText = recipesCount === 1 ? "recipe" : "recipes";
+
+    // Show selection count when in bulk edit mode and items are selected
+    const showSelectionCount = isBulkEditMode && hasSelections;
 
     return (
       <View style={styles.headerContainer}>
@@ -513,6 +525,14 @@ const CookbookHeader = forwardRef<Animated.View, CookbookHeaderProps>(
               <Text style={styles.metadataText}>
                 {recipesCount} {recipesText}
               </Text>
+              {showSelectionCount && (
+                <>
+                  <Text style={styles.metadataSeparator}> • </Text>
+                  <Text style={styles.metadataTextSelected}>
+                    {selectedCount} {selectedCount === 1 ? "item" : "items"} selected
+                  </Text>
+                </>
+              )}
             </View>
           )}
         </View>
@@ -556,6 +576,19 @@ const styles = StyleSheet.create({
     }),
     color: "#999",
     fontSize: 13,
+  },
+  metadataSeparator: {
+    color: "#999",
+    fontSize: 13,
+  },
+  metadataTextSelected: {
+    fontFamily: Platform.select({
+      android: "Manrope_700Bold",
+      ios: "Manrope-Bold",
+    }),
+    color: "#999",
+    fontSize: 13,
+    fontWeight: "600",
   },
   headerOptionsButtonText: {
     fontSize: 15,
