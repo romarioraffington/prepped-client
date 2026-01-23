@@ -9,7 +9,7 @@ import { useImageErrorFilter } from "@/hooks";
 import type { CookbookCardData } from "@/libs/types";
 import { ProfileIcon } from "@/components/ProfileIcon";
 import { ShimmerImage } from "@/components/ShimmerImage";
-import { ImagePlaceholder } from "../ImagePlaceholder";
+import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 
 const DEFAULT_AVATAR = require("~/assets/images/welcome/leaning-tower-of-pisa-in-pisa-italy.webp");
 

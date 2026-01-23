@@ -1,11 +1,13 @@
 // External Dependencies
 import { Alert } from "react-native";
 import * as Haptics from "expo-haptics";
+import { Ionicons } from "@expo/vector-icons";
 import { router, useNavigation, usePathname } from "expo-router";
 import type { default as BottomSheet } from "@gorhom/bottom-sheet";
 import { type FC, type RefObject, useCallback, useMemo } from "react";
 
 // Internal Dependencies
+import { Colors } from "@/libs/constants";
 import { useRecommendationDetails } from "@/api";
 import { ActionBottomSheet } from "@/components/ActionBottomSheet";
 import type { ActionBottomSheetMenuItem } from "@/components/ActionBottomSheet";
@@ -64,7 +66,7 @@ export const RecommendationOptionsSheet: FC<RecommendationOptionsSheetProps> = (
     bottomSheetRef.current?.close();
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     router.push({
-      pathname: "/(modal)/manage-wishlists",
+      pathname: "/(modal)/manage-wishlists" as any,
       params: {
         recommendationSlug,
       },
@@ -82,21 +84,21 @@ export const RecommendationOptionsSheet: FC<RecommendationOptionsSheetProps> = (
   const menuItems = useMemo<ActionBottomSheetMenuItem[]>(
     () => [
       {
-        icon: "share-outline",
         label: "Share",
         onPress: handleShare,
+        renderIcon: () => <Ionicons size={20} name="share-outline" color="#667" />,
       },
       {
-        icon: "heart-outline",
         label: "Manage wishlists",
         onPress: handleManageWishlists,
+        renderIcon: () => <Ionicons size={20} name="heart-outline" color="#667" />,
       },
       {
-        icon: "trash-outline",
-        label: isPending ? "Deleting..." : "Delete",
         onPress: handleDelete,
         destructive: true,
         disabled: isPending,
+        label: isPending ? "Deleting..." : "Delete",
+        renderIcon: () => <Ionicons size={20} name="trash-outline" color={Colors.destructive} />,
       },
     ],
     [handleShare, handleManageWishlists, handleDelete, isSaved, isPending],

@@ -1,13 +1,13 @@
 // External Dependencies
-import { Ionicons } from "@expo/vector-icons";
-import type Animated from "react-native-reanimated";
-import type { SharedValue } from "react-native-reanimated";
+import * as Haptics from "expo-haptics";
 import { useHeaderHeight } from "@react-navigation/elements";
+import { Ionicons, Feather, MaterialIcons } from "@expo/vector-icons";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { default as BottomSheet } from "@gorhom/bottom-sheet";
 import { router, useLocalSearchParams, useNavigation } from "expo-router";
-import { Platform, StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { Alert, Platform, StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import React, { useRef, useState, useMemo, forwardRef, useLayoutEffect, useCallback, useEffect } from "react";
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing, type SharedValue } from "react-native-reanimated";
 
 // Internal Dependencies
 import type { Recipe } from "@/libs/types";
@@ -22,11 +22,15 @@ import {
   WithPullToRefresh,
   RecipeOptionsSheet,
   LoadingStaggeredGrid,
+  CookbookOptionsSheet,
   PinterestRefreshIndicator,
 } from "@/components";
 
 // API
 import { useCookbookDetails } from "@/api";
+
+// Stable noop function for fallback (prevents creating new functions on every render)
+const noop = () => { };
 
 export default function CookbookDetails() {
   const navigation = useNavigation();
@@ -37,8 +41,14 @@ export default function CookbookDetails() {
   const bottomSheetRef = useRef<BottomSheet | null>(null);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
 
-  // Parse slug to extract ID for API call
-  const { id: cookbookId } = parseSlug(slug);
+  // Bulk edit mode state
+  const [isBulkEditMode, setIsBulkEditMode] = useState(false);
+  const [selectedRecipeIds, setSelectedRecipeIds] = useState<Set<string>>(new Set());
+  const cookbookOptionsSheetRef = useRef<BottomSheet | null>(null);
+  const [isOptionsSheetOpen, setIsOptionsSheetOpen] = useState(false);
+
+  // Parse slug to extract ID and name for API call
+  const { id: cookbookId, name: cookbookName } = parseSlug(slug);
 
   // Calculate bottom padding: safe area bottom + extra space for comfortable scrolling
   const contentBottomPadding = insets.bottom + 20;
@@ -48,6 +58,22 @@ export default function CookbookDetails() {
     refetch,
     isLoading,
   } = useCookbookDetails(cookbookId);
+
+  // Footer animation - starts off-screen (100 = hidden below screen)
+  const footerTranslateY = useSharedValue(100);
+
+  // Animate footer when bulk edit mode changes
+  useEffect(() => {
+    footerTranslateY.value = withTiming(isBulkEditMode ? 0 : 100, {
+      duration: 300,
+      easing: Easing.out(Easing.ease),
+    });
+  }, [isBulkEditMode, footerTranslateY]);
+
+  // Animated style for footer slide animation
+  const footerAnimatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: footerTranslateY.value }],
+  }));
 
   // Extract the needed data
   const recipes = data?.recipes ?? [];
@@ -67,15 +93,20 @@ export default function CookbookDetails() {
     currentTitle: collectionName,
   });
 
-  // Handle options press - navigate to options modal
+  // Handle options press - open bottom sheet instead of navigating
   const handleOptionsPress = useCallback(() => {
-    router.push({
-      pathname: "/cookbooks/[slug]/options",
-      params: {
-        slug,
-      },
-    });
-  }, [slug]);
+    setIsOptionsSheetOpen(true);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+  }, []);
+
+  // Open options sheet when state changes
+  useEffect(() => {
+    if (isOptionsSheetOpen) {
+      setTimeout(() => {
+        cookbookOptionsSheetRef.current?.snapToIndex(0);
+      }, 100);
+    }
+  }, [isOptionsSheetOpen]);
 
   // Handle edit press - navigate to edit recipes screen (only for unorganized collections)
   const handleEditPress = useCallback(() => {
@@ -87,10 +118,120 @@ export default function CookbookDetails() {
     });
   }, [slug]);
 
+  // Handle bulk edit press - triggered from options sheet
+  const handleBulkEditPress = useCallback(() => {
+    setIsBulkEditMode(true);
+    setSelectedRecipeIds(new Set());
+  }, []);
+
+  // Handle done press - exit bulk edit mode
+  const handleDonePress = useCallback(() => {
+    setIsBulkEditMode(false);
+    setSelectedRecipeIds(new Set());
+  }, []);
+
+  // Handle recipe selection toggle
+  const handleRecipeSelect = useCallback((recipeId: string) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setSelectedRecipeIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(recipeId)) {
+        next.delete(recipeId);
+      } else {
+        next.add(recipeId);
+      }
+      return next;
+    });
+  }, []);
+
+  // Create stable callback map using ref to prevent re-renders
+  // This ensures callbacks don't change even when recipes array reference changes
+  const selectCallbacksRef = useRef<Map<string, () => void>>(new Map());
+
+  // Update callbacks when recipes change, but keep same Map reference
+  useMemo(() => {
+    const callbacks = selectCallbacksRef.current;
+    // Clear old callbacks
+    callbacks.clear();
+    // Add new callbacks
+    for (const recipe of recipes) {
+      if (!callbacks.has(recipe.id)) {
+        callbacks.set(recipe.id, () => handleRecipeSelect(recipe.id));
+      }
+    }
+  }, [recipes, handleRecipeSelect]);
+
+  const selectCallbacks = selectCallbacksRef.current;
+
+  // Bulk edit action handlers (all show alerts for now)
+  const handleBulkAdd = useCallback(() => {
+    if (selectedRecipeIds.size === 0) return;
+    Alert.alert(
+      "Add",
+      `Add ${selectedRecipeIds.size} recipe(s) - functionality coming soon`,
+      [{ text: "OK" }],
+    );
+  }, [selectedRecipeIds.size]);
+
+  const handleBulkRemove = useCallback(() => {
+    if (selectedRecipeIds.size === 0) return;
+    Alert.alert(
+      "Remove",
+      `Remove ${selectedRecipeIds.size} recipe(s) from cookbook - functionality coming soon`,
+      [{ text: "OK" }],
+    );
+  }, [selectedRecipeIds.size]);
+
+  const handleBulkDelete = useCallback(() => {
+    if (selectedRecipeIds.size === 0) return;
+    Alert.alert(
+      "Delete",
+      `Delete ${selectedRecipeIds.size} recipe(s) - functionality coming soon`,
+      [{ text: "OK" }],
+    );
+  }, [selectedRecipeIds.size]);
+
+  // Filter out stale selections when recipes change
+  useEffect(() => {
+    if (selectedRecipeIds.size === 0) return;
+    const currentIds = new Set(recipes.map((r) => r.id));
+    setSelectedRecipeIds((prev) => {
+      const next = new Set(prev);
+      for (const id of prev) {
+        if (!currentIds.has(id)) {
+          next.delete(id);
+        }
+      }
+      return next;
+    });
+  }, [recipes]);
+
+  // Exit bulk edit mode if cookbook becomes empty
+  useEffect(() => {
+    if (isBulkEditMode && recipes.length === 0) {
+      setIsBulkEditMode(false);
+      setSelectedRecipeIds(new Set());
+    }
+  }, [isBulkEditMode, recipes.length]);
+
   // Memoize headerRight component to prevent unnecessary recreations
-  // Show edit button for UNORGANIZED collections, options button for others
+  // Show "Done" button in bulk edit mode, otherwise show edit/options button
   const HeaderRightComponent = useMemo(
     () => {
+      // In bulk edit mode, show "Done" button
+      if (isBulkEditMode) {
+        return (
+          <View style={styles.headerRightContainer}>
+            <TouchableOpacity
+              style={styles.headerOptionsButton}
+              onPress={handleDonePress}
+            >
+              <Text style={styles.headerDoneButtonText}>Done</Text>
+            </TouchableOpacity>
+          </View>
+        );
+      }
+
       // Show edit button for UNORGANIZED collections
       if (collectionType === COLLECTION_TYPE.UNORGANIZED) {
         return (
@@ -117,7 +258,13 @@ export default function CookbookDetails() {
         </View>
       );
     },
-    [handleOptionsPress, handleEditPress, collectionType],
+    [
+      handleOptionsPress,
+      handleEditPress,
+      handleDonePress,
+      collectionType,
+      isBulkEditMode,
+    ],
   );
 
   // Single setOptions call using hook-provided options
@@ -163,17 +310,40 @@ export default function CookbookDetails() {
   }, [selectedRecipe]);
 
   // Memoize renderItem to prevent re-creations during scroll
+  // Use RecipeCard with conditional selectable props based on bulk edit mode
   const renderItem = useCallback(
-    (item: Recipe, index: number) => (
-      <RecipeCard
-        key={item.id}
-        recipe={item}
-        index={index}
-        onMenuPress={handleMenuPress}
-        onCardPress={handleCardItemPress}
-      />
-    ),
-    [handleCardItemPress, handleMenuPress],
+    (item: Recipe, index: number) => {
+      if (isBulkEditMode) {
+        return (
+          <RecipeCard
+            key={item.id}
+            recipe={item}
+            index={index}
+            selectable={true}
+            isSelected={selectedRecipeIds.has(item.id)}
+            onSelect={selectCallbacks.get(item.id) ?? noop}
+          />
+        );
+      }
+
+      return (
+        <RecipeCard
+          key={item.id}
+          recipe={item}
+          index={index}
+          onMenuPress={handleMenuPress}
+          onCardPress={handleCardItemPress}
+        />
+      );
+    },
+    [
+      isBulkEditMode,
+      handleMenuPress,
+      handleCardItemPress,
+      handleRecipeSelect,
+      selectedRecipeIds,
+      selectCallbacks,
+    ],
   );
 
   // List header component with title and recipe count
@@ -188,7 +358,14 @@ export default function CookbookDetails() {
         currentTitle={collectionName}
       />
     ),
-    [titleRef, offsetY, measureTitle, largeTitleOpacity, collectionName, recipesCount],
+    [
+      titleRef,
+      offsetY,
+      measureTitle,
+      recipesCount,
+      collectionName,
+      largeTitleOpacity,
+    ],
   );
 
   if (isLoading) {
@@ -198,6 +375,10 @@ export default function CookbookDetails() {
       </View>
     );
   }
+
+  // Calculate bottom padding for bulk edit mode (footer height + safe area)
+  const bulkEditBottomPadding = isBulkEditMode ? 60 + insets.bottom : 0;
+  const hasSelections = selectedRecipeIds.size > 0;
 
   return (
     <View style={styles.container}>
@@ -213,11 +394,52 @@ export default function CookbookDetails() {
           items={recipes}
           renderItem={renderItem}
           headerHeight={headerHeight}
-          contentBottomPadding={contentBottomPadding}
+          contentBottomPadding={contentBottomPadding + bulkEditBottomPadding}
           animatedScrollHandler={scrollHandler}
           ListHeaderComponent={ListHeaderComponent}
         />
       </WithPullToRefresh>
+
+      {/* Bulk Edit Footer */}
+      <Animated.View
+        style={[styles.bulkEditFooter, { paddingBottom: insets.bottom }, footerAnimatedStyle]}
+        pointerEvents={isBulkEditMode ? "auto" : "none"}
+      >
+        <View style={styles.bulkEditButtonRow}>
+          <TouchableOpacity
+            style={[styles.bulkEditButton, !hasSelections && styles.bulkEditButtonDisabled]}
+            onPress={handleBulkAdd}
+            disabled={!hasSelections}
+          >
+            <MaterialIcons name="bookmark-add" size={25} color={hasSelections ? "#667" : "#999"} />
+            <Text style={[styles.bulkEditButtonText, !hasSelections && styles.bulkEditButtonTextDisabled]}>
+              Add
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.bulkEditButton, !hasSelections && styles.bulkEditButtonDisabled]}
+            onPress={handleBulkRemove}
+            disabled={!hasSelections}
+          >
+            <MaterialIcons name="bookmark-remove" size={24} color={hasSelections ? "#667" : "#999"} />
+            <Text style={[styles.bulkEditButtonText, !hasSelections && styles.bulkEditButtonTextDisabled]}>
+              Remove
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.bulkEditButton, !hasSelections && styles.bulkEditButtonDisabled]}
+            onPress={handleBulkDelete}
+            disabled={!hasSelections}
+          >
+            <Ionicons name="trash-outline" size={20} color={hasSelections ? Colors.destructive : "#999"} />
+            <Text style={[styles.bulkEditButtonText, styles.bulkEditButtonTextDestructive, !hasSelections && styles.bulkEditButtonTextDisabled]}>
+              Delete
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </Animated.View>
 
       {/* Recipe Options Bottom Sheet */}
       {selectedRecipe && (
@@ -229,6 +451,21 @@ export default function CookbookDetails() {
           onAnimationCompleted={() => {
             // Clear selected recipe when sheet closes
             setSelectedRecipe(null);
+          }}
+        />
+      )}
+
+      {/* Cookbook Options Bottom Sheet */}
+      {isOptionsSheetOpen && (
+        <CookbookOptionsSheet
+          cookbookId={cookbookId}
+          cookbookSlug={slug}
+          cookbookName={cookbookName}
+          hasRecipes={recipes.length > 0}
+          onBulkEditPress={handleBulkEditPress}
+          bottomSheetRef={cookbookOptionsSheetRef}
+          onAnimationCompleted={() => {
+            setIsOptionsSheetOpen(false);
           }}
         />
       )}
@@ -324,5 +561,47 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "500",
     paddingHorizontal: 4,
+  },
+  headerDoneButtonText: {
+    fontSize: 15,
+    fontWeight: "600",
+    paddingHorizontal: 4,
+    color: "#000",
+  },
+  bulkEditFooter: {
+    left: 0,
+    right: 0,
+    bottom: 0,
+    paddingTop: 10,
+    overflow: "hidden",
+    position: "absolute",
+    backgroundColor: "rgba(245, 245, 240, 0.95)",
+  },
+  bulkEditButtonRow: {
+    gap: 80,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    justifyContent: "center",
+  },
+  bulkEditButton: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 5,
+  },
+  bulkEditButtonDisabled: {
+    opacity: 0.5,
+  },
+  bulkEditButtonText: {
+    marginTop: 4,
+    fontSize: 13,
+    color: "#667",
+    fontWeight: "500",
+  },
+  bulkEditButtonTextDestructive: {
+    color: Colors.destructive,
+  },
+  bulkEditButtonTextDisabled: {
+    color: "#999",
   },
 });

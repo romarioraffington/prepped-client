@@ -20,6 +20,7 @@ export default function HomeLayout() {
         headerTintColor: '#000',
         headerTitleAlign: 'center',
         headerShadowVisible: false,
+        headerStyle: styles.headerStyle,
         contentStyle: styles.contentStyle,
         headerBackButtonDisplayMode: 'minimal',
       } as ExtendedScreenOptions}>
@@ -44,22 +45,6 @@ export default function HomeLayout() {
         }}
       />
       <Stack.Screen
-        name="cookbooks/[slug]/recommendations"
-        options={{
-          headerShown: true,
-          headerTransparent: true,
-        }}
-      />
-      <Stack.Screen
-        name="cookbooks/[slug]/options"
-        options={{
-          headerShown: false,
-          presentation: 'formSheet',
-          sheetAllowedDetents: [0.23],
-          sheetCornerRadius: 30,
-        }}
-      />
-      <Stack.Screen
         name="cookbooks/[slug]/edit"
         options={{
           headerShown: true,
@@ -73,6 +58,9 @@ export default function HomeLayout() {
 const styles = StyleSheet.create({
   contentStyle: {
     flex: 1,
+    backgroundColor: Colors.background,
+  },
+  headerStyle: {
     backgroundColor: Colors.background,
   },
 });

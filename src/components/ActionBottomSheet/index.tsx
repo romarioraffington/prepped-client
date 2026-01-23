@@ -1,21 +1,18 @@
 // External Dependencies
 import { Image } from "expo-image";
-import type { ComponentProps } from "react";
+import type { ReactNode } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { Portal } from "react-native-portalize";
-import React, { forwardRef, useMemo, useRef, useState } from "react";
+import { forwardRef, useMemo, useRef, useState } from "react";
 import { Animated, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet";
 
 // Internal Dependencies
 import { Colors } from "@/libs/constants";
 
-type IoniconName = ComponentProps<typeof Ionicons>["name"];
-
 export type ActionBottomSheetMenuItem = {
   label: string;
-  iconUri?: string;
-  icon?: IoniconName;
+  renderIcon?: () => ReactNode;
   onPress: () => void;
   hidden?: boolean;
   disabled?: boolean;
@@ -164,19 +161,7 @@ export const ActionBottomSheet = forwardRef<
                   onPress={item.onPress}
                   disabled={item.disabled}
                 >
-                  {item.iconUri ? (
-                    <Image
-                      source={{ uri: item.iconUri }}
-                      style={styles.menuItemIconImage}
-                      contentFit="cover"
-                    />
-                  ) : item.icon ? (
-                    <Ionicons
-                      size={20}
-                      name={item.icon}
-                      color={item.destructive ? Colors.destructive : "#667"}
-                    />
-                  ) : null}
+                  {item.renderIcon?.()}
                   <Text style={[
                     styles.menuItemText,
                     item.destructive && styles.menuItemTextDestructive
@@ -254,11 +239,6 @@ const styles = StyleSheet.create({
   },
   menuItemTextDestructive: {
     color: Colors.destructive,
-  },
-  menuItemIconImage: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
   },
 });
 

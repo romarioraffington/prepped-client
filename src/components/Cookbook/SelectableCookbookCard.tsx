@@ -4,9 +4,9 @@ import { Ionicons } from "@expo/vector-icons";
 import { StyleSheet, View } from "react-native";
 
 // Internal Dependencies
-import { Colors } from "~/src/libs/constants";
+import { Colors } from "@/libs/constants";
 import type { CookbookCardData } from "@/libs/types";
-import { CookbookCard } from "@/components/CookbookCard";
+import { CookbookCard } from "./CookbookCard";
 
 export interface SelectableCookbookCardProps {
   item: CookbookCardData;

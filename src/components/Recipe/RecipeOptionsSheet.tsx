@@ -1,14 +1,16 @@
 // External Dependencies
-import * as Haptics from "expo-haptics";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
+import * as Haptics from "expo-haptics";
 import type { ComponentProps } from "react";
 import { useMemo, useCallback } from "react";
-import { Alert, Linking, Text } from "react-native";
-import type { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons";
 import type BottomSheet from "@gorhom/bottom-sheet";
+import { Alert, Linking, StyleSheet, Text } from "react-native";
 
 // Internal Dependencies
 import { useActionToast } from "@/contexts";
+import { Colors } from "@/libs/constants";
 import { reportError, createFullSlug } from "@/libs/utils";
 import type { Recipe, RecipeOptionsVariant } from "@/libs/types";
 import { useDeleteRecipeMutation, useRemoveRecipeFromCookbookMutation } from "@/api";
@@ -313,13 +315,36 @@ export function RecipeOptionsSheet({
     const items: ActionBottomSheetMenuItem[] = [
       // Watch on [Social Platform]
       {
-        icon: socialIcon,
+        renderIcon: () => (
+          <Ionicons
+            size={20}
+            name={socialIcon}
+            color="#667"
+          />
+        ),
         label: socialLabel,
         onPress: handleWatchContent,
       },
       // Creator Profile with avatar
       {
-        iconUri: recipeData.author.avatarUri,
+        renderIcon: () => {
+          if (recipeData.author.avatarUri) {
+            return (
+              <Image
+                source={{ uri: recipeData.author.avatarUri }}
+                style={styles.menuItemIconImage}
+                contentFit="cover"
+              />
+            );
+          }
+          return (
+            <Ionicons
+              size={20}
+              name="person-outline"
+              color="#667"
+            />
+          );
+        },
         label: creatorLabel,
         onPress: handleCreatorProfilePress,
       },
@@ -328,7 +353,9 @@ export function RecipeOptionsSheet({
     // Add variant-specific options
     if (variant === "recipes" || variant === "detail") {
       items.push({
-        icon: "book-outline" as const,
+        renderIcon: () => (
+          <Ionicons size={20} name="book-outline" color="#667" />
+        ),
         label: "Manage Cookbooks",
         onPress: handleManageCookbookPress,
       });
@@ -336,27 +363,27 @@ export function RecipeOptionsSheet({
 
     if (variant === "cookbook") {
       items.push({
-        icon: "remove-circle-outline" as const,
         label: "Remove from Cookbook",
         onPress: handleRemoveFromCookbookPress,
+        renderIcon: () => <Ionicons size={20} name="remove-circle-outline" color="#667" />,
       });
     }
 
     // Report Issue (only on detail page)
     if (variant === "detail") {
       items.push({
-        icon: "flag-outline" as const,
         label: "Report Issue",
         onPress: handleReportIssuePress,
+        renderIcon: () => <Ionicons size={20} name="flag-outline" color="#667" />,
       });
     }
 
     // Delete (always last, destructive)
     items.push({
-      icon: "trash-outline" as const,
+      destructive: true,
       label: "Delete Recipe",
       onPress: handleDeletePress,
-      destructive: true,
+      renderIcon: () => <Ionicons size={20} name="trash-outline" color={Colors.destructive} />,
     });
 
     return items;
@@ -390,3 +417,11 @@ export function RecipeOptionsSheet({
     />
   );
 }
+
+const styles = StyleSheet.create({
+  menuItemIconImage: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+  },
+});

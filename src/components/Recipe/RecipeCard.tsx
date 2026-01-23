@@ -1,8 +1,7 @@
 // External Dependencies
-import type React from "react";
-import { useCallback } from "react";
+import { memo, useCallback } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { Platform, View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { Platform, View, Text, StyleSheet, TouchableOpacity, Pressable } from "react-native";
 
 // Internal Dependencies
 import type { Recipe } from "@/libs/types";
@@ -13,23 +12,35 @@ interface RecipeCardProps {
   recipe: Recipe; // Primary source of data
   index?: number;
   isLarge?: boolean;
-  onCardPress: (recipe: Recipe) => void;
+  onCardPress?: (recipe: Recipe) => void;
   onMenuPress?: (recipe: Recipe) => void;
+
+  // Selection mode props (optional)
+  selectable?: boolean;
+  isSelected?: boolean;
+  onSelect?: () => void;
 }
 
-export const RecipeCard: React.FC<RecipeCardProps> = ({
+const RecipeCardComponent = ({
   recipe,
   index,
   isLarge,
   onCardPress,
   onMenuPress,
-}) => {
+  selectable = false,
+  isSelected = false,
+  onSelect,
+}: RecipeCardProps) => {
   // Derive props from recipe object
   const id = recipe.id;
   const title = recipe.title;
   const cookTime = recipe.cookTime;
   const caloriesPerServing = recipe.caloriesPerServing;
   const thumbnailUri = recipe.coverUri;
+
+  // When selectable, don't show the menu button
+  const showMenuButton = !selectable && onMenuPress;
+
   const renderContent = () => {
     return (
       <View style={styles.cardContentContainer}>
@@ -53,7 +64,7 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
               </View>
             )}
           </View>
-          {onMenuPress && (
+          {showMenuButton && (
             <View style={styles.rightMetaContainer}>
               <TouchableOpacity
                 style={styles.menuButton}
@@ -72,16 +83,19 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
     );
   };
 
-  // Wrap onCardPress to pass recipe object instead of just ID
-  // PreviewCard expects (id: string) => void, but we want to pass the full recipe
+  // Handle card press - when selectable, use onSelect; otherwise use onCardPress
   const handleCardPress = useCallback(
     (_id: string) => {
-      onCardPress(recipe);
+      if (selectable && onSelect) {
+        onSelect();
+      } else if (onCardPress) {
+        onCardPress(recipe);
+      }
     },
-    [recipe, onCardPress],
+    [selectable, onSelect, onCardPress, recipe],
   );
 
-  return (
+  const previewCard = (
     <PreviewCard
       id={id}
       index={index}
@@ -91,7 +105,61 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({
       renderContent={renderContent}
     />
   );
+
+  // When selectable, wrap in container with selection overlay
+  if (selectable) {
+    return (
+      <View
+        accessibilityRole="checkbox"
+        style={styles.selectableContainer}
+        accessibilityState={{ checked: isSelected }}
+        accessibilityLabel={`${title}, ${isSelected ? "selected" : "not selected"}`}
+      >
+        {previewCard}
+        <Pressable
+          style={styles.selectionOverlay}
+          onPress={onSelect}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          {/* Always render both to prevent flicker, use opacity to show/hide */}
+          <View style={styles.indicatorWrapper} collapsable={false}>
+            <View
+              style={[
+                styles.checkmarkContainer,
+                { opacity: isSelected ? 1 : 0 },
+              ]}
+            >
+              <Ionicons name="checkmark-sharp" size={16} color="#FFF4E6" />
+            </View>
+            <View
+              style={[
+                styles.circleOutlineAbsolute,
+                { opacity: isSelected ? 0 : 1 },
+              ]}
+            />
+          </View>
+        </Pressable>
+      </View>
+    );
+  }
+
+  // When not selectable, return PreviewCard directly (no wrapper)
+  return previewCard;
 };
+
+// Memoize to prevent unnecessary re-renders
+// Custom comparison: only re-render if rendering-affecting props change
+export const RecipeCard = memo(RecipeCardComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.index === nextProps.index &&
+    prevProps.isLarge === nextProps.isLarge &&
+    prevProps.recipe.id === nextProps.recipe.id &&
+    prevProps.isSelected === nextProps.isSelected &&
+    prevProps.selectable === nextProps.selectable &&
+    prevProps.recipe.title === nextProps.recipe.title &&
+    prevProps.recipe.coverUri === nextProps.recipe.coverUri
+  );
+});
 
 const styles = StyleSheet.create({
   cardContentContainer: {
@@ -137,5 +205,49 @@ const styles = StyleSheet.create({
       android: "Manrope_400Regular",
       ios: "Manrope-Regular",
     }),
+  },
+  // Selection mode styles
+  selectableContainer: {
+    position: "relative",
+  },
+  selectionOverlay: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    zIndex: 2,
+  },
+  indicatorWrapper: {
+    width: 28,
+    height: 28,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  checkmarkContainer: {
+    position: "absolute",
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: Colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
+  },
+  circleOutlineAbsolute: {
+    position: "absolute",
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: "#fff",
+    backgroundColor: "rgba(0, 0, 0, 0.3)",
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
   },
 });

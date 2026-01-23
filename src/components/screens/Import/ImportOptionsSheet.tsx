@@ -2,15 +2,17 @@
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import { useMemo, useCallback } from "react";
+import { Ionicons } from "@expo/vector-icons";
 import { Alert, Linking } from "react-native";
 import type BottomSheet from "@gorhom/bottom-sheet";
 
 // Internal Dependencies
+import { Colors } from "@/libs/constants";
 import { useActionToast } from "@/contexts";
 import { useDeleteRecipeMutation } from "@/api";
 import type { ImportRecommendation } from "@/libs/types";
 import { createShortSlug, reportError } from "@/libs/utils";
-import { ActionBottomSheet } from "@/components/ActionBottomSheet";
+import { ActionBottomSheet, type ActionBottomSheetMenuItem } from "@/components/ActionBottomSheet";
 
 type ImportData = {
   id: string;
@@ -191,37 +193,61 @@ export function ImportOptionsSheet({
     deleteImportAsync,
   ]);
 
-  const menuItems = useMemo(() => {
+  const menuItems = useMemo<ActionBottomSheetMenuItem[]>(() => {
     return [
       ...(hasRecommendations
         ? [
           {
+            renderIcon: () => (
+              <Ionicons size={20} name="map-outline" color="#667" />
+            ),
             label: "Map",
-            icon: "map-outline" as const,
             onPress: handleMapPress
           }
         ]
         : []),
       isVideo
-        ? { icon: "play-outline" as const, label: "Watch", onPress: handleAssetPress }
-        : { icon: "open-outline" as const, label: "View", onPress: handleAssetPress },
+        ? {
+          renderIcon: () => (
+            <Ionicons size={20} name="play-outline" color="#667" />
+          ),
+          label: "Watch",
+          onPress: handleAssetPress
+        }
+        : {
+          renderIcon: () => (
+            <Ionicons size={20} name="open-outline" color="#667" />
+          ),
+          label: "View",
+          onPress: handleAssetPress
+        },
       {
-        icon: "person-outline" as const,
+        renderIcon: () => (
+          <Ionicons size={20} name="person-outline" color="#667" />
+        ),
         label: "Creator Profile",
         onPress: handleAuthorPress
       },
       {
-        icon: "megaphone-outline" as const,
+        renderIcon: () => (
+          <Ionicons size={20} name="megaphone-outline" color="#667" />
+        ),
         label: "Report Issue",
         onPress: handleReportPress
       },
       {
-        icon: "trash-outline" as const,
+        renderIcon: () => (
+          <Ionicons
+            size={20}
+            name="trash-outline"
+            color={Colors.destructive}
+          />
+        ),
         label: "Delete",
         onPress: handleDeletePress,
         destructive: true,
       },
-    ].filter(Boolean);
+    ].filter(Boolean) as ActionBottomSheetMenuItem[];
   }, [
     isVideo,
     hasRecommendations,
