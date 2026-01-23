@@ -17,6 +17,7 @@ export const API_ENDPOINTS = {
 
   // Recipes
   RECIPES_LIST_V1: `${API_SERVER_BASE_URL}/api/v1/recipes`,
+  RECIPES_BULK_DELETE_V1: `${API_SERVER_BASE_URL}/api/v1/recipes/bulk`,
 
   // Recommendations
   RECOMMENDATIONS_V1: `${API_SERVER_BASE_URL}/api/v1/recommendations`,

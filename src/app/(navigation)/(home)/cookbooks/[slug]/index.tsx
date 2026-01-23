@@ -27,7 +27,14 @@ import {
 } from "@/components";
 
 // API
-import { useCookbookDetails } from "@/api";
+import {
+  useCookbookDetails,
+  useBulkRemoveRecipesFromCookbookMutation,
+  useBulkDeleteRecipesMutation,
+} from "@/api";
+
+// Contexts
+import { useActionToast } from "@/contexts";
 
 // Stable noop function for fallback (prevents creating new functions on every render)
 const noop = () => { };
@@ -49,6 +56,20 @@ export default function CookbookDetails() {
 
   // Parse slug to extract ID and name for API call
   const { id: cookbookId, name: cookbookName } = parseSlug(slug);
+
+  // Toast context for showing success messages
+  const { showToast } = useActionToast();
+
+  // Bulk operation mutations
+  const {
+    mutateAsync: bulkRemoveRecipesAsync,
+    isPending: isRemovePending,
+  } = useBulkRemoveRecipesFromCookbookMutation();
+
+  const {
+    mutateAsync: bulkDeleteRecipesAsync,
+    isPending: isDeletePending,
+  } = useBulkDeleteRecipesMutation();
 
   // Calculate bottom padding: safe area bottom + extra space for comfortable scrolling
   const contentBottomPadding = insets.bottom + 20;
@@ -173,24 +194,6 @@ export default function CookbookDetails() {
     );
   }, [selectedRecipeIds.size]);
 
-  const handleBulkRemove = useCallback(() => {
-    if (selectedRecipeIds.size === 0) return;
-    Alert.alert(
-      "Remove",
-      `Remove ${selectedRecipeIds.size} recipe(s) from cookbook - functionality coming soon`,
-      [{ text: "OK" }],
-    );
-  }, [selectedRecipeIds.size]);
-
-  const handleBulkDelete = useCallback(() => {
-    if (selectedRecipeIds.size === 0) return;
-    Alert.alert(
-      "Delete",
-      `Delete ${selectedRecipeIds.size} recipe(s) - functionality coming soon`,
-      [{ text: "OK" }],
-    );
-  }, [selectedRecipeIds.size]);
-
   // Filter out stale selections when recipes change
   useEffect(() => {
     if (selectedRecipeIds.size === 0) return;
@@ -309,6 +312,122 @@ export default function CookbookDetails() {
     }
   }, [selectedRecipe]);
 
+  const handleBulkRemove = useCallback(() => {
+    if (selectedRecipeIds.size === 0) return;
+
+    // Client-side validation: max 20 recipes per request
+    if (selectedRecipeIds.size > 20) {
+      Alert.alert(
+        "Too Many Recipes",
+        "You can only remove up to 20 recipes at a time. Please deselect some recipes and try again.",
+        [{ text: "OK" }],
+      );
+      return;
+    }
+
+    const recipeCount = selectedRecipeIds.size;
+    const recipeText = recipeCount === 1 ? "recipe" : "recipes";
+
+    Alert.alert(
+      "Remove from Cookbook",
+      `You have selected ${recipeCount} ${recipeText} to be removed from this cookbook. `,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Remove",
+          style: "destructive",
+          onPress: () => {
+            const recipeIds = Array.from(selectedRecipeIds);
+
+            bulkRemoveRecipesAsync({ cookbookId, recipeIds })
+              .then(() => {
+                // Haptic feedback for success
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+                // Show success toast
+                showToast({
+                  text: `Removed ${recipeCount} ${recipeText}`,
+                });
+
+                // Clear selections
+                setSelectedRecipeIds(new Set());
+              })
+              .catch((error) => {
+                // Haptic feedback for error
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+
+                // Show error alert
+                Alert.alert(
+                  "Oops!",
+                  error?.message || "Failed to remove recipes from cookbook. Please try again.",
+                  [{ text: "OK" }],
+                );
+              });
+          },
+        },
+      ],
+      { cancelable: true },
+    );
+  }, [selectedRecipeIds, cookbookId, bulkRemoveRecipesAsync, showToast]);
+
+  const handleBulkDelete = useCallback(() => {
+    if (selectedRecipeIds.size === 0) return;
+
+    // Client-side validation: max 20 recipes per request
+    if (selectedRecipeIds.size > 20) {
+      Alert.alert(
+        "Too Many Recipes",
+        "You can only delete up to 20 recipes at a time. Please deselect some recipes and try again.",
+        [{ text: "OK" }],
+      );
+      return;
+    }
+
+    const recipeCount = selectedRecipeIds.size;
+    const recipeText = recipeCount === 1 ? "recipe" : "recipes";
+
+    Alert.alert(
+      "Delete Recipes",
+      `Permanently delete ${recipeCount} ${recipeText}? This will remove them from all cookbooks.`,
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: () => {
+            const recipeIds = Array.from(selectedRecipeIds);
+
+            bulkDeleteRecipesAsync(recipeIds)
+              .then(() => {
+                // Haptic feedback for success
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+                // Show success toast
+                showToast({
+                  text: `Deleted ${recipeCount} ${recipeText}`,
+                });
+
+                // Clear selections
+                setSelectedRecipeIds(new Set());
+              })
+              .catch((error) => {
+                // Haptic feedback for error
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+
+                // Show error alert
+                Alert.alert(
+                  "Oops!",
+                  error?.message || "Failed to delete recipes. Please try again.",
+                  [{ text: "OK" }],
+                );
+              });
+          },
+        },
+      ],
+      { cancelable: true },
+    );
+  }, [selectedRecipeIds, bulkDeleteRecipesAsync, showToast]);
+
   // Memoize renderItem to prevent re-creations during scroll
   // Use RecipeCard with conditional selectable props based on bulk edit mode
   const renderItem = useCallback(
@@ -383,6 +502,7 @@ export default function CookbookDetails() {
   // Calculate bottom padding for bulk edit mode (footer height + safe area)
   const bulkEditBottomPadding = isBulkEditMode ? 60 + insets.bottom : 0;
   const hasSelections = selectedRecipeIds.size > 0;
+  const isMutationPending = isRemovePending || isDeletePending;
 
   return (
     <View style={styles.container}>
@@ -411,34 +531,34 @@ export default function CookbookDetails() {
       >
         <View style={styles.bulkEditButtonRow}>
           <TouchableOpacity
-            style={[styles.bulkEditButton, !hasSelections && styles.bulkEditButtonDisabled]}
+            style={[styles.bulkEditButton, (!hasSelections || isMutationPending) && styles.bulkEditButtonDisabled]}
             onPress={handleBulkAdd}
-            disabled={!hasSelections}
+            disabled={!hasSelections || isMutationPending}
           >
-            <MaterialIcons name="bookmark-add" size={25} color={hasSelections ? "#667" : "#999"} />
-            <Text style={[styles.bulkEditButtonText, !hasSelections && styles.bulkEditButtonTextDisabled]}>
+            <MaterialIcons name="bookmark-add" size={25} color={hasSelections && !isMutationPending ? "#667" : "#999"} />
+            <Text style={[styles.bulkEditButtonText, (!hasSelections || isMutationPending) && styles.bulkEditButtonTextDisabled]}>
               Add
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.bulkEditButton, !hasSelections && styles.bulkEditButtonDisabled]}
+            style={[styles.bulkEditButton, (!hasSelections || isMutationPending) && styles.bulkEditButtonDisabled]}
             onPress={handleBulkRemove}
-            disabled={!hasSelections}
+            disabled={!hasSelections || isMutationPending}
           >
-            <MaterialIcons name="bookmark-remove" size={24} color={hasSelections ? "#667" : "#999"} />
-            <Text style={[styles.bulkEditButtonText, !hasSelections && styles.bulkEditButtonTextDisabled]}>
+            <MaterialIcons name="bookmark-remove" size={24} color={hasSelections && !isMutationPending ? "#667" : "#999"} />
+            <Text style={[styles.bulkEditButtonText, (!hasSelections || isMutationPending) && styles.bulkEditButtonTextDisabled]}>
               Remove
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.bulkEditButton, !hasSelections && styles.bulkEditButtonDisabled]}
+            style={[styles.bulkEditButton, (!hasSelections || isMutationPending) && styles.bulkEditButtonDisabled]}
             onPress={handleBulkDelete}
-            disabled={!hasSelections}
+            disabled={!hasSelections || isMutationPending}
           >
-            <Ionicons name="trash-outline" size={20} color={hasSelections ? Colors.destructive : "#999"} />
-            <Text style={[styles.bulkEditButtonText, styles.bulkEditButtonTextDestructive, !hasSelections && styles.bulkEditButtonTextDisabled]}>
+            <Ionicons name="trash-outline" size={20} color={hasSelections && !isMutationPending ? Colors.destructive : "#999"} />
+            <Text style={[styles.bulkEditButtonText, styles.bulkEditButtonTextDestructive, (!hasSelections || isMutationPending) && styles.bulkEditButtonTextDisabled]}>
               Delete
             </Text>
           </TouchableOpacity>
