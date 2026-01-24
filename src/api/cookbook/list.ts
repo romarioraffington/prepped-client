@@ -141,6 +141,7 @@ const fetchCookbooksForGrid = async (
       imageUris: item?.imageUris || [],
       count: item?.recipesCount || 0,
       lastUpdatedTimestamp: item?.lastUpdatedTimestamp || 0,
+      type: item?.type ?? 0,
     }));
 
     const result: ImageGridPageResult = {

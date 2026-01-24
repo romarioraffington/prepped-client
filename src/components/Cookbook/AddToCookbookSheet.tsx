@@ -10,9 +10,9 @@ import BottomSheet, { BottomSheetBackdrop, BottomSheetFlatList } from "@gorhom/b
 import { ActivityIndicator, Alert, Platform, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 // Internal Dependencies
-import { Colors } from "@/libs/constants";
 import { useActionToast } from "@/contexts";
 import type { Recipe, ImageGridItem } from "@/libs/types";
+import { Colors, COLLECTION_TYPE } from "@/libs/constants";
 import { useCookbooks, useBulkAddRecipesToCookbookMutation } from "@/api";
 
 // Components
@@ -72,14 +72,17 @@ export function AddToCookbookSheet({
     }
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  // Flatten all cookbook pages and filter out current cookbook and system cookbooks
+  // Flatten all cookbook pages and filter out current cookbook, system cookbooks, and featured cookbooks
   const cookbooks = useMemo(() => {
     if (!cookbooksData?.pages) {
       return [];
     }
     const allCookbooks = cookbooksData.pages.flatMap((page) => page.data ?? []);
     const filtered = allCookbooks.filter(
-      (cookbook) => cookbook.id !== currentCookbookId && cookbook.variant !== "featured",
+      (cookbook) =>
+        cookbook.id !== currentCookbookId &&
+        cookbook.variant !== "featured" &&
+        cookbook.type !== COLLECTION_TYPE.UNORGANIZED,
     );
     return filtered;
   }, [cookbooksData, currentCookbookId]);

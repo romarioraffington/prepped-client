@@ -8,6 +8,7 @@ export interface ImageGridItem {
   hasSubCollections?: boolean;
   lastUpdatedTimestamp: number;
   variant?: CollectionVariant;
+  type: number;
 }
 
 /**

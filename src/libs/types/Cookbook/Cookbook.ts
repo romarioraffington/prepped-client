@@ -28,6 +28,7 @@ export interface CookbookListItem {
   recipesCount: number;
   lastUpdatedTimestamp: number;
   containsRecipe?: boolean;
+  type: number;
 }
 
 export interface CookbookListResponse {
