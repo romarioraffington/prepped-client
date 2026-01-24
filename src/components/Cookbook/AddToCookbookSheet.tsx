@@ -461,7 +461,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   createButton: {
-    gap: 5,
+    gap: 2,
     flexDirection: "row",
     alignItems: "center",
   },

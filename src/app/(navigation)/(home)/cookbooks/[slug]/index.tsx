@@ -23,6 +23,7 @@ import {
   RecipeOptionsSheet,
   LoadingStaggeredGrid,
   CookbookOptionsSheet,
+  AddToCookbookSheet,
   PinterestRefreshIndicator,
 } from "@/components";
 
@@ -53,6 +54,10 @@ export default function CookbookDetails() {
   const [selectedRecipeIds, setSelectedRecipeIds] = useState<Set<string>>(new Set());
   const cookbookOptionsSheetRef = useRef<BottomSheet | null>(null);
   const [isOptionsSheetOpen, setIsOptionsSheetOpen] = useState(false);
+
+  // Add to cookbook sheet state
+  const addToCookbookSheetRef = useRef<BottomSheet | null>(null);
+  const [isAddSheetOpen, setIsAddSheetOpen] = useState(false);
 
   // Parse slug to extract ID and name for API call
   const { id: cookbookId, name: cookbookName } = parseSlug(slug);
@@ -184,15 +189,49 @@ export default function CookbookDetails() {
 
   const selectCallbacks = selectCallbacksRef.current;
 
-  // Bulk edit action handlers (all show alerts for now)
+  // Get selected recipes for add to cookbook sheet
+  const selectedRecipes = useMemo(() => {
+    return recipes.filter((recipe) => selectedRecipeIds.has(recipe.id));
+  }, [recipes, selectedRecipeIds]);
+
+  // Handle bulk add - open add to cookbook sheet
   const handleBulkAdd = useCallback(() => {
     if (selectedRecipeIds.size === 0) return;
-    Alert.alert(
-      "Add",
-      `Add ${selectedRecipeIds.size} recipe(s) - functionality coming soon`,
-      [{ text: "OK" }],
-    );
+
+    // Client-side validation: max 20 recipes per request
+    if (selectedRecipeIds.size > 20) {
+      Alert.alert(
+        "Too Many Recipes",
+        "You can only add up to 20 recipes at a time. Please deselect some recipes and try again.",
+        [{ text: "OK" }],
+      );
+      return;
+    }
+
+    // Exit bulk edit mode immediately when Add is pressed
+    setIsBulkEditMode(false);
+
+    // Open add to cookbook sheet
+    setIsAddSheetOpen(true);
   }, [selectedRecipeIds.size]);
+
+  // Sheet opening is now handled by the AddToCookbookSheet component via isOpen prop
+
+  // Handle successful add to cookbook
+  const handleAddToCookbookSuccess = useCallback(() => {
+    // Clear selections and exit bulk edit mode after successful bulk add
+    setSelectedRecipeIds(new Set());
+    setIsBulkEditMode(false);
+    setIsAddSheetOpen(false);
+  }, []);
+
+  // Handle add to cookbook sheet close
+  const handleAddToCookbookClose = useCallback(() => {
+    // Exit bulk edit mode and clear state when sheet closes
+    setIsAddSheetOpen(false);
+    setIsBulkEditMode(false);
+    setSelectedRecipeIds(new Set());
+  }, []);
 
   // Filter out stale selections when recipes change
   useEffect(() => {
@@ -593,6 +632,16 @@ export default function CookbookDetails() {
           }}
         />
       )}
+
+      {/* Add to Cookbook Bottom Sheet */}
+      <AddToCookbookSheet
+        isOpen={isAddSheetOpen}
+        recipes={selectedRecipes}
+        currentCookbookId={cookbookId}
+        bottomSheetRef={addToCookbookSheetRef}
+        onSuccess={handleAddToCookbookSuccess}
+        onClose={handleAddToCookbookClose}
+      />
     </View>
   );
 }
@@ -642,6 +691,12 @@ const CookbookHeader = forwardRef<Animated.View, CookbookHeaderProps>(
           {/* Recipe count metadata */}
           {hasRecipes && (
             <View style={styles.metadataContainer}>
+              <View style={styles.cookbookBadge}>
+                <Ionicons size={11} name="book-outline" color="#667" />
+                <Text style={styles.cookbookBadgeText}>Cookbook</Text>
+              </View>
+              <Text style={styles.metadataSeparator}> • </Text>
+
               <Text style={styles.metadataText}>
                 {recipesCount} {recipesText}
               </Text>
@@ -709,6 +764,21 @@ const styles = StyleSheet.create({
     color: "#999",
     fontSize: 13,
     fontWeight: "600",
+  },
+  cookbookBadge: {
+    gap: 4,
+    flexDirection: "row",
+    alignItems: "center",
+    borderRadius: 5,
+  },
+  cookbookBadgeText: {
+    fontFamily: Platform.select({
+      android: "Manrope_400Regular",
+      ios: "Manrope-Regular",
+    }),
+    color: "#999",
+    fontSize: 12,
+    fontWeight: "400",
   },
   headerOptionsButtonText: {
     fontSize: 15,

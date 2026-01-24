@@ -8,37 +8,32 @@ import { Colors } from "@/libs/constants";
 export interface DotsLoaderProps {
   /**
    * Color of the loading dots
-   * @default Colors.primary
    */
   color?: string;
   /**
    * Size of each dot in pixels
-   * @default 10
    */
   dotSize?: number;
   /**
    * Spacing between dots in pixels
-   * @default 6
    */
   dotSpacing?: number;
   /**
    * Background color of the container
-   * @default "#fff"
    */
   backgroundColor?: string;
   /**
    * Whether the loader should take full height
-   * @default true
    */
   fullHeight?: boolean;
 }
 
 export const DotsLoader: React.FC<DotsLoaderProps> = ({
-  color = Colors.primary,
   dotSize = 10,
   dotSpacing = 6,
-  backgroundColor = "#fff",
   fullHeight = true,
+  color = Colors.primary,
+  backgroundColor = Colors.background,
 }) => {
   const dots = useMemo(
     () => [new Animated.Value(0), new Animated.Value(0), new Animated.Value(0)],
@@ -122,8 +117,8 @@ export const DotsLoader: React.FC<DotsLoaderProps> = ({
 const styles = StyleSheet.create({
   container: {
     alignItems: "center",
-    justifyContent: "center",
     flexDirection: "row",
+    justifyContent: "center",
   },
   fullHeight: {
     flex: 0.5,

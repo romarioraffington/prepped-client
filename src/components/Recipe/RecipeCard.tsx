@@ -117,8 +117,8 @@ const RecipeCardComponent = ({
       >
         {previewCard}
         <Pressable
-          style={styles.selectionOverlay}
           onPress={onSelect}
+          style={styles.selectionOverlay}
           hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
         >
           {/* Always render both to prevent flicker, use opacity to show/hide */}
