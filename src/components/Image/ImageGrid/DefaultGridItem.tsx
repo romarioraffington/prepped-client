@@ -1,6 +1,6 @@
 // External Imports
-import type React from "react";
 import { Ionicons } from "@expo/vector-icons";
+import type React from "react";
 
 import {
   View,
@@ -17,7 +17,7 @@ import type { GridItemProps } from "@/libs/types";
 import { columnWidth, imageGap, itemHeight } from "./consts";
 
 // Import directly to avoid circular dependency with @/components
-import { ShimmerImage } from "@/components/ShimmerImage";
+import { ShimmerImage } from "@/components/Image";
 
 export const DefaultGridItem = ({
   item,
@@ -26,7 +26,9 @@ export const DefaultGridItem = ({
   onItemPress,
   onOptionsPress,
 }: GridItemProps & { isLoading?: boolean }) => {
-  const { validImages, handleImageError } = useImageErrorFilter(item.imageUris || []);
+  const { validImages, handleImageError } = useImageErrorFilter(
+    item.imageUris || [],
+  );
 
   const hasImage1 = validImages.length > 0;
   const hasImage2 = validImages.length > 1;
@@ -86,7 +88,9 @@ export const DefaultGridItem = ({
 
       {/* Item Name and Options */}
       <View style={styles.titleRow}>
-        <Text style={styles.itemName} numberOfLines={1}>{heading}</Text>
+        <Text style={styles.itemName} numberOfLines={1}>
+          {heading}
+        </Text>
         {onOptionsPress && (
           <TouchableOpacity
             onPress={(e) => {
@@ -102,15 +106,10 @@ export const DefaultGridItem = ({
       </View>
 
       {/* Item Info */}
-      {metadata && (
-        <View style={styles.metadataContainer}>
-          {metadata}
-        </View>
-      )}
+      {metadata && <View style={styles.metadataContainer}>{metadata}</View>}
     </TouchableOpacity>
   );
 };
-
 
 const styles = StyleSheet.create({
   itemContainer: {

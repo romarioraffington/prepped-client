@@ -1,5 +1,5 @@
-import { View, Text, StyleSheet } from 'react-native';
-import Svg, { Circle } from 'react-native-svg';
+import { StyleSheet, Text, View } from "react-native";
+import Svg, { Circle } from "react-native-svg";
 
 interface CircleGraphProps {
   current: number;
@@ -38,7 +38,9 @@ export function CircleGraph({ current, total }: CircleGraphProps) {
         />
       </Svg>
       <View style={styles.textContainer}>
-        <Text style={styles.text}>{current}/{total}</Text>
+        <Text style={styles.text}>
+          {current}/{total}
+        </Text>
       </View>
     </View>
   );
@@ -46,18 +48,18 @@ export function CircleGraph({ current, total }: CircleGraphProps) {
 
 const styles = StyleSheet.create({
   container: {
-    position: 'relative',
-    alignItems: 'center',
-    justifyContent: 'center',
+    position: "relative",
+    alignItems: "center",
+    justifyContent: "center",
   },
   textContainer: {
-    position: 'absolute',
-    alignItems: 'center',
-    justifyContent: 'center',
+    position: "absolute",
+    alignItems: "center",
+    justifyContent: "center",
   },
   text: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#9333EA',
+    fontWeight: "600",
+    color: "#9333EA",
   },
 });

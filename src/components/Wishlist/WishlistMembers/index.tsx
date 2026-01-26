@@ -1,11 +1,11 @@
+import { Feather } from "@expo/vector-icons";
 // External Dependencies
 import type React from "react";
-import { Feather } from "@expo/vector-icons";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
+import { ProfileIcon } from "@/components/ProfileIcon";
 // Internal Dependencies
 import { DEFAULT_AVATAR } from "@/libs/constants";
-import { ProfileIcon } from "@/components/ProfileIcon";
 import type { WishlistMember } from "@/libs/types/Wishlists/Wishlist";
 
 interface WishlistMembersProps {
@@ -71,7 +71,12 @@ export const WishlistMembers: React.FC<WishlistMembersProps> = ({
           </View>
         )}
       </View>
-      <Feather name="chevron-right" size={15} color="#000" style={styles.chevronRight} />
+      <Feather
+        name="chevron-right"
+        size={15}
+        color="#000"
+        style={styles.chevronRight}
+      />
     </TouchableOpacity>
   );
 };
@@ -125,4 +130,3 @@ const styles = StyleSheet.create({
     marginRight: 4,
   },
 });
-

@@ -1,11 +1,11 @@
 // External Dependencies
-import { useMemo, useState, useCallback, useRef, memo, useEffect } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Dimensions, ScrollView, StyleSheet, View } from "react-native";
 import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 
+import { Colors } from "@/libs/constants";
 // Internal Dependencies
 import type { Recipe } from "@/libs/types";
-import { Colors } from "@/libs/constants";
 import { RecipeCarouselCard } from "./RecipeCarouselCard";
 import { RECIPE_CAROUSEL_CARD_WIDTH } from "./consts";
 
@@ -17,7 +17,6 @@ const SCREEN_WIDTH = Dimensions.get("window").width;
 export interface RecipeCarouselProps {
   recipes: Recipe[];
 }
-
 
 export const RecipeCarousel = memo(({ recipes }: RecipeCarouselProps) => {
   const scrollPositionRef = useRef<number>(0);
@@ -31,7 +30,9 @@ export const RecipeCarousel = memo(({ recipes }: RecipeCarouselProps) => {
     if (recipes.length <= 1) return 1;
 
     // Calculate total content width: all cards + gaps between them
-    const contentWidth = recipes.length * RECIPE_CAROUSEL_CARD_WIDTH + (recipes.length - 1) * CARD_GAP;
+    const contentWidth =
+      recipes.length * RECIPE_CAROUSEL_CARD_WIDTH +
+      (recipes.length - 1) * CARD_GAP;
 
     // Number of pages = how many viewport-widths fit in the content
     // We need at least 1 page, and we round up for partial last pages
@@ -121,7 +122,9 @@ export const RecipeCarousel = memo(({ recipes }: RecipeCarouselProps) => {
       </ScrollView>
 
       {/* Pagination dots */}
-      {showDots && <PaginationDots totalPages={totalPages} currentPage={currentPage} />}
+      {showDots && (
+        <PaginationDots totalPages={totalPages} currentPage={currentPage} />
+      )}
     </View>
   );
 });
@@ -129,23 +132,28 @@ export const RecipeCarousel = memo(({ recipes }: RecipeCarouselProps) => {
 RecipeCarousel.displayName = "RecipeCarousel";
 
 // Memoized pagination dots component
-const PaginationDots = memo(({ totalPages, currentPage }: { totalPages: number; currentPage: number }) => {
-  const dots = useMemo(
-    () =>
-      Array.from({ length: totalPages }, (_, index) => (
-        <View
-          key={`dot-${index}`}
-          style={[
-            styles.dot,
-            index === currentPage ? styles.dotActive : styles.dotInactive,
-          ]}
-        />
-      )),
-    [totalPages, currentPage],
-  );
+const PaginationDots = memo(
+  ({
+    totalPages,
+    currentPage,
+  }: { totalPages: number; currentPage: number }) => {
+    const dots = useMemo(
+      () =>
+        Array.from({ length: totalPages }, (_, index) => (
+          <View
+            key={`dot-${index}`}
+            style={[
+              styles.dot,
+              index === currentPage ? styles.dotActive : styles.dotInactive,
+            ]}
+          />
+        )),
+      [totalPages, currentPage],
+    );
 
-  return <View style={styles.dotsContainer}>{dots}</View>;
-});
+    return <View style={styles.dotsContainer}>{dots}</View>;
+  },
+);
 
 PaginationDots.displayName = "PaginationDots";
 

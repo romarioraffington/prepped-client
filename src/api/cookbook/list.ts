@@ -1,18 +1,18 @@
 // External Dependencies
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
+import { API_ENDPOINTS, QUERY_KEYS, getApiClient } from "@/libs/constants";
 
 // Internal Dependencies
 import { reportError } from "@/libs/utils";
 import { useAuthStore } from "@/stores/authStore";
-import { API_ENDPOINTS, getApiClient, QUERY_KEYS } from "@/libs/constants";
 
 import type {
   ImageGridItem,
   CookbookCardData,
   CookbookListItem,
   CookbookPageResult,
-  ImageGridPageResult,
   CookbookListResponse,
+  ImageGridPageResult,
 } from "@/libs/types";
 
 /**
@@ -24,9 +24,8 @@ const transformToCookbookCardData = (
   return {
     id: item.id,
     name: item.name,
-    coverImageUri: item.imageUris?.[0] || null,
     savedCount: item.recipesCount,
-    members: [],
+    coverImageUri: item.imageUris?.[0] || null,
     containsRecipe: item.containsRecipe,
   };
 };

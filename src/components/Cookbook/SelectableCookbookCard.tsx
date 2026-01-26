@@ -1,6 +1,6 @@
+import { Ionicons } from "@expo/vector-icons";
 // External Dependencies
 import type { FC } from "react";
-import { Ionicons } from "@expo/vector-icons";
 import { StyleSheet, View } from "react-native";
 
 // Internal Dependencies
@@ -28,10 +28,7 @@ export const SelectableCookbookCard: FC<SelectableCookbookCardProps> = ({
       accessibilityState={{ checked: isSelected, disabled }}
       accessibilityLabel={`${item.name}, ${isSelected ? "selected" : "not selected"}`}
     >
-      <CookbookCard
-        item={item}
-        onPress={disabled ? () => { } : onSelect}
-      />
+      <CookbookCard item={item} onPress={disabled ? () => {} : onSelect} />
       {isSelected && (
         <View style={styles.checkmarkOverlay}>
           <View style={styles.checkmarkContainer}>

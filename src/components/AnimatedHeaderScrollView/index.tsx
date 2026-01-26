@@ -1,8 +1,8 @@
+import { useHeaderHeight } from "@react-navigation/elements";
+import { useNavigation } from "expo-router";
 // External imports
 import type React from "react";
 import { useLayoutEffect } from "react";
-import { useNavigation } from "expo-router";
-import { useHeaderHeight } from "@react-navigation/elements";
 import Animated, { type SharedValue } from "react-native-reanimated";
 
 // Internal imports
@@ -48,7 +48,10 @@ export function AnimatedHeaderScrollView({
       onScroll={scrollHandler}
       scrollEventThrottle={16}
       showsVerticalScrollIndicator={false}
-      contentContainerStyle={{ paddingBottom: 50, paddingTop: headerHeight + 16 }}
+      contentContainerStyle={{
+        paddingBottom: 50,
+        paddingTop: headerHeight + 16,
+      }}
     >
       {headerTitle && (
         <LargeTitle

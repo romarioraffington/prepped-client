@@ -4,7 +4,10 @@ import React, { createContext, useContext } from "react";
 import type { SharedValue } from "react-native-reanimated";
 
 // Internal Dependencies
-import { useScrollDirection, type ScrollDirection } from "@/hooks/useScrollDirection";
+import {
+  type ScrollDirection,
+  useScrollDirection,
+} from "@/hooks/useScrollDirection";
 
 // Scroll event type matching reanimated's scroll handler event
 type ScrollEventData = { contentOffset: { y: number } };
@@ -18,8 +21,11 @@ interface TabScrollContextValue {
 const TabScrollContext = createContext<TabScrollContextValue | null>(null);
 
 export const TabScrollProvider: FC<PropsWithChildren> = ({ children }) => {
-  const { scrollDirection, onScroll: handleScrollDirectionOnScroll, resetScrollDirection } =
-    useScrollDirection();
+  const {
+    scrollDirection,
+    onScroll: handleScrollDirectionOnScroll,
+    resetScrollDirection,
+  } = useScrollDirection();
 
   const handleTabScroll = (e: ScrollEventData) => {
     "worklet";

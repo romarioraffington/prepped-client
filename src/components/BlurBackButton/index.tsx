@@ -1,10 +1,10 @@
+import { Ionicons } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
+import { isLiquidGlassAvailable } from "expo-glass-effect";
+import { useNavigation } from "expo-router";
 // External Dependencies
-import { useCallback } from 'react';
-import { BlurView } from 'expo-blur';
-import { useNavigation } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
-import { isLiquidGlassAvailable } from 'expo-glass-effect';
-import { StyleSheet, TouchableOpacity, type ViewStyle } from 'react-native';
+import { useCallback } from "react";
+import { StyleSheet, TouchableOpacity, type ViewStyle } from "react-native";
 
 interface BlurBackButtonProps {
   isScrolled?: boolean;
@@ -14,7 +14,12 @@ interface BlurBackButtonProps {
 }
 
 // Reusable back button component with blur when liquid glass is not available
-export function BlurBackButton({ isScrolled = false, style, onPress, disabled }: BlurBackButtonProps) {
+export function BlurBackButton({
+  isScrolled = false,
+  style,
+  onPress,
+  disabled,
+}: BlurBackButtonProps) {
   const navigation = useNavigation();
   const shouldShowBlur = !isLiquidGlassAvailable() && !isScrolled;
 
@@ -27,7 +32,7 @@ export function BlurBackButton({ isScrolled = false, style, onPress, disabled }:
       navigation.goBack();
     } else {
       // Fallback if can't go back
-      navigation.navigate('(tabs)' as never);
+      navigation.navigate("(tabs)" as never);
     }
   }, [navigation, onPress]);
 
@@ -42,9 +47,13 @@ export function BlurBackButton({ isScrolled = false, style, onPress, disabled }:
       style={[styles.buttonContainer, style]}
       hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
     >
-
       {isLiquidGlassAvailable() ? (
-        <Ionicons style={{ left: -2, top: -1 }} name="chevron-back" size={28} color={iconColor} />
+        <Ionicons
+          style={{ left: -2, top: -1 }}
+          name="chevron-back"
+          size={28}
+          color={iconColor}
+        />
       ) : (
         <>
           <BlurView
@@ -52,7 +61,12 @@ export function BlurBackButton({ isScrolled = false, style, onPress, disabled }:
             intensity={blurIntensity}
             style={StyleSheet.absoluteFillObject}
           />
-          <Ionicons style={{ left: -1, top: 1 }} name="chevron-back" size={25} color={iconColor} />
+          <Ionicons
+            style={{ left: -1, top: 1 }}
+            name="chevron-back"
+            size={25}
+            color={iconColor}
+          />
         </>
       )}
     </TouchableOpacity>
@@ -64,8 +78,8 @@ const styles = StyleSheet.create({
     width: 38,
     height: 40,
     borderRadius: 20,
-    overflow: 'hidden',
-    alignItems: 'center',
-    justifyContent: 'center',
+    overflow: "hidden",
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

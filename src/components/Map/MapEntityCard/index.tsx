@@ -1,39 +1,37 @@
 // External Dependencies
-import { memo, type ReactNode } from "react";
+import { type ReactNode, memo } from "react";
+import { useImageErrorFilter } from "@/hooks";
+
 import {
-  View,
   Text,
-  StyleSheet,
+  View,
   Dimensions,
+  StyleSheet,
   TouchableOpacity,
 } from "react-native";
 
 // Internal Dependencies
 import type { Hours } from "@/libs/types";
-import { useImageErrorFilter } from "@/hooks";
-
-// Imported directly to prevent circular dependencies warning
-import { ShimmerImage } from '@/components/ShimmerImage';
-import { ImagePlaceholder } from '@/components/ImagePlaceholder';
-import { HoursStatus } from '@/components/Hours/HoursStatus';
-import { RatingInfo } from '@/components/Rating/RatingInfo';
-import { EntityInfo } from '@/components/Entity/EntityInfo';
+import { EntityInfo } from "@/components/Entity/EntityInfo";
+import { HoursStatus } from "@/components/Hours/HoursStatus";
+import { RatingInfo } from "@/components/Rating/RatingInfo";
+import { ImagePlaceholder, ShimmerImage } from "@/components/Image";
 
 type MapEntityCardProps = {
   hours?: Hours;
   category: string;
   title: string;
   rating?: number;
-  reviewCount?: number;
   imageUrls: string[];
-  isAccessible?: boolean;
+  reviewCount?: number;
   priceRange?: string;
-  renderActions?: () => ReactNode;
+  isAccessible?: boolean;
   onPress: () => void;
+  renderActions?: () => ReactNode;
 };
 
 const IMAGE_HEIGHT = 90;
-const CARD_WIDTH = Dimensions.get('window').width * 0.7;
+const CARD_WIDTH = Dimensions.get("window").width * 0.7;
 
 const MapEntityCardComponent = ({
   category,
@@ -49,10 +47,19 @@ const MapEntityCardComponent = ({
 }: MapEntityCardProps) => {
   const { validImages, handleImageError } = useImageErrorFilter(imageUrls);
   const firstValidImage = validImages[0];
-  const isReviewAvailable = !!(reviewCount && reviewCount > 0 && rating && rating > 0);
+  const isReviewAvailable = !!(
+    reviewCount &&
+    reviewCount > 0 &&
+    rating &&
+    rating > 0
+  );
 
   return (
-    <TouchableOpacity style={styles.container} onPress={onPress} activeOpacity={0.9}>
+    <TouchableOpacity
+      style={styles.container}
+      onPress={onPress}
+      activeOpacity={0.9}
+    >
       {/* Image */}
       <View style={styles.imageContainer}>
         {firstValidImage ? (
@@ -75,26 +82,36 @@ const MapEntityCardComponent = ({
       </View>
 
       <View style={styles.contentContainer}>
-        <Text style={styles.title} numberOfLines={1}>{title}</Text>
+        <Text style={styles.title} numberOfLines={1}>
+          {title}
+        </Text>
 
         {/* Title row with rating and buttons */}
         <View style={styles.titleRow}>
-          {isReviewAvailable && rating !== undefined && reviewCount !== undefined && (
-            <View style={styles.ratingContainer}>
-              <RatingInfo size={14} rating={rating} reviewCount={reviewCount} />
-            </View>
-          )}
+          {isReviewAvailable &&
+            rating !== undefined &&
+            reviewCount !== undefined && (
+              <View style={styles.ratingContainer}>
+                <RatingInfo
+                  size={14}
+                  rating={rating}
+                  reviewCount={reviewCount}
+                />
+              </View>
+            )}
           {renderActions && (
-            <View style={styles.actionsContainer}>
-              {renderActions()}
-            </View>
+            <View style={styles.actionsContainer}>{renderActions()}</View>
           )}
         </View>
 
-        <EntityInfo category={category} isAccessible={isAccessible} priceRange={priceRange} />
+        <EntityInfo
+          category={category}
+          isAccessible={isAccessible}
+          priceRange={priceRange}
+        />
         {hours && <HoursStatus hours={hours} />}
       </View>
-    </TouchableOpacity >
+    </TouchableOpacity>
   );
 };
 
@@ -132,7 +149,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: "600",
-    color: '#000',
+    color: "#000",
     marginBottom: 2,
   },
   titleRow: {
@@ -153,8 +170,8 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     marginTop: 3,
-    color: '#888',
+    color: "#888",
     lineHeight: 18,
-    fontWeight: '400',
+    fontWeight: "400",
   },
 });

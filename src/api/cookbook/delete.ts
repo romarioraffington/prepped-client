@@ -1,14 +1,14 @@
 // External Dependencies
 import {
+  type InfiniteData,
   useMutation,
   useQueryClient,
-  type InfiniteData,
 } from "@tanstack/react-query";
 
+import { API_ENDPOINTS, QUERY_KEYS, getApiClient } from "@/libs/constants";
+import type { ImageGridItem } from "@/libs/types";
 // Internal Dependencies
 import { reportError } from "@/libs/utils";
-import type { ImageGridItem } from "@/libs/types";
-import { API_ENDPOINTS, getApiClient, QUERY_KEYS } from "@/libs/constants";
 
 /**
  * Delete a cookbook

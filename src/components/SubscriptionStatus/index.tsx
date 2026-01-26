@@ -1,19 +1,18 @@
+import { Image } from "expo-image";
+import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
+import { LucideCoins } from "lucide-react-native";
 // External Dependencies
-import type React from 'react';
-import { router } from 'expo-router';
-import { Image } from 'expo-image';
-import { LucideCoins } from 'lucide-react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import type React from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
+import { useImportQuota } from "@/api";
+import { useSubscriptionStatus } from "@/hooks";
+import { Colors } from "@/libs/constants";
+import { formatDate } from "@/libs/utils/date";
+import { ChevronForward } from "../ChevronForward";
 // Internal Dependencies
-import { ProBadge } from '../ProBadge';
-import { useImportQuota } from '@/api';
-import { Colors } from '@/libs/constants';
-import { formatDate } from '@/libs/utils/date';
-import { useSubscriptionStatus } from '@/hooks';
-import { ChevronForward } from '../ChevronForward';
-
+import { ProBadge } from "../ProBadge";
 
 export const SubscriptionStatus = () => {
   const {
@@ -23,17 +22,17 @@ export const SubscriptionStatus = () => {
     isAutoRenewEnabled,
     isOperationInProgress,
     hasActiveSubscription,
-  } = useSubscriptionStatus()
+  } = useSubscriptionStatus();
 
-  const { data: importQuota, isLoading: isQuotaLoading } = useImportQuota()
+  const { data: importQuota, isLoading: isQuotaLoading } = useImportQuota();
 
   const handleUpgradePress = () => {
     router.push("/account/manage-subscription");
-  }
+  };
 
   const handleManageSubscriptionPress = () => {
     router.push("/account/manage-subscription");
-  }
+  };
 
   if (!isInitialized || isOperationInProgress) {
     return null;
@@ -42,40 +41,54 @@ export const SubscriptionStatus = () => {
   if (hasActiveSubscription) {
     return (
       <View style={styles.activeSubscriptionContainer}>
-        <TouchableOpacity style={styles.subscriptionInfoSection} onPress={handleManageSubscriptionPress}>
+        <TouchableOpacity
+          style={styles.subscriptionInfoSection}
+          onPress={handleManageSubscriptionPress}
+        >
           <ProBadge text={subscriptionTier.toUpperCase()} />
           <View style={styles.subscriptionInfoTextContainer}>
-            <Text style={styles.subscriptionInfoSubscribedTitle}>Tripster 👋</Text>
-            <Text style={[styles.subscribedInfoSubscribedSubtitle, { color: isAutoRenewEnabled ? Colors.primary : '#DC2626' }]}>
-              {isAutoRenewEnabled ? 'Renews on' : 'Expires on'} {formatDate(expirationDate)}
+            <Text style={styles.subscriptionInfoSubscribedTitle}>
+              Tripster 👋
+            </Text>
+            <Text
+              style={[
+                styles.subscribedInfoSubscribedSubtitle,
+                { color: isAutoRenewEnabled ? Colors.primary : "#DC2626" },
+              ]}
+            >
+              {isAutoRenewEnabled ? "Renews on" : "Expires on"}{" "}
+              {formatDate(expirationDate)}
             </Text>
           </View>
           <ChevronForward color={Colors.primary} />
         </TouchableOpacity>
       </View>
-    )
+    );
   }
 
-
   const creditBalanceRemaining = importQuota?.creditBalanceRemaining ?? 0;
-  const showImportCount = !hasActiveSubscription && importQuota && !isQuotaLoading
+  const showImportCount =
+    !hasActiveSubscription && importQuota && !isQuotaLoading;
 
   // Check if the quota is full
-  const isQuotaFull = creditBalanceRemaining <= 0
+  const isQuotaFull = creditBalanceRemaining <= 0;
 
   // Calculate import count text
   const importCountText = isQuotaFull
     ? `You have no import credits remaining`
-    : `${creditBalanceRemaining} import credits remaining`
+    : `${creditBalanceRemaining} import credits remaining`;
 
   return (
     <View style={styles.container}>
-      <TouchableOpacity style={styles.upsellSection} onPress={handleUpgradePress}>
+      <TouchableOpacity
+        style={styles.upsellSection}
+        onPress={handleUpgradePress}
+      >
         {/* Background Image */}
         <Image
           contentFit="cover"
           style={styles.backgroundImage}
-          source={require('~/assets/images/suitcase/suitcase-with-coins-no-bg.webp')}
+          source={require("~/assets/images/suitcase/suitcase-with-coins-no-bg.webp")}
         />
 
         {/* Gradient Overlay */}
@@ -83,7 +96,7 @@ export const SubscriptionStatus = () => {
           start={{ x: 1, y: 1 }}
           end={{ x: 0, y: 0 }}
           style={styles.gradientOverlay}
-          colors={['#FAF5FF', '#F5F0FF', '#F0EBFF']}
+          colors={["#FAF5FF", "#F5F0FF", "#F0EBFF"]}
         />
 
         {/* Content */}
@@ -93,9 +106,7 @@ export const SubscriptionStatus = () => {
               <View style={styles.importCountContainer}>
                 <View style={styles.importCountRow}>
                   <LucideCoins size={20} color="#9333EA" strokeWidth={2} />
-                  <Text style={styles.importCountText}>
-                    {importCountText}
-                  </Text>
+                  <Text style={styles.importCountText}>{importCountText}</Text>
                 </View>
               </View>
             )}
@@ -103,7 +114,8 @@ export const SubscriptionStatus = () => {
           </View>
 
           <Text style={styles.upsellSubheading}>
-            Subscribe for unlimited imports {'\n'}and early access to new features.
+            Subscribe for unlimited imports {"\n"}and early access to new
+            features.
           </Text>
         </View>
       </TouchableOpacity>
@@ -117,8 +129,8 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 14,
-    color: '#7F8C8D',
-    textAlign: 'center',
+    color: "#7F8C8D",
+    textAlign: "center",
     padding: 16,
   },
 
@@ -155,17 +167,17 @@ const styles = StyleSheet.create({
   // Upsell Section
   upsellSection: {
     borderRadius: 16,
-    overflow: 'hidden',
+    overflow: "hidden",
     borderWidth: 1,
     borderColor: "#E9D5FF",
-    position: 'relative',
+    position: "relative",
   },
   backgroundImage: {
-    position: 'absolute',
+    position: "absolute",
     right: 18,
     top: 0,
     bottom: 0,
-    width: '32%',
+    width: "32%",
     opacity: 0.4,
     zIndex: 10,
   },
@@ -178,7 +190,7 @@ const styles = StyleSheet.create({
     paddingLeft: 16,
     paddingRight: 5,
     paddingVertical: 16,
-    position: 'relative',
+    position: "relative",
     zIndex: 1,
   },
   upsellHeading: {
@@ -218,15 +230,15 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   refreshButton: {
-    backgroundColor: '#ECF0F1',
+    backgroundColor: "#ECF0F1",
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 8,
     marginTop: 8,
   },
   refreshButtonText: {
-    color: '#7F8C8D',
+    color: "#7F8C8D",
     fontSize: 12,
-    textAlign: 'center',
+    textAlign: "center",
   },
 });

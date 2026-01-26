@@ -1,5 +1,5 @@
-import type { Region } from "react-native-maps";
 import type { RecommendationListItem } from "@/libs/types";
+import type { Region } from "react-native-maps";
 
 /**
  * Calculate the region for a set of recommendations

@@ -1,10 +1,10 @@
 // External Dependencies
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
+import { API_ENDPOINTS, QUERY_KEYS, getApiClient } from "@/libs/constants";
+import type { RecommendationDetail } from "@/libs/types";
 // Internal Dependencies
 import { parseSlug, reportError } from "@/libs/utils";
-import type { RecommendationDetail } from "@/libs/types";
-import { API_ENDPOINTS, getApiClient, QUERY_KEYS } from "@/libs/constants";
 
 interface RecommendationDetailsResponse {
   data: RecommendationDetail;
@@ -49,7 +49,8 @@ export const useRecommendationDetails = (
   return useQuery({
     queryKey: QUERY_KEYS.RECOMMENDATION_DETAILS(recommendationId),
     queryFn: () => fetchRecommendationDetails(recommendationId),
-    enabled: options?.enabled !== undefined ? options.enabled : !!recommendationId,
+    enabled:
+      options?.enabled !== undefined ? options.enabled : !!recommendationId,
   });
 };
 

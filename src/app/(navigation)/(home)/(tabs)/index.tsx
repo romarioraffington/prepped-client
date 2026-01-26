@@ -1,20 +1,20 @@
 // External Components
 import { useRouter } from "expo-router";
-import { Alert, View, StyleSheet, FlatList } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import type { useAnimatedScrollHandler } from "react-native-reanimated";
 import React, { useCallback, useEffect, useState, useMemo } from "react";
+import { Alert, FlatList, StyleSheet, View } from "react-native";
+import type { useAnimatedScrollHandler } from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import type { ImageGridItem } from "@/libs/types";
 // Internal Components
 import { createFullSlug } from "@/libs/utils";
-import type { ImageGridItem } from "@/libs/types";
 
 import {
-  ImageGridList,
   EmptyImageState,
-  WithPullToRefresh,
+  ImageGridList,
   LoadingImageGridList,
-  PinterestRefreshIndicator
+  PinterestRefreshIndicator,
+  WithPullToRefresh,
 } from "@/components";
 
 // API
@@ -88,16 +88,19 @@ export default function Cookbooks({
   }, [refetch]);
 
   // Memoize to prevent re-renders in ImageGridList
-  const handleBoardItemPress = useCallback((cookbookItem: ImageGridItem) => {
-    const slug = createFullSlug(cookbookItem.name, cookbookItem.id);
+  const handleBoardItemPress = useCallback(
+    (cookbookItem: ImageGridItem) => {
+      const slug = createFullSlug(cookbookItem.name, cookbookItem.id);
 
-    router.push({
-      pathname: "/cookbooks/[slug]",
-      params: {
-        slug,
-      },
-    });
-  }, [router]);
+      router.push({
+        pathname: "/cookbooks/[slug]",
+        params: {
+          slug,
+        },
+      });
+    },
+    [router],
+  );
 
   const handleEndReached = React.useCallback(() => {
     if (hasNextPage && !isFetchingNextPage) {
@@ -111,7 +114,7 @@ export default function Cookbooks({
       paddingTop: contentTopPadding,
       paddingBottom: contentBottomPadding,
     }),
-    [contentTopPadding, contentBottomPadding]
+    [contentTopPadding, contentBottomPadding],
   );
 
   if (!cookbooks.length && !isLoading) {
@@ -129,7 +132,12 @@ export default function Cookbooks({
             data={[]}
             renderItem={() => null}
             ListHeaderComponent={
-              <View style={[styles.emptyStateContainer, { paddingTop: contentTopPadding }]}>
+              <View
+                style={[
+                  styles.emptyStateContainer,
+                  { paddingTop: contentTopPadding },
+                ]}
+              >
                 <EmptyImageState
                   title="Create a cookbook ✨"
                   description={`Share recipes from other apps to start building your cookbook.`}

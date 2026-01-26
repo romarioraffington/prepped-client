@@ -1,7 +1,7 @@
+import { Ionicons } from "@expo/vector-icons";
 // External Dependencies
 import type React from "react";
-import { Ionicons } from "@expo/vector-icons";
-import { TouchableOpacity, Text, StyleSheet, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 // Internal Dependencies
 import { Colors } from "@/libs/constants";
@@ -27,7 +27,9 @@ export const HoursBadge: React.FC<HoursBadgeProps> = ({ hours, onPress }) => {
           name="time-outline"
           style={styles.icon}
         />
-        <Text style={[styles.text, { color: Colors.successColor }]}>Open 24 Hours</Text>
+        <Text style={[styles.text, { color: Colors.successColor }]}>
+          Open 24 Hours
+        </Text>
       </View>
     );
   }
@@ -48,7 +50,12 @@ export const HoursBadge: React.FC<HoursBadgeProps> = ({ hours, onPress }) => {
         style={styles.icon}
       />
       <Text
-        style={[styles.text, { color: hours.isOpen ? Colors.successColor : Colors.pinkAccentColor }]}
+        style={[
+          styles.text,
+          {
+            color: hours.isOpen ? Colors.successColor : Colors.pinkAccentColor,
+          },
+        ]}
       >
         {hours.isOpen
           ? `Open until ${hours.closedAt}`

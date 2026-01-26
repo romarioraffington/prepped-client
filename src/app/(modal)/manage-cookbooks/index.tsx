@@ -1,31 +1,37 @@
-// External Dependencies
-import * as Haptics from "expo-haptics";
 import { AntDesign } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
+// External Dependencies
+import * as Haptics from "expo-haptics";
 import { router, useLocalSearchParams } from "expo-router";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
-  Text,
-  View,
   Alert,
   FlatList,
   StyleSheet,
+  Text,
   TouchableOpacity,
+  View,
 } from "react-native";
 
+import { CookbookCard, DotsLoader, EmptyImageState } from "@/components";
 // Internal Dependencies
 import { useActionToast } from "@/contexts";
 import { Colors } from "@/libs/constants";
-import { parseSlug, reportError } from "@/libs/utils";
 import type { CookbookCardData } from "@/libs/types";
-import { DotsLoader, EmptyImageState, CookbookCard } from "@/components";
+import { parseSlug, reportError } from "@/libs/utils";
 
 import {
   useCookbooksForCards,
-  useSaveRecipeToCookbookMutation,
   useRemoveRecipeFromCookbookMutation,
+  useSaveRecipeToCookbookMutation,
 } from "@/api";
 
 type Cookbook = CookbookCardData;
@@ -37,13 +43,17 @@ export default function ManageCookbooks() {
   // Parse slug to extract ID and name
   const { id: recipeId, name: recipeName } = parseSlug(recipeSlug);
 
-  const { mutate: saveToCookbook, isPending: isSaving } = useSaveRecipeToCookbookMutation();
-  const { mutate: removeFromCookbook, isPending: isDeleting } = useRemoveRecipeFromCookbookMutation();
+  const { mutate: saveToCookbook, isPending: isSaving } =
+    useSaveRecipeToCookbookMutation();
+  const { mutate: removeFromCookbook, isPending: isDeleting } =
+    useRemoveRecipeFromCookbookMutation();
 
   const isPending = isSaving || isDeleting;
 
   // Track selected cookbook (for removal flow)
-  const [selectedCookbookId, setSelectedCookbookId] = useState<string | null>(null);
+  const [selectedCookbookId, setSelectedCookbookId] = useState<string | null>(
+    null,
+  );
 
   // Fetch all cookbooks and use the includeStatusForRecipeId
   // option to get the status of the recipe in the cookbooks
@@ -78,7 +88,7 @@ export default function ManageCookbooks() {
       if (hasInitialDataRef.current) {
         refetch();
       }
-    }, [refetch])
+    }, [refetch]),
   );
 
   // Flatten paginated data
@@ -112,7 +122,9 @@ export default function ManageCookbooks() {
 
       // Set as selected (for addition or removal)
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      setSelectedCookbookId((prev) => (prev === cookbook.id ? null : cookbook.id));
+      setSelectedCookbookId((prev) =>
+        prev === cookbook.id ? null : cookbook.id,
+      );
     },
     [recipeSlug, isPending],
   );
@@ -154,7 +166,7 @@ export default function ManageCookbooks() {
 
     // Show toast with callbacks
     showToast({
-      text: `Adding to ${selectedCookbookForAddition?.name ?? 'cookbook'}`,
+      text: `Adding to ${selectedCookbookForAddition?.name ?? "cookbook"}`,
       thumbnailUri: selectedCookbookForAddition.coverImageUri || null,
       cta: {
         text: "Undo",
@@ -221,7 +233,7 @@ export default function ManageCookbooks() {
 
     // Show toast with callbacks
     showToast({
-      text: `Removing from ${selectedCookbookForRemoval?.name ?? 'cookbook'}`,
+      text: `Removing from ${selectedCookbookForRemoval?.name ?? "cookbook"}`,
       thumbnailUri: selectedCookbookForRemoval.coverImageUri || null,
       cta: {
         text: "Undo",
@@ -275,7 +287,7 @@ export default function ManageCookbooks() {
             showRecentlyViewed={false}
             isSelectedForRemoval={isSelectedForRemoval}
             isSelectedForAddition={isSelectedForAddition}
-            onPress={isPending ? () => { } : () => handleCookbookSelect(item)}
+            onPress={isPending ? () => {} : () => handleCookbookSelect(item)}
           />
         </View>
       );
@@ -323,7 +335,8 @@ export default function ManageCookbooks() {
         <View style={styles.headerContent}>
           <Text style={styles.headerTitle}>Cookbooks</Text>
           <Text style={styles.headerSubtitle}>
-            Manage the <Text style={styles.subtextBold}>{recipeName}</Text> Recipe
+            Manage the <Text style={styles.subtextBold}>{recipeName}</Text>{" "}
+            Recipe
           </Text>
         </View>
         <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
@@ -359,9 +372,17 @@ export default function ManageCookbooks() {
             activeOpacity={0.8}
             disabled={isActionButtonDisabled}
             onPress={isSelectedForRemoval ? handleRemove : handleAdd}
-            style={[styles.actionButton, isActionButtonDisabled && styles.actionButtonDisabled]}
+            style={[
+              styles.actionButton,
+              isActionButtonDisabled && styles.actionButtonDisabled,
+            ]}
           >
-            <Text style={[styles.actionButtonText, isActionButtonDisabled && styles.actionButtonTextDisabled]}>
+            <Text
+              style={[
+                styles.actionButtonText,
+                isActionButtonDisabled && styles.actionButtonTextDisabled,
+              ]}
+            >
               {isSelectedForRemoval ? "Remove" : "Save"}
             </Text>
           </TouchableOpacity>

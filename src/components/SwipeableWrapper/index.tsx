@@ -1,10 +1,10 @@
+import { Feather, Octicons } from "@expo/vector-icons";
 // External Dependencies
 import * as Haptics from "expo-haptics";
-import { StyleSheet, View } from "react-native";
 import { type ReactNode, useCallback } from "react";
-import { scheduleOnRN } from "react-native-worklets";
-import { Feather, Octicons } from "@expo/vector-icons";
+import { StyleSheet, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { scheduleOnRN } from "react-native-worklets";
 
 // Internal Dependencies
 import { Colors } from "@/libs/constants";
@@ -206,14 +206,26 @@ export const SwipeableWrapper = ({
   return (
     <View style={styles.container}>
       {/* Left action background (Add to wishlist - Purple) */}
-      <Animated.View style={[styles.actionBackground, styles.leftBackground, leftBackgroundStyle]}>
+      <Animated.View
+        style={[
+          styles.actionBackground,
+          styles.leftBackground,
+          leftBackgroundStyle,
+        ]}
+      >
         <Animated.View style={[styles.actionButton, leftActionStyle]}>
           <Feather name="heart" size={26} color={Colors.primary} />
         </Animated.View>
       </Animated.View>
 
       {/* Right action background (Delete - Red) */}
-      <Animated.View style={[styles.actionBackground, styles.rightBackground, rightBackgroundStyle]}>
+      <Animated.View
+        style={[
+          styles.actionBackground,
+          styles.rightBackground,
+          rightBackgroundStyle,
+        ]}
+      >
         <Animated.View style={[styles.actionButton, rightActionStyle]}>
           <Octicons name="trash" size={25} color={Colors.destructive} />
         </Animated.View>
@@ -259,4 +271,3 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 });
-

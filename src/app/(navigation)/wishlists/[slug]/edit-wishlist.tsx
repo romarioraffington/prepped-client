@@ -1,13 +1,13 @@
 // External Dependencies
 import * as Haptics from "expo-haptics";
 import { router, useLocalSearchParams } from "expo-router";
-import { View, Alert, StyleSheet, ActivityIndicator } from "react-native";
+import { ActivityIndicator, Alert, StyleSheet, View } from "react-native";
 
+import { useWishlistDetails } from "@/api/wishlist/detail";
+import { useUpdateWishlistMutation } from "@/api/wishlist/update";
 // Internal Dependencies
 import { SingleInputForm } from "@/components";
-import { useWishlistDetails } from "@/api/wishlist/detail";
 import { reportError } from "@/libs/utils/errorReporting";
-import { useUpdateWishlistMutation } from "@/api/wishlist/update";
 
 type EditWishlistParams = {
   slug: string;
@@ -17,9 +17,7 @@ export default function EditWishlist() {
   const { slug } = useLocalSearchParams<EditWishlistParams>();
 
   // Fetch wishlist details - React Query handles cache automatically
-  const { data, isLoading: isLoadingWishlist } = useWishlistDetails(
-    slug ?? "",
-  );
+  const { data, isLoading: isLoadingWishlist } = useWishlistDetails(slug ?? "");
 
   // Extract metadata from first page
   const wishlist = data?.pages[0]?.metadata;
@@ -44,11 +42,9 @@ export default function EditWishlist() {
             action: "Update Wishlist",
             extra: { slug },
           });
-          Alert.alert(
-            "Oops!",
-            "Failed to rename wishlist. Please try again.",
-            [{ text: "OK" }],
-          );
+          Alert.alert("Oops!", "Failed to rename wishlist. Please try again.", [
+            { text: "OK" },
+          ]);
         },
       },
     );

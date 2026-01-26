@@ -1,18 +1,18 @@
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import * as Sentry from "@sentry/react-native";
+import { useQueryClient } from "@tanstack/react-query";
+import * as AppleAuthentication from "expo-apple-authentication";
+import Constants from "expo-constants";
 // External Dependencies
 import type React from "react";
-import Constants from "expo-constants";
-import * as Sentry from '@sentry/react-native';
-import { useQueryClient } from "@tanstack/react-query";
-import { createContext, useContext, type ReactNode } from "react";
-import * as AppleAuthentication from "expo-apple-authentication";
-import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import { type ReactNode, createContext, useContext } from "react";
 
+import { useLogout, useSocialLogin } from "@/api/auth";
+import { AUTH_PROVIDERS } from "@/libs/constants";
+import type { AuthTokens, User } from "@/libs/types";
 // Internal Dependencies
 import { reportError } from "@/libs/utils";
-import { AUTH_PROVIDERS } from "@/libs/constants";
 import { useAuthStore } from "@/stores/authStore";
-import type { User, AuthTokens } from "@/libs/types";
-import { useSocialLogin, useLogout } from "@/api/auth";
 
 interface AuthContextType {
   // State
@@ -75,7 +75,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       throw error;
     }
   };
-
 
   const handleSignIn = async (user: User, tokens: AuthTokens) => {
     try {
@@ -153,9 +152,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         throw new Error("No user data received from Google");
       }
 
-      const {
-        idToken,
-      } = result.data;
+      const { idToken } = result.data;
 
       if (!idToken) {
         throw new Error("No ID token received from Google");
@@ -166,7 +163,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         provider: AUTH_PROVIDERS.GOOGLE,
         identity_token: idToken,
       });
-
 
       await handleSignIn(loginResult.user, loginResult.tokens);
     } catch (error: any) {
@@ -204,7 +200,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       // Apple Sign-In doesn't require explicit sign out
       // The tokens will be cleared from storage
-
     } catch (error: any) {
       reportError(error, {
         component: "AuthContext",

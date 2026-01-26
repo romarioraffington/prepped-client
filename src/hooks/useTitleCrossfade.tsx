@@ -2,17 +2,12 @@
 import type React from "react";
 import { StyleSheet, type View } from "react-native";
 
-import {
-  useMemo,
-  useRef,
-  useEffect,
-  useCallback,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import {
-  useHeaderHeight,
-  type HeaderTitleProps,
   HeaderTitle as HeaderTitleComponent,
+  type HeaderTitleProps,
+  useHeaderHeight,
 } from "@react-navigation/elements";
 
 import Animated, {
@@ -118,9 +113,15 @@ export const useTitleCrossfade = ({
 
   // Derived value for header title opacity
   const headerTitleOpacity = useDerivedValue(() => {
-    if (measurementsValid.value === 0 || headerBaselineY.value <= 0 || titleHeight.value <= 0) {
+    if (
+      measurementsValid.value === 0 ||
+      headerBaselineY.value <= 0 ||
+      titleHeight.value <= 0
+    ) {
       const shouldShowFallback = offsetY.value > headerHeight + 8;
-      return withTiming(shouldShowFallback ? 1 : 0, { duration: shouldShowFallback ? 220 : 160 });
+      return withTiming(shouldShowFallback ? 1 : 0, {
+        duration: shouldShowFallback ? 220 : 160,
+      });
     }
 
     // Trigger when the bottom of the title crosses the header height
@@ -132,7 +133,11 @@ export const useTitleCrossfade = ({
 
   // Derived value for whether scrolled past title (for blur toggle)
   const isScrolledPastTitle = useDerivedValue(() => {
-    if (headerBaselineY.value <= 0 || titleHeight.value <= 0 || measurementsValid.value === 0) {
+    if (
+      headerBaselineY.value <= 0 ||
+      titleHeight.value <= 0 ||
+      measurementsValid.value === 0
+    ) {
       return offsetY.value > headerHeight + 8;
     }
     const scrollDistance = headerBaselineY.value - headerHeight;
@@ -149,7 +154,9 @@ export const useTitleCrossfade = ({
     () =>
       function HeaderTitle(props: HeaderTitleProps) {
         return (
-          <Animated.View style={[rTitleOpacityStyle, styles.headerTitleWrapper]}>
+          <Animated.View
+            style={[rTitleOpacityStyle, styles.headerTitleWrapper]}
+          >
             <HeaderTitleComponent {...props} style={headerTitleStyle}>
               {truncatedTitle}
             </HeaderTitleComponent>

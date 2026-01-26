@@ -5,12 +5,16 @@ import { scheduleOnRN } from "react-native-worklets";
 import type { LayoutChangeEvent } from "react-native";
 import { useSharedValue } from "react-native-reanimated";
 import { Dimensions, StyleSheet, Text, View } from "react-native";
-import { Gesture, GestureDetector, ScrollView } from "react-native-gesture-handler";
+
+import {
+  Gesture,
+  ScrollView,
+  GestureDetector,
+} from "react-native-gesture-handler";
 
 // Internal Dependencies
 import { useImageErrorFilter } from "@/hooks";
-import { ShimmerImage } from "@/components/ShimmerImage";
-import { ImagePlaceholder } from "@/components/ImagePlaceholder";
+import { ImagePlaceholder, ShimmerImage } from "@/components/Image";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -118,7 +122,10 @@ export const HeroSlideShow: React.FC<HeroSlideShowProps> = ({
                 {validImages.map((url, index) => (
                   <View
                     key={`${url}-${index}`}
-                    style={[styles.imageWrapper, { width: containerWidth, height }]}
+                    style={[
+                      styles.imageWrapper,
+                      { width: containerWidth, height },
+                    ]}
                   >
                     <ShimmerImage
                       contentFit="cover"
@@ -148,10 +155,7 @@ export const HeroSlideShow: React.FC<HeroSlideShowProps> = ({
             {validImages.map((_, index) => (
               <View
                 key={index}
-                style={[
-                  styles.dot,
-                  activeIndex === index && styles.activeDot,
-                ]}
+                style={[styles.dot, activeIndex === index && styles.activeDot]}
               />
             ))}
           </View>
@@ -166,9 +170,7 @@ export const HeroSlideShow: React.FC<HeroSlideShowProps> = ({
             {name}
           </Text>
           {metadataRight && (
-            <View style={styles.metadataRightContainer}>
-              {metadataRight}
-            </View>
+            <View style={styles.metadataRightContainer}>{metadataRight}</View>
           )}
         </View>
 
@@ -257,4 +259,3 @@ const styles = StyleSheet.create({
     flexShrink: 0,
   },
 });
-

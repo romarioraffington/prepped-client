@@ -1,5 +1,5 @@
 // External Dependencies
-import { View, StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 // Internal Dependencies
 import { DotsLoader, SingleInputForm } from "@/components";

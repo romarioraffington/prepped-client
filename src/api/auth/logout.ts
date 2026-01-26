@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 
-import { reportError } from "@/libs/utils";
 import { API_ENDPOINTS, getApiClient } from "@/libs/constants";
+import { reportError } from "@/libs/utils";
 
 const logout = async (): Promise<void> => {
   const apiClient = getApiClient();

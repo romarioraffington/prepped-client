@@ -1,7 +1,13 @@
+import {
+  type ReactElement,
+  cloneElement,
+  createContext,
+  useContext,
+  useEffect,
+} from "react";
 // External Dependencies
-import { useWindowDimensions, StyleSheet, View } from "react-native";
+import { StyleSheet, View, useWindowDimensions } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import { cloneElement, createContext, type ReactElement, useContext, useEffect } from "react";
 
 import Animated, {
   interpolate,
@@ -102,7 +108,12 @@ export function WithPullToRefresh({
   // overshooting beyond 1 when users over-pull.
   const refreshProgress = useDerivedValue(() => {
     if (refreshOffsetY.get() <= 1) return 0;
-    return interpolate(refreshOffsetY.get(), [0, refreshThreshold], [0, 1], Extrapolation.CLAMP);
+    return interpolate(
+      refreshOffsetY.get(),
+      [0, refreshThreshold],
+      [0, 1],
+      Extrapolation.CLAMP,
+    );
   });
 
   // Why: Track list scroll to know when we're at the very top. 16ms throttle (below)
@@ -113,7 +124,9 @@ export function WithPullToRefresh({
     },
   });
 
-  const outerScrollHandler = (children as any).props?.onScroll || (children as any).props?.animatedScrollHandler;
+  const outerScrollHandler =
+    (children as any).props?.onScroll ||
+    (children as any).props?.animatedScrollHandler;
   const handlers = outerScrollHandler
     ? [localScrollHandler, outerScrollHandler]
     : [localScrollHandler];
@@ -146,7 +159,9 @@ export function WithPullToRefresh({
         >
           {refreshComponent}
         </Animated.View>
-        {typeof originalListHeader === "function" ? originalListHeader() : originalListHeader}
+        {typeof originalListHeader === "function"
+          ? originalListHeader()
+          : originalListHeader}
       </>
     ),
     bounces: false,
@@ -219,13 +234,19 @@ export function WithPullToRefresh({
       // If already pulling, continue responding (allows smooth continuation of gesture)
       if (isAlreadyPulling) {
         // Always respond when already in pull state
-        const next = Math.max(0, Math.min(currentRefreshOffset + deltaY, screenHeight));
+        const next = Math.max(
+          0,
+          Math.min(currentRefreshOffset + deltaY, screenHeight),
+        );
         refreshOffsetY.set(next);
         scrollDirectionOnScroll(next);
         singleHapticOnScroll(next);
       } else if (isAtTop && isPullingDown) {
         // Start responding immediately when at top and pulling down
-        const next = Math.max(0, Math.min(currentRefreshOffset + deltaY, screenHeight));
+        const next = Math.max(
+          0,
+          Math.min(currentRefreshOffset + deltaY, screenHeight),
+        );
         refreshOffsetY.set(next);
         scrollDirectionOnScroll(next);
         singleHapticOnScroll(next);
@@ -248,15 +269,17 @@ export function WithPullToRefresh({
         // Why: Crossed threshold — settle to loading height with spring for elastic feel.
         refreshOffsetY.set(
           withSpring(
-            lockRefreshViewOnRelease ? lockedRefreshOffsetY.get() : refreshViewBaseHeight,
+            lockRefreshViewOnRelease
+              ? lockedRefreshOffsetY.get()
+              : refreshViewBaseHeight,
             {},
             (finished) => {
               "worklet";
               if (finished) {
                 isAnimating.set(false);
               }
-            }
-          )
+            },
+          ),
         );
         // Why: Run on JS immediately after scheduling from UI thread without blocking
         // animations. Keeps gesture thread free while starting refresh work.
@@ -269,7 +292,7 @@ export function WithPullToRefresh({
             if (finished) {
               isAnimating.set(false);
             }
-          })
+          }),
         );
       }
 
@@ -296,7 +319,7 @@ export function WithPullToRefresh({
             lastDragY.set(0);
             isListDragging.set(false);
           }
-        })
+        }),
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -318,7 +341,9 @@ export function WithPullToRefresh({
   return (
     <WithPullToRefreshContext.Provider value={contextValue}>
       <GestureDetector gesture={composedGestures}>
-        <View collapsable={false} style={styles.wrapper}>{clonedChild}</View>
+        <View collapsable={false} style={styles.wrapper}>
+          {clonedChild}
+        </View>
       </GestureDetector>
     </WithPullToRefreshContext.Provider>
   );
@@ -333,4 +358,3 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
-

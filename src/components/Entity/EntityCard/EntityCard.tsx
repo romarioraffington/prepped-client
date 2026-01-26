@@ -1,23 +1,23 @@
 // External dependencies
-import { memo, type ReactNode } from 'react';
+import { type ReactNode, memo } from "react";
 import {
-  View,
   Text,
+  View,
   StyleSheet,
-  TouchableOpacity,
   type ViewStyle,
+  TouchableOpacity,
   type GestureResponderEvent,
-} from 'react-native';
+} from "react-native";
 
 // Internal dependencies
-import type { Hours } from '@/libs/types'
-import { hasValidHours } from '@/libs/utils';
+import type { Hours } from "@/libs/types";
+import { hasValidHours } from "@/libs/utils";
+import { EntityInfo } from "@/components/Entity/EntityInfo";
+import { HoursStatus } from "@/components/Hours/HoursStatus";
 
 // Imported directly to prevent circular dependencies warning
-import { ImageCarousel } from '@/components/ImageCarousel';
-import { EntityInfo } from '@/components/Entity/EntityInfo';
-import { RatingInfo } from '@/components/Rating/RatingInfo';
-import { HoursStatus } from '@/components/Hours/HoursStatus';
+import { ImageCarousel } from "@/components/Image";
+import { RatingInfo } from "@/components/Rating/RatingInfo";
 
 interface EntityCardProps {
   title: string;
@@ -49,7 +49,8 @@ const EntityCardComponent = ({
   onPress,
 }: EntityCardProps) => {
   const isRatingAvailable = rating !== undefined && reviewCount !== undefined;
-  const isEditorialSummaryAvailable = editorialSummary && editorialSummary.length > 0;
+  const isEditorialSummaryAvailable =
+    editorialSummary && editorialSummary.length > 0;
 
   return (
     <TouchableOpacity
@@ -58,23 +59,18 @@ const EntityCardComponent = ({
       delayPressIn={100}
       style={styles.container}
     >
-
       <View style={[styles.contentContainer, contentContainerStyle]}>
         <ImageCarousel imageUrls={imageUrls} />
         <View style={styles.titleRow}>
-          <Text numberOfLines={1} style={styles.title}>{title}</Text>
-          {titleActions && (
-            <View>
-              {titleActions}
-            </View>
-          )}
+          <Text numberOfLines={1} style={styles.title}>
+            {title}
+          </Text>
+          {titleActions && <View>{titleActions}</View>}
         </View>
 
-        {
-          isRatingAvailable && (
-            <RatingInfo rating={rating} reviewCount={reviewCount} />
-          )
-        }
+        {isRatingAvailable && (
+          <RatingInfo rating={rating} reviewCount={reviewCount} />
+        )}
 
         <EntityInfo
           category={category}
@@ -82,15 +78,11 @@ const EntityCardComponent = ({
           priceRange={priceRange}
         />
 
-        {hours && hasValidHours(hours) && (
-          <HoursStatus hours={hours} />
-        )}
+        {hours && hasValidHours(hours) && <HoursStatus hours={hours} />}
 
-        {
-          isEditorialSummaryAvailable && (
-            <Text style={styles.editorialSummary}>{editorialSummary}</Text>
-          )
-        }
+        {isEditorialSummaryAvailable && (
+          <Text style={styles.editorialSummary}>{editorialSummary}</Text>
+        )}
       </View>
     </TouchableOpacity>
   );
@@ -112,20 +104,20 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     marginTop: 3,
-    color: '#888',
+    color: "#888",
     lineHeight: 18,
-    fontWeight: '400',
+    fontWeight: "400",
   },
   titleRow: {
     gap: 8,
     marginTop: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   title: {
     flex: 1,
     fontSize: 18,
-    color: '#000',
+    color: "#000",
     fontWeight: "600",
   },
 });

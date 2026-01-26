@@ -1,15 +1,15 @@
+import { Ionicons } from "@expo/vector-icons";
 // External Dependencies
 import { router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
-import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useCallback, useEffect } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import {
-  View,
-  Text,
   StyleSheet,
+  Text,
   TextInput,
   TouchableOpacity,
+  View,
 } from "react-native";
 
 // Internal Dependencies

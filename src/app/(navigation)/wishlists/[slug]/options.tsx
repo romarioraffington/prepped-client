@@ -1,19 +1,19 @@
+import { Ionicons } from "@expo/vector-icons";
+import { type InfiniteData, useQueryClient } from "@tanstack/react-query";
+import * as Haptics from "expo-haptics";
+import { router, useLocalSearchParams } from "expo-router";
 // External Dependencies
 import React from "react";
-import * as Haptics from "expo-haptics";
-import { Ionicons } from "@expo/vector-icons";
-import { router, useLocalSearchParams } from "expo-router";
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useQueryClient, type InfiniteData } from "@tanstack/react-query";
-import { View, Text, Alert, StyleSheet, TouchableOpacity } from "react-native";
 
-// Internal Dependencies
-import { useActionToast } from "@/contexts";
-import { truncate, parseSlug } from "@/libs/utils";
-import { Colors, QUERY_KEYS } from "@/libs/constants";
-import type { WishlistPageResult } from "@/libs/types";
 import { useDeleteWishlistMutation } from "@/api/wishlist/delete";
 import type { WishlistDetailPageResult } from "@/api/wishlist/detail";
+// Internal Dependencies
+import { useActionToast } from "@/contexts";
+import { Colors, QUERY_KEYS } from "@/libs/constants";
+import type { WishlistPageResult } from "@/libs/types";
+import { parseSlug, truncate } from "@/libs/utils";
 
 type OptionsParams = {
   slug: string;
@@ -141,7 +141,7 @@ export default function WishlistOptions() {
                   Alert.alert(
                     "Oops!",
                     error?.message ||
-                    "Failed to delete wishlist. Please try again.",
+                      "Failed to delete wishlist. Please try again.",
                     [{ text: "OK" }],
                   );
                 });

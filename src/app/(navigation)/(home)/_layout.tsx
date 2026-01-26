@@ -1,10 +1,10 @@
+import type { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 // External Dependencies
-import { Stack } from 'expo-router';
-import { StyleSheet } from 'react-native';
-import type { NativeStackNavigationOptions } from '@react-navigation/native-stack';
+import { Stack } from "expo-router";
+import { StyleSheet } from "react-native";
 
 // Internal Dependencies
-import { Colors } from '@/libs/constants';
+import { Colors } from "@/libs/constants";
 
 // Extended screen options type thatp includes headerTitleContainerStyle
 // This is supported by React Navigation at runtime but not fully typed
@@ -15,15 +15,18 @@ type ExtendedScreenOptions = NativeStackNavigationOptions & {
 export default function HomeLayout() {
   return (
     <Stack
-      screenOptions={{
-        headerTitle: '',
-        headerTintColor: '#000',
-        headerTitleAlign: 'center',
-        headerShadowVisible: false,
-        headerStyle: styles.headerStyle,
-        contentStyle: styles.contentStyle,
-        headerBackButtonDisplayMode: 'minimal',
-      } as ExtendedScreenOptions}>
+      screenOptions={
+        {
+          headerTitle: "",
+          headerTintColor: "#000",
+          headerTitleAlign: "center",
+          headerShadowVisible: false,
+          headerStyle: styles.headerStyle,
+          contentStyle: styles.contentStyle,
+          headerBackButtonDisplayMode: "minimal",
+        } as ExtendedScreenOptions
+      }
+    >
       <Stack.Screen
         name="(tabs)"
         options={{
@@ -33,7 +36,7 @@ export default function HomeLayout() {
       <Stack.Screen
         name="recipes/[slug]/index"
         options={{
-          headerBackTitle: 'Home',
+          headerBackTitle: "Home",
           headerTransparent: true,
         }}
       />

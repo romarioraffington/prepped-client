@@ -1,5 +1,5 @@
-import Constants from "expo-constants";
 import * as Application from "expo-application";
+import Constants from "expo-constants";
 
 export const APP_VERSION = Application.nativeApplicationVersion || "";
 export const APP_BUILD_NUMBER = Application.nativeBuildVersion || "";

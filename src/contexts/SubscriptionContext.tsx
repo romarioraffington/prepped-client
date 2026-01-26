@@ -1,14 +1,23 @@
+import Constants from "expo-constants";
 // External Dependencies
 import type React from "react";
-import Constants from "expo-constants";
-import Purchases from 'react-native-purchases';
-import { createContext, useContext, useEffect, useRef, type ReactNode } from "react";
+import {
+  type ReactNode,
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+} from "react";
+import Purchases from "react-native-purchases";
 
-// Internal Dependencies
-import { useAuth } from "./AuthContext";
 import { reportError } from "@/libs/utils";
 import { useSubscriptionStore } from "@/stores/subscriptionStore";
-import type { PurchasesPackage, PurchasesOffering } from 'react-native-purchases';
+import type {
+  PurchasesOffering,
+  PurchasesPackage,
+} from "react-native-purchases";
+// Internal Dependencies
+import { useAuth } from "./AuthContext";
 
 interface SubscriptionContextType {
   // State
@@ -28,21 +37,22 @@ interface SubscriptionContextType {
   purchasePackage: (packageToPurchase: PurchasesPackage) => Promise<void>;
 }
 
-const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
+const SubscriptionContext = createContext<SubscriptionContextType | undefined>(
+  undefined,
+);
 
 interface SubscriptionProviderProps {
   children: ReactNode;
 }
 
-export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({ children }) => {
+export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({
+  children,
+}) => {
   const listenerAddedRef = useRef(false);
   const removeListenerRef = useRef<((customerInfo: any) => void) | null>(null);
   const lastUserIdRef = useRef<string | null>(null);
 
-  const {
-    user,
-    isAuthenticated
-  } = useAuth();
+  const { user, isAuthenticated } = useAuth();
 
   const {
     // State
@@ -71,8 +81,10 @@ export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({ chil
         const { REVENUECAT_API_KEY_IOS } = Constants.expoConfig?.extra || {};
 
         if (!REVENUECAT_API_KEY_IOS) {
-          console.warn('RevenueCat iOS API key not configured. Subscription features will be disabled.');
-          setError('RevenueCat iOS API key not configured');
+          console.warn(
+            "RevenueCat iOS API key not configured. Subscription features will be disabled.",
+          );
+          setError("RevenueCat iOS API key not configured");
           return;
         }
 
@@ -82,13 +94,13 @@ export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({ chil
         try {
           // Set the appropriate log level based on the environment
           Purchases.setLogLevel(
-            __DEV__ ? Purchases.LOG_LEVEL.DEBUG : Purchases.LOG_LEVEL.WARN
+            __DEV__ ? Purchases.LOG_LEVEL.DEBUG : Purchases.LOG_LEVEL.WARN,
           );
 
           await Purchases.configure({ apiKey: REVENUECAT_API_KEY_IOS });
         } catch (error: any) {
           // If already configured, that's fine
-          if (!error.message?.includes('singleton instance')) {
+          if (!error.message?.includes("singleton instance")) {
             throw error;
           }
         }
@@ -97,7 +109,7 @@ export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({ chil
           component: "SubscriptionContext",
           action: "Configure RevenueCat",
         });
-        setError(error.message || 'Failed to configure RevenueCat');
+        setError(error.message || "Failed to configure RevenueCat");
       }
     };
 
@@ -131,7 +143,7 @@ export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({ chil
           component: "SubscriptionContext",
           action: "Initialize Subscription Data",
         });
-        setError(error.message || 'Failed to initialize subscriptions');
+        setError(error.message || "Failed to initialize subscriptions");
       }
     };
 
@@ -168,10 +180,10 @@ export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({ chil
         component: "SubscriptionContext",
         action: "Refresh Subscription Status",
       });
-      if (error.message?.includes('singleton instance')) {
-        setError('RevenueCat not configured. Please configure API keys first.');
+      if (error.message?.includes("singleton instance")) {
+        setError("RevenueCat not configured. Please configure API keys first.");
       } else {
-        setError(error.message || 'Failed to refresh subscription status');
+        setError(error.message || "Failed to refresh subscription status");
       }
     }
   };
@@ -193,7 +205,9 @@ export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({ chil
                 await Purchases.setEmail(user.email);
 
                 if (user.firstName || user.lastName) {
-                  await Purchases.setDisplayName(`${user.firstName} ${user.lastName}`);
+                  await Purchases.setDisplayName(
+                    `${user.firstName} ${user.lastName}`,
+                  );
                 }
               } catch (error: any) {
                 reportError(error, {
@@ -269,7 +283,7 @@ export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({ chil
         action: "Set User ID",
         extra: { userId },
       });
-      setError(error.message || 'Failed to set user ID');
+      setError(error.message || "Failed to set user ID");
       throw error;
     }
   };
@@ -302,7 +316,9 @@ export const SubscriptionProvider: React.FC<SubscriptionProviderProps> = ({ chil
 export const useSubscription = (): SubscriptionContextType => {
   const context = useContext(SubscriptionContext);
   if (context === undefined) {
-    throw new Error('useSubscription must be used within a SubscriptionProvider');
+    throw new Error(
+      "useSubscription must be used within a SubscriptionProvider",
+    );
   }
   return context;
 };

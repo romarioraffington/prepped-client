@@ -1,47 +1,48 @@
+import type BottomSheet from "@gorhom/bottom-sheet";
+import { BlurView } from "expo-blur";
 // External Dependencies
 import { Image } from "expo-image";
-import { BlurView } from "expo-blur";
-import Animated from "react-native-reanimated";
-import { Portal } from "react-native-portalize";
-import type BottomSheet from "@gorhom/bottom-sheet";
-import { scheduleOnRN } from "react-native-worklets";
 import { router, useLocalSearchParams, useNavigation } from "expo-router";
-import React, { useRef, useState, useLayoutEffect, useCallback, useEffect } from "react";
+import React, {
+  useRef,
+  useState,
+  useLayoutEffect,
+  useCallback,
+  useEffect,
+} from "react";
+import { Portal } from "react-native-portalize";
+import Animated from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
+
+import { Dimensions, StyleSheet, Text, View } from "react-native";
 
 import {
-  View,
-  Text,
-  Dimensions,
-  StyleSheet,
-} from "react-native";
-
-import {
-  withRepeat,
-  withTiming,
-  withSequence,
-  useSharedValue,
   useAnimatedReaction,
   useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withTiming,
 } from "react-native-reanimated";
 
 // Internal Dependencies
 import {
-  Hero,
-  MapSection,
-  ReviewList,
-  OfferingList,
   BlurBackButton,
+  HeaderMetadataSection,
+  Hero,
   HoursBottomSheet,
+  MapSection,
+  OfferingList,
   ParallaxScrollView,
   QuickActionButtons,
-  HeaderMetadataSection,
+  RecommendationOptionsButton,
+  ReviewList,
   ReviewsMetadataSection,
   WishlistButtonWithCount,
-  RecommendationOptionsButton,
 } from "@/components";
 
-import { useTitleCrossfade } from "@/hooks";
 import { useRecommendationDetails } from "@/api";
+import { useTitleCrossfade } from "@/hooks";
 import { hasValidHours, truncate } from "@/libs/utils";
 import { isLiquidGlassAvailable } from "expo-glass-effect";
 
@@ -66,16 +67,12 @@ export default function RecommendationDetail() {
 
   // Dynamic title crossfade -
   // measures title position and triggers header title fade
-  const {
-    titleRef,
-    handleLayout,
-    getHeaderOptions,
-    isScrolledPastTitle,
-  } = useTitleCrossfade({
-    offsetY,
-    headerTitleStyle: { color: "#000" },
-    title: truncate(recommendation?.name, 25),
-  });
+  const { titleRef, handleLayout, getHeaderOptions, isScrolledPastTitle } =
+    useTitleCrossfade({
+      offsetY,
+      headerTitleStyle: { color: "#000" },
+      title: truncate(recommendation?.name, 25),
+    });
 
   /**
    * React to scroll position changes to update blur state
@@ -89,9 +86,9 @@ export default function RecommendationDetail() {
   );
 
   /**
- * Single setOptions call using hook-provided options;
- * keep blur tied to scroll state
- */
+   * Single setOptions call using hook-provided options;
+   * keep blur tied to scroll state
+   */
   useLayoutEffect(() => {
     if (!recommendation?.name) {
       navigation.setOptions({
@@ -103,7 +100,9 @@ export default function RecommendationDetail() {
     const headerOptions: any = {
       ...getHeaderOptions(),
       headerLeft: () => <BlurBackButton isScrolled={isScrolled} />,
-      headerBackground: isScrolled ? () => <BlurView tint="light" intensity={60} style={{ flex: 1 }} /> : undefined,
+      headerBackground: isScrolled
+        ? () => <BlurView tint="light" intensity={60} style={{ flex: 1 }} />
+        : undefined,
     };
 
     if (!isLiquidGlassAvailable()) {
@@ -179,12 +178,15 @@ export default function RecommendationDetail() {
 
   // Accessibility and reviews
   const isAccessible = recommendation?.isAccessible;
-  const isReviewsAvailable = recommendation?.reviews && recommendation?.reviews?.count > 0;
+  const isReviewsAvailable =
+    recommendation?.reviews && recommendation?.reviews?.count > 0;
 
   // Hours
   const isOpen24Hours = recommendation?.hours?.is24Hours;
-  const isHoursAvailable = recommendation?.hours && hasValidHours(recommendation.hours);
-  const isHoursBottomSheetAvailable = isHoursAvailable && !isOpen24Hours && recommendation?.hours?.dailyHours;
+  const isHoursAvailable =
+    recommendation?.hours && hasValidHours(recommendation.hours);
+  const isHoursBottomSheetAvailable =
+    isHoursAvailable && !isOpen24Hours && recommendation?.hours?.dailyHours;
 
   // Hours BottomSheet
   const hoursBottomSheetRef = useRef<BottomSheet>(null);
@@ -205,7 +207,8 @@ export default function RecommendationDetail() {
     <View style={styles.screenContainer}>
       <ParallaxScrollView
         headerImage={
-          <Hero height={HEADER_HEIGHT}
+          <Hero
+            height={HEADER_HEIGHT}
             imageUrls={recommendation.images}
             onImagePress={handleImagePress}
           />
@@ -214,7 +217,6 @@ export default function RecommendationDetail() {
         headerHeight={HEADER_HEIGHT}
       >
         <View style={styles.overlayContainer}>
-
           {/* Header Section*/}
           <View style={styles.headerContainer}>
             <View ref={titleRef} onLayout={handleLayout}>
@@ -231,7 +233,9 @@ export default function RecommendationDetail() {
                 hours={recommendation.hours}
                 isAccessible={isAccessible}
                 priceRange={recommendation.priceRange}
-                onHoursClicked={isHoursBottomSheetAvailable ? handleOpenHoursSheet : undefined}
+                onHoursClicked={
+                  isHoursBottomSheetAvailable ? handleOpenHoursSheet : undefined
+                }
               />
             </View>
           </View>
@@ -259,7 +263,9 @@ export default function RecommendationDetail() {
               directionsUrl={recommendation.mapsUri}
               websiteUrl={recommendation.contactInfo?.websiteUri}
               phone={recommendation.contactInfo?.internationalPhoneNumber}
-              onOpenHoursClick={isHoursBottomSheetAvailable ? handleOpenHoursSheet : undefined}
+              onOpenHoursClick={
+                isHoursBottomSheetAvailable ? handleOpenHoursSheet : undefined
+              }
             />
           </View>
 
@@ -267,10 +273,12 @@ export default function RecommendationDetail() {
           {recommendation.offerings && recommendation.offerings.length > 1 && (
             <View style={styles.offeringsContainer}>
               <Text style={styles.sectionTitle}>What this place offers</Text>
-              <OfferingList offerings={recommendation.offerings} onShowAll={handleShowAllOfferings} />
+              <OfferingList
+                offerings={recommendation.offerings}
+                onShowAll={handleShowAllOfferings}
+              />
             </View>
           )}
-
 
           {/* Map Section */}
           <View style={styles.mapContainer}>
@@ -302,19 +310,17 @@ export default function RecommendationDetail() {
               source={require("~/assets/images/attribution/GoogleMaps_Logo_Gray.svg")}
             />
           </View>
-
         </View>
       </ParallaxScrollView>
-
 
       {isHoursBottomSheetAvailable && (
         <Portal>
           <HoursBottomSheet
-            ref={hoursBottomSheetRef} dailyHours={recommendation.hours.dailyHours}
+            ref={hoursBottomSheetRef}
+            dailyHours={recommendation.hours.dailyHours}
           />
         </Portal>
       )}
-
     </View>
   );
 }
@@ -328,10 +334,10 @@ const RecommendationDetailSkeleton = () => {
     opacity.value = withRepeat(
       withSequence(
         withTiming(0.7, { duration: 1000 }),
-        withTiming(0.3, { duration: 1000 })
+        withTiming(0.3, { duration: 1000 }),
       ),
       -1,
-      true
+      true,
     );
   }, []);
 
@@ -359,9 +365,15 @@ const RecommendationDetailSkeleton = () => {
 
               {/* Header Metadata Skeleton */}
               <View style={styles.skeletonMetadataContainer}>
-                <Animated.View style={[styles.skeletonMetadataItem, animatedStyle]} />
-                <Animated.View style={[styles.skeletonMetadataItem, animatedStyle]} />
-                <Animated.View style={[styles.skeletonMetadataItem, animatedStyle]} />
+                <Animated.View
+                  style={[styles.skeletonMetadataItem, animatedStyle]}
+                />
+                <Animated.View
+                  style={[styles.skeletonMetadataItem, animatedStyle]}
+                />
+                <Animated.View
+                  style={[styles.skeletonMetadataItem, animatedStyle]}
+                />
               </View>
             </View>
           </View>
@@ -370,29 +382,53 @@ const RecommendationDetailSkeleton = () => {
           <View style={styles.reviewsMetadataSection}>
             <View style={styles.skeletonMetadataContainer}>
               <Animated.View style={[styles.skeletonRating, animatedStyle]} />
-              <Animated.View style={[styles.skeletonReviewCount, animatedStyle]} />
+              <Animated.View
+                style={[styles.skeletonReviewCount, animatedStyle]}
+              />
             </View>
           </View>
 
           {/* Editorial Summary Skeleton */}
           <View style={styles.quickInfoContainer}>
             <View style={styles.editorialSummaryContainer}>
-              <Animated.View style={[styles.skeletonSummaryLine, animatedStyle]} />
-              <Animated.View style={[styles.skeletonSummaryLine, { width: "90%" }, animatedStyle]} />
-              <Animated.View style={[styles.skeletonSummaryLine, { width: "75%" }, animatedStyle]} />
+              <Animated.View
+                style={[styles.skeletonSummaryLine, animatedStyle]}
+              />
+              <Animated.View
+                style={[
+                  styles.skeletonSummaryLine,
+                  { width: "90%" },
+                  animatedStyle,
+                ]}
+              />
+              <Animated.View
+                style={[
+                  styles.skeletonSummaryLine,
+                  { width: "75%" },
+                  animatedStyle,
+                ]}
+              />
             </View>
 
             {/* Quick Action Buttons Skeleton */}
             <View style={styles.skeletonActionButtons}>
-              <Animated.View style={[styles.skeletonActionButton, animatedStyle]} />
-              <Animated.View style={[styles.skeletonActionButton, animatedStyle]} />
-              <Animated.View style={[styles.skeletonActionButton, animatedStyle]} />
+              <Animated.View
+                style={[styles.skeletonActionButton, animatedStyle]}
+              />
+              <Animated.View
+                style={[styles.skeletonActionButton, animatedStyle]}
+              />
+              <Animated.View
+                style={[styles.skeletonActionButton, animatedStyle]}
+              />
             </View>
           </View>
 
           {/* Map Section Skeleton */}
           <View style={styles.mapContainer}>
-            <Animated.View style={[styles.skeletonSectionTitle, animatedStyle]} />
+            <Animated.View
+              style={[styles.skeletonSectionTitle, animatedStyle]}
+            />
             <Animated.View style={[styles.skeletonMap, animatedStyle]} />
           </View>
         </View>
@@ -446,7 +482,6 @@ const styles = StyleSheet.create({
     marginBottom: 25,
   },
 
-
   // Reviews Metadata Section
   reviewsMetadataSection: {
     marginBottom: 30,
@@ -498,7 +533,7 @@ const styles = StyleSheet.create({
 
   // Google Maps Attribution
   googleMapsAttribution: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   googleMapsLogo: {
     width: 90,

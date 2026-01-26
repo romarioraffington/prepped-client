@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
+import { API_ENDPOINTS, QUERY_KEYS, getApiClient } from "@/libs/constants";
 import { parseSlug, reportError } from "@/libs/utils";
-import { API_ENDPOINTS, getApiClient, QUERY_KEYS } from "@/libs/constants";
 
 interface AmenitiesResponse {
   data: string[];
@@ -15,7 +15,7 @@ const fetchAmenities = async (id: string): Promise<string[]> => {
 
     const client = getApiClient();
     const result: AmenitiesResponse = await client.get(
-      API_ENDPOINTS.RECOMMENDATIONS_V1_AMENITIES.replace("{id}", id)
+      API_ENDPOINTS.RECOMMENDATIONS_V1_AMENITIES.replace("{id}", id),
     );
     const data = result?.data;
 

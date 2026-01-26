@@ -1,6 +1,6 @@
+import type { RouteProp } from "@react-navigation/native";
 // External Dependencies
 import { useCallback, useEffect, useRef } from "react";
-import type { RouteProp } from "@react-navigation/native";
 import { Animated, DeviceEventEmitter, Easing } from "react-native";
 
 // Internal Dependencies

@@ -1,17 +1,17 @@
+import { Ionicons } from "@expo/vector-icons";
+import type { default as BottomSheet } from "@gorhom/bottom-sheet";
+import * as Haptics from "expo-haptics";
+import { router, useNavigation, usePathname } from "expo-router";
+import { type FC, type RefObject, useCallback, useMemo } from "react";
 // External Dependencies
 import { Alert } from "react-native";
-import * as Haptics from "expo-haptics";
-import { Ionicons } from "@expo/vector-icons";
-import { router, useNavigation, usePathname } from "expo-router";
-import type { default as BottomSheet } from "@gorhom/bottom-sheet";
-import { type FC, type RefObject, useCallback, useMemo } from "react";
 
-// Internal Dependencies
-import { Colors } from "@/libs/constants";
 import { useRecommendationDetails } from "@/api";
 import { ActionBottomSheet } from "@/components/ActionBottomSheet";
 import type { ActionBottomSheetMenuItem } from "@/components/ActionBottomSheet";
 import { useRecommendationDeleteHandler } from "@/hooks/useRecommendationDeleteHandler";
+// Internal Dependencies
+import { Colors } from "@/libs/constants";
 
 export interface RecommendationOptionsSheetProps {
   recommendationSlug: string;
@@ -20,12 +20,9 @@ export interface RecommendationOptionsSheetProps {
   initialIndex?: number;
 }
 
-export const RecommendationOptionsSheet: FC<RecommendationOptionsSheetProps> = ({
-  recommendationSlug,
-  bottomSheetRef,
-  onChange,
-  initialIndex = -1,
-}) => {
+export const RecommendationOptionsSheet: FC<
+  RecommendationOptionsSheetProps
+> = ({ recommendationSlug, bottomSheetRef, onChange, initialIndex = -1 }) => {
   const navigation = useNavigation();
   const pathname = usePathname();
   const { data: recommendation } = useRecommendationDetails(recommendationSlug);
@@ -34,23 +31,25 @@ export const RecommendationOptionsSheet: FC<RecommendationOptionsSheetProps> = (
   const isSaved = (recommendation?.wishlistIds?.length ?? 0) > 0;
 
   // Check if we're on the recommendation detail page (not sub-routes like /photos or /amenities)
-  const isRecommendationDetailPage = pathname?.match(/^\/recommendations\/[^/]+$/) !== null;
+  const isRecommendationDetailPage =
+    pathname?.match(/^\/recommendations\/[^/]+$/) !== null;
 
   // Use the delete handler hook
-  const { handleDelete: executeDelete, isPending } = useRecommendationDeleteHandler({
-    recommendationSlug,
-    thumbnailUri: recommendation?.images?.[0],
-    recommendationName: recommendation?.name ?? "This recommendation",
-    onSuccess: () => {
-      // Close the sheet after successful delete
-      bottomSheetRef.current?.close();
+  const { handleDelete: executeDelete, isPending } =
+    useRecommendationDeleteHandler({
+      recommendationSlug,
+      thumbnailUri: recommendation?.images?.[0],
+      recommendationName: recommendation?.name ?? "This recommendation",
+      onSuccess: () => {
+        // Close the sheet after successful delete
+        bottomSheetRef.current?.close();
 
-      // Only navigate back if we're on the recommendation detail page
-      if (isRecommendationDetailPage && navigation.canGoBack()) {
-        router.back();
-      }
-    },
-  });
+        // Only navigate back if we're on the recommendation detail page
+        if (isRecommendationDetailPage && navigation.canGoBack()) {
+          router.back();
+        }
+      },
+    });
 
   // Dynamic snap points based on isSaved state
   const snapPoints = useMemo(() => [isSaved ? "30%" : "25%"], [isSaved]);
@@ -86,19 +85,25 @@ export const RecommendationOptionsSheet: FC<RecommendationOptionsSheetProps> = (
       {
         label: "Share",
         onPress: handleShare,
-        renderIcon: () => <Ionicons size={20} name="share-outline" color="#667" />,
+        renderIcon: () => (
+          <Ionicons size={20} name="share-outline" color="#667" />
+        ),
       },
       {
         label: "Manage wishlists",
         onPress: handleManageWishlists,
-        renderIcon: () => <Ionicons size={20} name="heart-outline" color="#667" />,
+        renderIcon: () => (
+          <Ionicons size={20} name="heart-outline" color="#667" />
+        ),
       },
       {
         onPress: handleDelete,
         destructive: true,
         disabled: isPending,
         label: isPending ? "Deleting..." : "Delete",
-        renderIcon: () => <Ionicons size={20} name="trash-outline" color={Colors.destructive} />,
+        renderIcon: () => (
+          <Ionicons size={20} name="trash-outline" color={Colors.destructive} />
+        ),
       },
     ],
     [handleShare, handleManageWishlists, handleDelete, isSaved, isPending],

@@ -1,16 +1,20 @@
+import {
+  Ionicons,
+  MaterialCommunityIcons,
+  MaterialIcons,
+} from "@expo/vector-icons";
+import { Tabs, useRouter } from "expo-router";
 // External Dependencies
 import { Animated } from "react-native";
-import { Tabs, useRouter } from "expo-router";
 import { DeviceEventEmitter } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 
-// Internal Dependencies
-import { Colors } from "@/libs/constants";
 import { useAuth, useSubscription } from "@/contexts";
 import { useBottomNavigationAnimation } from "@/hooks";
-import { reportWarning } from "@/libs/utils/errorReporting";
+// Internal Dependencies
+import { Colors } from "@/libs/constants";
 import { getBottomNavigationVisibility } from "@/libs/utils/bottomnavigation";
+import { reportWarning } from "@/libs/utils/errorReporting";
 
 const TAB_BAR_HEIGHT = 75;
 
@@ -24,7 +28,8 @@ export default function BottomNavigation() {
     <>
       <Tabs
         screenOptions={({ route }) => {
-          const { tabBarAnimation, scaleAnimation } = useBottomNavigationAnimation({ route });
+          const { tabBarAnimation, scaleAnimation } =
+            useBottomNavigationAnimation({ route });
           const totalHeight = TAB_BAR_HEIGHT + insets.bottom;
 
           // Check if we should hide the tab bar using the utility function
@@ -71,29 +76,29 @@ export default function BottomNavigation() {
             tabBarStyle: shouldHideTabBar
               ? { display: "none" }
               : {
-                left: 0,
-                right: 0,
-                bottom: 0,
-                borderTopWidth: 0,
-                position: "absolute",
-                height: TAB_BAR_HEIGHT,
-                paddingBottom: insets.bottom,
-                paddingHorizontal: 30,
-                backgroundColor: "transparent",
-                opacity: tabBarAnimation,
-                overflow: "hidden",
-                transform: [
-                  {
-                    translateY: tabBarAnimation.interpolate({
-                      inputRange: [0, 1],
-                      outputRange: [totalHeight, 0],
-                    }),
-                  },
-                  {
-                    scale: scaleAnimation,
-                  },
-                ],
-              },
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  borderTopWidth: 0,
+                  position: "absolute",
+                  height: TAB_BAR_HEIGHT,
+                  paddingBottom: insets.bottom,
+                  paddingHorizontal: 30,
+                  backgroundColor: "transparent",
+                  opacity: tabBarAnimation,
+                  overflow: "hidden",
+                  transform: [
+                    {
+                      translateY: tabBarAnimation.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [totalHeight, 0],
+                      }),
+                    },
+                    {
+                      scale: scaleAnimation,
+                    },
+                  ],
+                },
           };
         }}
       >
@@ -136,14 +141,14 @@ export default function BottomNavigation() {
             headerTransparent: true,
             tabBarIcon: ({ color, focused }) => (
               <MaterialIcons size={22} name="person" color={color} />
-
             ),
           }}
           listeners={() => ({
             tabPress: () => {
               // Refresh subscription status when account tab is clicked
               refreshSubscriptionStatus().catch((error) => {
-                const errorMessage = error instanceof Error ? error.message : String(error);
+                const errorMessage =
+                  error instanceof Error ? error.message : String(error);
                 reportWarning(errorMessage, {
                   component: "BottomNavigation",
                   action: "Refresh Subscription on Tab Press",

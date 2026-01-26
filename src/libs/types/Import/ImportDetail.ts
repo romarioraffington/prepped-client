@@ -1,5 +1,5 @@
-import type { AssetType } from "../AssetType";
 import type { ImportRecommendation } from "@/libs/types";
+import type { AssetType } from "../AssetType";
 
 export interface ImportDetail {
   id: string;

@@ -1,13 +1,15 @@
-import type React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import type React from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface ErrorBoundaryTestProps {
   shouldThrow?: boolean;
 }
 
-export const ErrorBoundaryTest: React.FC<ErrorBoundaryTestProps> = ({ shouldThrow = false }) => {
+export const ErrorBoundaryTest: React.FC<ErrorBoundaryTestProps> = ({
+  shouldThrow = false,
+}) => {
   if (shouldThrow) {
-    throw new Error('Test error for error boundary!');
+    throw new Error("Test error for error boundary!");
   }
 
   return (
@@ -19,7 +21,7 @@ export const ErrorBoundaryTest: React.FC<ErrorBoundaryTestProps> = ({ shouldThro
       <TouchableOpacity
         style={styles.button}
         onPress={() => {
-          throw new Error('Manual test error!');
+          throw new Error("Manual test error!");
         }}
       >
         <Text style={styles.buttonText}>Throw Error</Text>
@@ -31,28 +33,28 @@ export const ErrorBoundaryTest: React.FC<ErrorBoundaryTestProps> = ({ shouldThro
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    backgroundColor: '#f0f0f0',
+    backgroundColor: "#f0f0f0",
     margin: 10,
     borderRadius: 8,
   },
   title: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 8,
   },
   description: {
     fontSize: 14,
-    color: '#666',
+    color: "#666",
     marginBottom: 16,
   },
   button: {
-    backgroundColor: '#ff6b6b',
+    backgroundColor: "#ff6b6b",
     padding: 12,
     borderRadius: 6,
-    alignItems: 'center',
+    alignItems: "center",
   },
   buttonText: {
-    color: 'white',
-    fontWeight: '600',
+    color: "white",
+    fontWeight: "600",
   },
 });

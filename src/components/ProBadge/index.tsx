@@ -1,5 +1,5 @@
 // External Dependencies
-import { View, Text, StyleSheet } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 
 // Color Constants
@@ -24,7 +24,7 @@ interface ProBadgeProps {
 export const ProBadge = ({
   text = "Premium",
   animated = false,
-  style
+  style,
 }: ProBadgeProps) => {
   const badgeContent = (
     <View style={[styles.proBadge, style]}>
@@ -69,4 +69,3 @@ const styles = StyleSheet.create({
     fontWeight: "700",
   },
 });
-

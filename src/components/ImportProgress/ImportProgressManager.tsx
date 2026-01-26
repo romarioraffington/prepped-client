@@ -1,16 +1,16 @@
 // External Dependencies
-import type React from 'react';
-import { useEffect, useRef } from 'react';
-import { Portal } from 'react-native-portalize';
-import { View, StyleSheet, Animated } from 'react-native';
+import type React from "react";
+import { useEffect, useRef } from "react";
+import { Animated, StyleSheet, View } from "react-native";
+import { Portal } from "react-native-portalize";
 
 // Internal Dependencies
-import { useImportProgress } from '@/contexts';
-import { IMPORT_STATUS } from '@/libs/constants';
+import { useImportProgress } from "@/contexts";
+import { IMPORT_STATUS } from "@/libs/constants";
 
+import { ExtractionStatusPoller } from "../ExtractionStatusPoller";
 // Imported like this to avoid circular dependency
-import { ImportProgressItem } from './ImportProgressItem';
-import { ExtractionStatusPoller } from '../ExtractionStatusPoller';
+import { ImportProgressItem } from "./ImportProgressItem";
 
 const BOTTOM_OFFSET = 125;
 
@@ -44,8 +44,11 @@ export const ImportProgressManager: React.FC = () => {
       <View style={styles.container}>
         {/* Polling components for each active extraction */}
         {progressItems
-          .filter(item => item.extractionId && item.status === IMPORT_STATUS.PROCESSING)
-          .map(item => (
+          .filter(
+            (item) =>
+              item.extractionId && item.status === IMPORT_STATUS.PROCESSING,
+          )
+          .map((item) => (
             <ExtractionStatusPoller
               key={`poller-${item.id}`}
               progressItemId={item.id}
@@ -66,17 +69,14 @@ export const ImportProgressManager: React.FC = () => {
                 {
                   transform: [{ translateY }],
                   zIndex: progressItems.length - index, // Stack newer items on top
-                }
+                },
               ]}
             >
               {
                 // ImportProgressItem is the component that renders
                 // the import progress item UI
               }
-              <ImportProgressItem
-                item={item}
-                onClose={removeItem}
-              />
+              <ImportProgressItem item={item} onClose={removeItem} />
             </Animated.View>
           );
         })}
@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
     right: 0,
     zIndex: 1000,
     bottom: BOTTOM_OFFSET,
-    position: 'absolute',
+    position: "absolute",
   },
   itemContainer: {
     marginBottom: 8,

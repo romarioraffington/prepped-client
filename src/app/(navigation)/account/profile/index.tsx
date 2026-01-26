@@ -1,23 +1,23 @@
-// External Imports
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { router } from "expo-router";
+// External Imports
+import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
+import { useAccountDeletionMutation } from "@/api/account/deletion";
 // Internal Imports
 import { useAuth } from "@/contexts";
-import { formatDate } from "@/libs/utils/date";
 import { useSubscriptionStatus } from "@/hooks";
-import { useAccountDeletionMutation } from "@/api/account/deletion";
+import { formatDate } from "@/libs/utils/date";
 
 export default function Profile() {
   const { user } = useAuth();
   const accountDeletionMutation = useAccountDeletionMutation();
-  const { hasActiveSubscription, isAutoRenewEnabled, expirationDate } = useSubscriptionStatus();
+  const { hasActiveSubscription, isAutoRenewEnabled, expirationDate } =
+    useSubscriptionStatus();
 
   let displayName = null;
   if (user?.firstName && user?.lastName) {
     displayName = `${user.firstName} ${user.lastName}`.trim();
   }
-
 
   const handleBottomSheetDeletePress = () => {
     if (hasActiveSubscription) {
@@ -26,23 +26,19 @@ export default function Profile() {
         ? "Please cancel your subscription first before deleting your account."
         : `Please wait untiil your subscription expires on ${formatDate(expirationDate)} before deleting your account.`;
 
-      Alert.alert(
-        "Oops!",
-        message,
-        [
-          {
-            isPreferred: true,
-            text: "Manage",
-            onPress: () => {
-              router.push("/account/manage-subscription");
-            }
+      Alert.alert("Oops!", message, [
+        {
+          isPreferred: true,
+          text: "Manage",
+          onPress: () => {
+            router.push("/account/manage-subscription");
           },
-          {
-            text: "OK",
-            style: "cancel"
-          }
-        ]
-      );
+        },
+        {
+          text: "OK",
+          style: "cancel",
+        },
+      ]);
     } else {
       // Show alert for users without subscription
       Alert.alert(
@@ -51,7 +47,7 @@ export default function Profile() {
         [
           {
             text: "Cancel",
-            style: "cancel"
+            style: "cancel",
           },
           {
             text: "Request",
@@ -59,37 +55,28 @@ export default function Profile() {
             onPress: () => {
               accountDeletionMutation.mutate(undefined, {
                 onSuccess: (data) => {
-                  Alert.alert(
-                    "Request Submitted",
-                    data.message,
-                    [
-                      {
-                        text: "OK",
-                        style: "default"
-                      }
-                    ]
-                  );
+                  Alert.alert("Request Submitted", data.message, [
+                    {
+                      text: "OK",
+                      style: "default",
+                    },
+                  ]);
                 },
                 onError: (error) => {
-                  Alert.alert(
-                    "Oops!",
-                    error?.message,
-                    [
-                      {
-                        text: "OK",
-                        style: "default"
-                      }
-                    ]
-                  );
-                }
+                  Alert.alert("Oops!", error?.message, [
+                    {
+                      text: "OK",
+                      style: "default",
+                    },
+                  ]);
+                },
               });
-            }
-          }
-        ]
+            },
+          },
+        ],
       );
     }
   };
-
 
   return (
     <View style={styles.container}>
@@ -126,7 +113,6 @@ export default function Profile() {
       >
         <Text style={styles.deleteText}>Delete account</Text>
       </TouchableOpacity>
-
     </View>
   );
 }

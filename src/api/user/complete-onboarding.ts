@@ -1,10 +1,10 @@
 // External Dependencies
 import { useMutation } from "@tanstack/react-query";
 
+import { API_ENDPOINTS, getApiClient } from "@/libs/constants";
+import { reportError } from "@/libs/utils/errorReporting";
 // Internal Dependencies
 import { useAuthStore } from "@/stores/authStore";
-import { reportError } from "@/libs/utils/errorReporting";
-import { API_ENDPOINTS, getApiClient } from "@/libs/constants";
 
 const completeOnboardingMutationFn = async (): Promise<void> => {
   const apiClient = getApiClient();

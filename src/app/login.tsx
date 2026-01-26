@@ -1,21 +1,27 @@
+import { Ionicons } from "@expo/vector-icons";
 // External Dependencies
 import React, { useState } from "react";
-import { Ionicons } from "@expo/vector-icons";
+import {
+  ActivityIndicator,
+  Linking,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Linking } from "react-native";
 
+import { BackgroundCycler } from "@/components";
 // Internal Dependencies
 import { useAuth } from "@/contexts";
-import { reportError } from "@/libs/utils";
-import { BackgroundCycler } from "@/components";
 import { LEGAL_URLS } from "@/libs/constants";
+import { reportError } from "@/libs/utils";
 
 export default function Login() {
   const insets = useSafeAreaInsets();
   const [isSigningInWithApple, setIsSigningInWithApple] = useState(false);
   const [isSigningInWithGoogle, setIsSigningInWithGoogle] = useState(false);
   const { signInWithGoogle, signInWithApple, isLoading, error } = useAuth();
-
 
   const handleAppleSignIn = async () => {
     try {
@@ -44,7 +50,7 @@ export default function Login() {
         action: "Open Terms of Service",
       });
     }
-  }
+  };
 
   const handlePrivacyPolicyPress = async () => {
     try {
@@ -55,16 +61,22 @@ export default function Login() {
         action: "Open Privacy Policy",
       });
     }
-  }
+  };
 
   return (
     <BackgroundCycler>
-      <View style={[styles.container, { paddingTop: insets.top + 16, paddingBottom: insets.bottom }]}>
+      <View
+        style={[
+          styles.container,
+          { paddingTop: insets.top + 16, paddingBottom: insets.bottom },
+        ]}
+      >
         <View style={styles.contentContainer}>
           <View style={styles.headerContainer}>
             <Text style={styles.title}>Get Started</Text>
             <Text style={styles.subtitle}>
-              Curate, save places, and discover inspiring destinations for your next trip.
+              Curate, save places, and discover inspiring destinations for your
+              next trip.
             </Text>
           </View>
 
@@ -73,7 +85,7 @@ export default function Login() {
               style={[
                 styles.button,
                 styles.primaryButton,
-                (isLoading || isSigningInWithApple) && styles.disabledButton
+                (isLoading || isSigningInWithApple) && styles.disabledButton,
               ]}
               activeOpacity={0.85}
               onPress={handleAppleSignIn}
@@ -85,14 +97,14 @@ export default function Login() {
                 <Ionicons name="logo-apple" size={20} color="#000" />
               )}
               <Text style={[styles.buttonText, styles.primaryButtonText]}>
-                {isSigningInWithApple ? 'Signing in...' : 'Continue with Apple'}
+                {isSigningInWithApple ? "Signing in..." : "Continue with Apple"}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[
                 styles.button,
                 styles.secondaryButton,
-                (isLoading || isSigningInWithGoogle) && styles.disabledButton
+                (isLoading || isSigningInWithGoogle) && styles.disabledButton,
               ]}
               onPress={handleGoogleSignIn}
               disabled={isLoading || isSigningInWithGoogle}
@@ -103,7 +115,9 @@ export default function Login() {
                 <Ionicons name="logo-google" size={20} color="#111" />
               )}
               <Text style={[styles.buttonText, styles.secondaryButtonText]}>
-                {isSigningInWithGoogle ? 'Signing in...' : 'Continue with Google'}
+                {isSigningInWithGoogle
+                  ? "Signing in..."
+                  : "Continue with Google"}
               </Text>
             </TouchableOpacity>
           </View>
@@ -117,9 +131,16 @@ export default function Login() {
           <View>
             <Text style={styles.termsText}>
               By continuing you agree to TripSpire's{" "}
-              <Text style={styles.termsLink} onPress={handleTermsOfServicePress}>terms</Text>
-              {" "}and{" "}
-              <Text style={styles.termsLink} onPress={handlePrivacyPolicyPress}>privacy</Text>
+              <Text
+                style={styles.termsLink}
+                onPress={handleTermsOfServicePress}
+              >
+                terms
+              </Text>{" "}
+              and{" "}
+              <Text style={styles.termsLink} onPress={handlePrivacyPolicyPress}>
+                privacy
+              </Text>
             </Text>
           </View>
         </View>
@@ -134,13 +155,13 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
     paddingHorizontal: 28,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   headerContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: 40,
   },
   title: {
@@ -159,17 +180,17 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     gap: 12,
-    width: '100%',
-    flexDirection: 'column',
+    width: "100%",
+    flexDirection: "column",
   },
   button: {
     gap: 12,
     borderRadius: 30,
     paddingVertical: 13,
     paddingHorizontal: 40,
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'center',
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "center",
   },
   primaryButton: {
     backgroundColor: "white",
@@ -198,7 +219,7 @@ const styles = StyleSheet.create({
   },
   termsLink: {
     color: "white",
-    textDecorationLine: 'underline',
+    textDecorationLine: "underline",
   },
   disabledButton: {
     opacity: 0.6,
@@ -214,6 +235,6 @@ const styles = StyleSheet.create({
   errorText: {
     color: "#ff6b6b",
     fontSize: 14,
-    textAlign: 'center',
+    textAlign: "center",
   },
 });

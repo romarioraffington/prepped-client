@@ -1,9 +1,9 @@
+import { FontAwesome5, Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 // External Dependencies
 import React from "react";
-import { router } from "expo-router";
-import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
 // Internal Dependencies
 import { BackgroundCycler } from "@/components";
@@ -32,15 +32,20 @@ export default function Setup() {
 
   return (
     <BackgroundCycler>
-      <View style={[styles.container, { paddingTop: insets.top + 16, paddingBottom: insets.bottom }]}>
-
+      <View
+        style={[
+          styles.container,
+          { paddingTop: insets.top + 16, paddingBottom: insets.bottom },
+        ]}
+      >
         <View style={styles.headerContainer}>
           <View style={styles.titleRow}>
             <FontAwesome5 name="share" size={24} color="white" />
             <Text style={styles.title}>Start Sharing</Text>
           </View>
           <Text style={styles.subtitle}>
-            Learn how to share travel recommendations to TripSpire from your favorite apps!
+            Learn how to share travel recommendations to TripSpire from your
+            favorite apps!
           </Text>
         </View>
 
@@ -59,7 +64,11 @@ export default function Setup() {
 
           {/* Instagram */}
           <TouchableOpacity
-            style={[styles.button, styles.secondaryButton, styles.comingSoonButton]}
+            style={[
+              styles.button,
+              styles.secondaryButton,
+              styles.comingSoonButton,
+            ]}
             onPress={handleInstagramSelection}
             disabled={true}
           >
@@ -74,7 +83,11 @@ export default function Setup() {
 
           {/* YouTube */}
           <TouchableOpacity
-            style={[styles.button, styles.secondaryButton, styles.comingSoonButton]}
+            style={[
+              styles.button,
+              styles.secondaryButton,
+              styles.comingSoonButton,
+            ]}
             onPress={handleYouTubeSelection}
             disabled={true}
           >
@@ -89,7 +102,11 @@ export default function Setup() {
 
           {/* Web Browser */}
           <TouchableOpacity
-            style={[styles.button, styles.secondaryButton, styles.comingSoonButton]}
+            style={[
+              styles.button,
+              styles.secondaryButton,
+              styles.comingSoonButton,
+            ]}
             onPress={handleWebBrowserSelection}
             disabled={true}
           >
@@ -111,7 +128,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingHorizontal: 28,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   headerContainer: {
     marginBottom: 40,
@@ -135,16 +152,16 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     gap: 15,
-    width: '100%',
-    flexDirection: 'column',
+    width: "100%",
+    flexDirection: "column",
   },
   button: {
     gap: 8,
     borderRadius: 25,
-    position: 'relative',
+    position: "relative",
     paddingVertical: 14,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 40,
   },
   primaryButton: {

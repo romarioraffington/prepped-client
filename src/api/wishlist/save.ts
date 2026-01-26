@@ -1,22 +1,22 @@
 // External Dependencies
 import {
+  type InfiniteData,
   useMutation,
   useQueryClient,
-  type InfiniteData,
 } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
 
+import { API_ENDPOINTS, QUERY_KEYS, getApiClient } from "@/libs/constants";
+import type { RecommendationDetail, WishlistPageResult } from "@/libs/types";
+import { parseSlug, reportError } from "@/libs/utils";
 // Internal Dependencies
 import { cacheWishlistId } from "./storage";
-import { parseSlug, reportError } from "@/libs/utils";
-import type { RecommendationDetail, WishlistPageResult } from "@/libs/types";
-import { API_ENDPOINTS, getApiClient, QUERY_KEYS } from "@/libs/constants";
 
 import {
-  updateAllWishlistCaches,
-  snapshotAllWishlistCaches,
-  rollbackAllWishlistCaches,
   invalidateAllWishlistQueries,
+  rollbackAllWishlistCaches,
+  snapshotAllWishlistCaches,
+  updateAllWishlistCaches,
 } from "./cache";
 
 // Track mutations that should be ignored (when "Change" is clicked)

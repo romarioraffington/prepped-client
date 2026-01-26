@@ -1,21 +1,21 @@
+import { FontAwesome } from "@expo/vector-icons";
+import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
 // External Dependencies
 import { Image } from "expo-image";
+import { useNavigation, useRouter } from "expo-router";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Region } from "react-native-maps";
-import { FontAwesome } from "@expo/vector-icons";
-import { useRouter, useNavigation } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import BottomSheet, { BottomSheetFlatList } from "@gorhom/bottom-sheet";
-import { useMemo, useRef, useState, useEffect, useCallback, memo } from "react";
 
 import {
-  View,
-  Text,
-  StatusBar,
-  StyleSheet,
   Dimensions,
   FlatList,
   type NativeScrollEvent,
   type NativeSyntheticEvent,
+  StatusBar,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 
 import Animated, {
@@ -32,14 +32,14 @@ import MapView, {
   type MarkerPressEvent,
 } from "react-native-maps";
 
+import type { RecommendationListItem } from "@/libs/types";
 // Internal dependencies
 import { createFullSlug, truncate } from "@/libs/utils";
-import type { RecommendationListItem } from "@/libs/types";
 
+import { EntityCard, LoadingEntityCardList } from "@/components/Entity";
 // Direct imports to avoid cyclic dependency:
 import { MapEntityCard } from "@/components/Map/MapEntityCard";
 import { MapLocationMarker } from "@/components/Map/MapLocationMarker";
-import { EntityCard, LoadingEntityCardList } from "@/components/Entity";
 
 // Offset for the marker cards
 const MARKER_CARDS_BOTTOM_OFFSET = 130;
@@ -91,56 +91,58 @@ const SEPARATOR_HEIGHT = 16; // 1px height + 15px marginBottom
 
 // Memoized marker component with dynamic tracksViewChanges
 // to prevent flickering while allowing visual selection updates
-const MemoizedMarker = memo(({
-  index,
-  isSelected,
-  recommendation,
-  onPress,
-}: {
-  index: number;
-  isSelected: boolean;
-  recommendation: RecommendationListItem;
-  onPress: (event: MarkerPressEvent) => void;
-}) => {
-  const isFirstRender = useRef(true);
-  const [shouldTrack, setShouldTrack] = useState(isSelected);
+const MemoizedMarker = memo(
+  ({
+    index,
+    isSelected,
+    recommendation,
+    onPress,
+  }: {
+    index: number;
+    isSelected: boolean;
+    recommendation: RecommendationListItem;
+    onPress: (event: MarkerPressEvent) => void;
+  }) => {
+    const isFirstRender = useRef(true);
+    const [shouldTrack, setShouldTrack] = useState(isSelected);
 
-  useEffect(() => {
-    // Skip tracking on initial mount for non-selected markers
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      if (!isSelected) {
-        setShouldTrack(false);
-        return;
+    useEffect(() => {
+      // Skip tracking on initial mount for non-selected markers
+      if (isFirstRender.current) {
+        isFirstRender.current = false;
+        if (!isSelected) {
+          setShouldTrack(false);
+          return;
+        }
       }
-    }
 
-    // Enable tracking when selection or index
-    // changes, then disable after render
-    setShouldTrack(true);
-    const timer = setTimeout(() => setShouldTrack(false), 300);
-    return () => clearTimeout(timer);
-  }, [isSelected, index]);
+      // Enable tracking when selection or index
+      // changes, then disable after render
+      setShouldTrack(true);
+      const timer = setTimeout(() => setShouldTrack(false), 300);
+      return () => clearTimeout(timer);
+    }, [isSelected, index]);
 
-  return (
-    <Marker
-      identifier={recommendation.id}
-      coordinate={recommendation.coordinates}
-      onPress={onPress}
-      tracksViewChanges={shouldTrack}
-    >
-      <MapLocationMarker
-        content={`${index + 1}`}
-        isSelected={isSelected}
-      />
-    </Marker>
-  );
-}, (prevProps, nextProps) => {
-  // Re-render if isSelected, recommendation.id, or index changes
-  return prevProps.isSelected === nextProps.isSelected &&
-    prevProps.recommendation.id === nextProps.recommendation.id &&
-    prevProps.index === nextProps.index;
-});
+    return (
+      <Marker
+        identifier={recommendation.id}
+        coordinate={recommendation.coordinates}
+        onPress={onPress}
+        tracksViewChanges={shouldTrack}
+      >
+        <MapLocationMarker content={`${index + 1}`} isSelected={isSelected} />
+      </Marker>
+    );
+  },
+  (prevProps, nextProps) => {
+    // Re-render if isSelected, recommendation.id, or index changes
+    return (
+      prevProps.isSelected === nextProps.isSelected &&
+      prevProps.recommendation.id === nextProps.recommendation.id &&
+      prevProps.index === nextProps.index
+    );
+  },
+);
 
 export const RecommendationsScreen = ({
   name,
@@ -171,9 +173,11 @@ export const RecommendationsScreen = ({
   const insets = useSafeAreaInsets();
   const [isMapReady, setIsMapReady] = useState(false);
   const [showSkeleton, setShowSkeleton] = useState(false);
-  const [activeMakerCardIndex, setActiveMakerCardIndex] = useState<number | null>(null);
-  const [selectedRecommendation, setSelectedRecommendation] = useState<RecommendationListItem | null>(null);
-
+  const [activeMakerCardIndex, setActiveMakerCardIndex] = useState<
+    number | null
+  >(null);
+  const [selectedRecommendation, setSelectedRecommendation] =
+    useState<RecommendationListItem | null>(null);
 
   const snapPoints = useMemo(() => {
     return recommendations.length > 1
@@ -188,7 +192,7 @@ export const RecommendationsScreen = ({
   // Coordinates for the map - memoized to prevent recalculation on every render
   const coordinates = useMemo(
     () => recommendations.map((r) => r.coordinates),
-    [recommendations]
+    [recommendations],
   );
 
   const animatedMarkerCardsStyle = useAnimatedStyle(() => ({
@@ -248,7 +252,7 @@ export const RecommendationsScreen = ({
     // Clear selection if the selected recommendation no longer exists
     if (selectedRecommendation) {
       const stillExists = recommendations.some(
-        (r) => r.id === selectedRecommendation.id
+        (r) => r.id === selectedRecommendation.id,
       );
       if (!stillExists) {
         setSelectedRecommendation(null);
@@ -278,7 +282,15 @@ export const RecommendationsScreen = ({
         animated: true,
       });
     }
-  }, [recommendations, coordinates, isMapReady, region, selectedRecommendation, height, width]);
+  }, [
+    recommendations,
+    coordinates,
+    isMapReady,
+    region,
+    selectedRecommendation,
+    height,
+    width,
+  ]);
 
   // Memoize handleMapReady to prevent recreation on every render
   const handleMapReady = useCallback(() => {
@@ -311,90 +323,44 @@ export const RecommendationsScreen = ({
   }, [isMapReady, recommendations, coordinates, height, width]);
 
   // Memoize handleMakerCardScroll to prevent recreation on every render
-  const handleMakerCardScroll = useCallback((event: NativeSyntheticEvent<NativeScrollEvent>) => {
-    if (!markerCardsRef.current || isProgrammaticScroll.current) {
-      return;
-    }
-
-    const contentOffset = event.nativeEvent.contentOffset.x;
-    const index = Math.round(contentOffset / MARKER_CARD_SNAP_INTERVAL);
-
-    if (
-      index !== activeMakerCardIndex &&
-      index >= 0 &&
-      index < recommendations.length
-    ) {
-      setActiveMakerCardIndex(index);
-      setSelectedRecommendation(recommendations[index]);
-    }
-  }, [activeMakerCardIndex, recommendations]);
-
-  // Memoize handleMakerCardLayout to prevent recreation on every render
-  const handleMakerCardLayout = useCallback((event: any) => {
-    scrollViewWidth.current = event.nativeEvent.layout.width;
-
-    // If we have a selected recommendation, scroll to its position
-    if (selectedRecommendation && markerCardsRef.current) {
-      const index = recommendations.findIndex(
-        (r) => r.id === selectedRecommendation.id,
-      );
-
-      if (index < 0) {
+  const handleMakerCardScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      if (!markerCardsRef.current || isProgrammaticScroll.current) {
         return;
       }
 
-      isProgrammaticScroll.current = true;
+      const contentOffset = event.nativeEvent.contentOffset.x;
+      const index = Math.round(contentOffset / MARKER_CARD_SNAP_INTERVAL);
 
-      // Use scrollToIndex for FlatList
-      markerCardsRef.current.scrollToIndex({
-        index,
-        animated: true,
-        viewPosition: 0.5, // Center the item
-      });
+      if (
+        index !== activeMakerCardIndex &&
+        index >= 0 &&
+        index < recommendations.length
+      ) {
+        setActiveMakerCardIndex(index);
+        setSelectedRecommendation(recommendations[index]);
+      }
+    },
+    [activeMakerCardIndex, recommendations],
+  );
 
-      // Reset the flag after a short delay to ensure the scroll has completed
-      setTimeout(() => {
-        isProgrammaticScroll.current = false;
-      }, 300);
-    }
-  }, [selectedRecommendation, recommendations]);
+  // Memoize handleMakerCardLayout to prevent recreation on every render
+  const handleMakerCardLayout = useCallback(
+    (event: any) => {
+      scrollViewWidth.current = event.nativeEvent.layout.width;
 
-  // Memoize handleMarkerPress to prevent recreation on every render
-  const handleMarkerPress = useCallback((event: MarkerPressEvent) => {
-    const markerId = event.nativeEvent?.id;
-    const recommendation = recommendations.find((rec) => rec.id === markerId);
+      // If we have a selected recommendation, scroll to its position
+      if (selectedRecommendation && markerCardsRef.current) {
+        const index = recommendations.findIndex(
+          (r) => r.id === selectedRecommendation.id,
+        );
 
-    if (!recommendation) {
-      return;
-    }
+        if (index < 0) {
+          return;
+        }
 
-    // Find the index of the selected recommendation
-    const index = recommendations.findIndex(
-      (rec) => rec.id === recommendation.id,
-    );
+        isProgrammaticScroll.current = true;
 
-    // Set programmatic scroll flag BEFORE any state updates or animations
-    // to prevent handleMakerCardScroll from interfering
-    isProgrammaticScroll.current = true;
-
-    setSelectedRecommendation(recommendation);
-    setActiveMakerCardIndex(index);
-    bottomSheetRef.current?.snapToIndex(0);
-
-    // Animate marker cards down with opacity
-    markerCardsAnimation.value = withTiming(0, {
-      duration: MARKER_CARDS_ANIMATION_DURATION,
-    });
-
-    // Animate marker cards up with opacity
-    markerCardsOpacity.value = withTiming(1, {
-      duration: MARKER_CARDS_ANIMATION_DURATION,
-    });
-
-    // Scroll to the selected card
-    // Use setTimeout to ensure state updates have propagated
-    setTimeout(() => {
-      if (markerCardsRef.current) {
         // Use scrollToIndex for FlatList
         markerCardsRef.current.scrollToIndex({
           index,
@@ -402,186 +368,252 @@ export const RecommendationsScreen = ({
           viewPosition: 0.5, // Center the item
         });
 
-        // Reset the flag after the animation duration plus a small buffer
+        // Reset the flag after a short delay to ensure the scroll has completed
         setTimeout(() => {
           isProgrammaticScroll.current = false;
-        }, MARKER_CARDS_ANIMATION_DURATION + 100);
+        }, 300);
       }
-    }, 0);
-  }, [recommendations, markerCardsAnimation, markerCardsOpacity]);
+    },
+    [selectedRecommendation, recommendations],
+  );
 
-  // Memoize handleBottomSheetAnimation to prevent recreation on every render
-  const handleBottomSheetAnimation = useCallback((fromIndex: number, toIndex: number) => {
-    // When the bottom sheet first mounts,
-    // do not run the animations
-    if (fromIndex < 0) {
-      return;
-    }
+  // Memoize handleMarkerPress to prevent recreation on every render
+  const handleMarkerPress = useCallback(
+    (event: MarkerPressEvent) => {
+      const markerId = event.nativeEvent?.id;
+      const recommendation = recommendations.find((rec) => rec.id === markerId);
 
-    // Only animate the map when the bottom sheet is going
-    // to to index 0 or 1, the first two snap points
-    if (toIndex > 1) {
-      return;
-    }
+      if (!recommendation) {
+        return;
+      }
 
-    // Only clear selection when EXPANDING the bottom sheet (user dragging up),
-    // not when COLLAPSING (which happens when marker is pressed).
-    // This prevents clearing the selection when a marker is tapped.
-    const isExpanding = toIndex > fromIndex;
+      // Find the index of the selected recommendation
+      const index = recommendations.findIndex(
+        (rec) => rec.id === recommendation.id,
+      );
 
-    // If we have a selected recommendation and the bottom sheet is expanding,
-    // animate the marker cards down and up with opacity, then clear selection
-    if (selectedRecommendation && isExpanding) {
-      // Animate marker cards down
-      markerCardsAnimation.value = withTiming(MARKER_CARDS_BOTTOM_OFFSET, {
+      // Set programmatic scroll flag BEFORE any state updates or animations
+      // to prevent handleMakerCardScroll from interfering
+      isProgrammaticScroll.current = true;
+
+      setSelectedRecommendation(recommendation);
+      setActiveMakerCardIndex(index);
+      bottomSheetRef.current?.snapToIndex(0);
+
+      // Animate marker cards down with opacity
+      markerCardsAnimation.value = withTiming(0, {
         duration: MARKER_CARDS_ANIMATION_DURATION,
       });
 
       // Animate marker cards up with opacity
-      markerCardsOpacity.value = withTiming(0, {
+      markerCardsOpacity.value = withTiming(1, {
         duration: MARKER_CARDS_ANIMATION_DURATION,
       });
 
-      setSelectedRecommendation(null);
-      setActiveMakerCardIndex(null);
-    }
+      // Scroll to the selected card
+      // Use setTimeout to ensure state updates have propagated
+      setTimeout(() => {
+        if (markerCardsRef.current) {
+          // Use scrollToIndex for FlatList
+          markerCardsRef.current.scrollToIndex({
+            index,
+            animated: true,
+            viewPosition: 0.5, // Center the item
+          });
 
-    // If we have a single recommendation, we
-    // need to modify the zoom in effect
-    if (recommendations.length === 1) {
-      if (!region) {
+          // Reset the flag after the animation duration plus a small buffer
+          setTimeout(() => {
+            isProgrammaticScroll.current = false;
+          }, MARKER_CARDS_ANIMATION_DURATION + 100);
+        }
+      }, 0);
+    },
+    [recommendations, markerCardsAnimation, markerCardsOpacity],
+  );
+
+  // Memoize handleBottomSheetAnimation to prevent recreation on every render
+  const handleBottomSheetAnimation = useCallback(
+    (fromIndex: number, toIndex: number) => {
+      // When the bottom sheet first mounts,
+      // do not run the animations
+      if (fromIndex < 0) {
         return;
       }
 
-      // Duration of the zoom animation (in milliseconds)
-      const ANIMATION_DURATION = 300;
+      // Only animate the map when the bottom sheet is going
+      // to to index 0 or 1, the first two snap points
+      if (toIndex > 1) {
+        return;
+      }
 
-      // Amount to shift the map upward when the bottom
-      //sheet is collapsed (in degrees of latitude)
-      const COLLAPSED_LATITUDE_OFFSET = 0.02;
+      // Only clear selection when EXPANDING the bottom sheet (user dragging up),
+      // not when COLLAPSING (which happens when marker is pressed).
+      // This prevents clearing the selection when a marker is tapped.
+      const isExpanding = toIndex > fromIndex;
 
-      // Controls how much the map zooms in when bottom sheet
-      // is collapsed (0.7 = 70% of original zoom). The higher
-      // the value, the more the map zooms in.
-      const ZOOM_FACTOR = 0.7;
+      // If we have a selected recommendation and the bottom sheet is expanding,
+      // animate the marker cards down and up with opacity, then clear selection
+      if (selectedRecommendation && isExpanding) {
+        // Animate marker cards down
+        markerCardsAnimation.value = withTiming(MARKER_CARDS_BOTTOM_OFFSET, {
+          duration: MARKER_CARDS_ANIMATION_DURATION,
+        });
 
-      const newRegion: Region = {
-        ...region,
-        latitude:
-          region.latitude + (toIndex === 0 ? COLLAPSED_LATITUDE_OFFSET : 0),
-        latitudeDelta:
-          toIndex === 0
-            ? region.latitudeDelta * ZOOM_FACTOR
-            : region.latitudeDelta,
-        longitudeDelta:
-          toIndex === 0
-            ? region.longitudeDelta * ZOOM_FACTOR
-            : region.longitudeDelta,
-      };
+        // Animate marker cards up with opacity
+        markerCardsOpacity.value = withTiming(0, {
+          duration: MARKER_CARDS_ANIMATION_DURATION,
+        });
 
-      map.current?.animateToRegion(newRegion, ANIMATION_DURATION);
-      return;
-    }
+        setSelectedRecommendation(null);
+        setActiveMakerCardIndex(null);
+      }
 
-    // Zoomed out: The default values causes
-    // the map to have a zoomed in effect
-    let topPercentage = 0.1; // 10% from top
-    let rightPercentage = 0.1; // 10% from right
-    let leftPercentage = 0.1; // 10% from left
-    let bottomPercentage = 0.4; // 40% from bottom (accounts for the MapEntityCard)
+      // If we have a single recommendation, we
+      // need to modify the zoom in effect
+      if (recommendations.length === 1) {
+        if (!region) {
+          return;
+        }
 
-    // Zoomed in: When the bottom sheet is back
-    // to it's orginal position, we want the map zoom
-    // to go back to the original values
-    if (toIndex === 1) {
-      topPercentage = 0.2;
-      rightPercentage = 0.2;
-      leftPercentage = 0.2;
-      bottomPercentage = 0.55;
-    }
+        // Duration of the zoom animation (in milliseconds)
+        const ANIMATION_DURATION = 300;
 
-    map.current?.fitToCoordinates(coordinates, {
-      edgePadding: {
-        top: Math.round(height * topPercentage),
-        right: Math.round(width * rightPercentage),
-        bottom: Math.round(height * bottomPercentage),
-        left: Math.round(width * leftPercentage),
-      },
-      animated: true,
-    });
-  }, [
-    region,
-    width,
-    height,
-    coordinates,
-    recommendations,
-    selectedRecommendation,
-    markerCardsAnimation,
-    markerCardsOpacity,
-  ]
+        // Amount to shift the map upward when the bottom
+        //sheet is collapsed (in degrees of latitude)
+        const COLLAPSED_LATITUDE_OFFSET = 0.02;
+
+        // Controls how much the map zooms in when bottom sheet
+        // is collapsed (0.7 = 70% of original zoom). The higher
+        // the value, the more the map zooms in.
+        const ZOOM_FACTOR = 0.7;
+
+        const newRegion: Region = {
+          ...region,
+          latitude:
+            region.latitude + (toIndex === 0 ? COLLAPSED_LATITUDE_OFFSET : 0),
+          latitudeDelta:
+            toIndex === 0
+              ? region.latitudeDelta * ZOOM_FACTOR
+              : region.latitudeDelta,
+          longitudeDelta:
+            toIndex === 0
+              ? region.longitudeDelta * ZOOM_FACTOR
+              : region.longitudeDelta,
+        };
+
+        map.current?.animateToRegion(newRegion, ANIMATION_DURATION);
+        return;
+      }
+
+      // Zoomed out: The default values causes
+      // the map to have a zoomed in effect
+      let topPercentage = 0.1; // 10% from top
+      let rightPercentage = 0.1; // 10% from right
+      let leftPercentage = 0.1; // 10% from left
+      let bottomPercentage = 0.4; // 40% from bottom (accounts for the MapEntityCard)
+
+      // Zoomed in: When the bottom sheet is back
+      // to it's orginal position, we want the map zoom
+      // to go back to the original values
+      if (toIndex === 1) {
+        topPercentage = 0.2;
+        rightPercentage = 0.2;
+        leftPercentage = 0.2;
+        bottomPercentage = 0.55;
+      }
+
+      map.current?.fitToCoordinates(coordinates, {
+        edgePadding: {
+          top: Math.round(height * topPercentage),
+          right: Math.round(width * rightPercentage),
+          bottom: Math.round(height * bottomPercentage),
+          left: Math.round(width * leftPercentage),
+        },
+        animated: true,
+      });
+    },
+    [
+      region,
+      width,
+      height,
+      coordinates,
+      recommendations,
+      selectedRecommendation,
+      markerCardsAnimation,
+      markerCardsOpacity,
+    ],
   );
 
   // Memoize handleRecommendationPress to prevent recreation on every render
-  const handleRecommendationPress = useCallback((item: RecommendationListItem) => {
-    router.push({
-      pathname: "/recommendations/[slug]",
-      params: {
-        slug: createFullSlug(item.name, item.id),
-      },
-    });
-  }, [router]);
-
+  const handleRecommendationPress = useCallback(
+    (item: RecommendationListItem) => {
+      router.push({
+        pathname: "/recommendations/[slug]",
+        params: {
+          slug: createFullSlug(item.name, item.id),
+        },
+      });
+    },
+    [router],
+  );
 
   // Memoize renderItem to prevent recreation on every render
-  const renderItem = useCallback(({
-    item,
-    index,
-  }: { item: RecommendationListItem; index: number }) => {
-    const slug = createFullSlug(item.name, item.id);
-    return (
-      <RecommendationListItemComponent
-        slug={slug}
-        item={item}
-        index={index}
-        onPress={handleRecommendationPress}
-        renderItemActions={renderItemActions}
-        renderSwipeableItem={renderSwipeableItem}
-        itemContentContainerStyle={itemContentContainerStyle}
-      />
-    );
-  }, [
-    renderItemActions,
-    renderSwipeableItem,
-    itemContentContainerStyle,
-    handleRecommendationPress,
-  ]);
+  const renderItem = useCallback(
+    ({ item, index }: { item: RecommendationListItem; index: number }) => {
+      const slug = createFullSlug(item.name, item.id);
+      return (
+        <RecommendationListItemComponent
+          slug={slug}
+          item={item}
+          index={index}
+          onPress={handleRecommendationPress}
+          renderItemActions={renderItemActions}
+          renderSwipeableItem={renderSwipeableItem}
+          itemContentContainerStyle={itemContentContainerStyle}
+        />
+      );
+    },
+    [
+      renderItemActions,
+      renderSwipeableItem,
+      itemContentContainerStyle,
+      handleRecommendationPress,
+    ],
+  );
 
   // Memoize keyExtractor to prevent recreation on every render
-  const keyExtractor = useCallback((item: RecommendationListItem) => item.id, []);
+  const keyExtractor = useCallback(
+    (item: RecommendationListItem) => item.id,
+    [],
+  );
 
   // Memoize renderMarkerCard to prevent recreation on every render
-  const renderMarkerCard = useCallback(({
-    item,
-    index,
-  }: { item: RecommendationListItem; index: number }) => {
-    // Calculate values once per item render
-    const itemSlug = createFullSlug(item.name, item.id);
+  const renderMarkerCard = useCallback(
+    ({ item, index }: { item: RecommendationListItem; index: number }) => {
+      // Calculate values once per item render
+      const itemSlug = createFullSlug(item.name, item.id);
 
-    return (
-      <MapEntityCard
-        hours={item?.hours}
-        category={item.category}
-        imageUrls={item.images || []}
-        priceRange={item.priceRange}
-        rating={item?.reviews?.rating}
-        isAccessible={item.isAccessible}
-        reviewCount={item?.reviews?.count}
-        title={`${index + 1}. ${item.name}`}
-        renderActions={renderItemActions ? () => renderItemActions({ item, slug: itemSlug }) : undefined}
-        onPress={() => handleRecommendationPress(item)}
-      />
-    );
-  }, [handleRecommendationPress, renderItemActions]);
+      return (
+        <MapEntityCard
+          hours={item?.hours}
+          category={item.category}
+          imageUrls={item.images || []}
+          priceRange={item.priceRange}
+          rating={item?.reviews?.rating}
+          isAccessible={item.isAccessible}
+          reviewCount={item?.reviews?.count}
+          title={`${index + 1}. ${item.name}`}
+          renderActions={
+            renderItemActions
+              ? () => renderItemActions({ item, slug: itemSlug })
+              : undefined
+          }
+          onPress={() => handleRecommendationPress(item)}
+        />
+      );
+    },
+    [handleRecommendationPress, renderItemActions],
+  );
 
   // Memoize getItemLayout for FlatList performance
   const getMarkerCardItemLayout = useCallback(
@@ -604,7 +636,6 @@ export const RecommendationsScreen = ({
     }),
     [],
   );
-
 
   return (
     <View style={styles.container}>
@@ -658,14 +689,12 @@ export const RecommendationsScreen = ({
             getItemLayout={getMarkerCardItemLayout}
             snapToInterval={MARKER_CARD_SNAP_INTERVAL}
             contentContainerStyle={styles.markerCardsContent}
-
             // Performance optimizations for large lists
             windowSize={5}
             initialNumToRender={5}
             maxToRenderPerBatch={5}
             removeClippedSubviews={true}
             updateCellsBatchingPeriod={50}
-
             // Prevent scrollToIndex errors when item is not yet rendered
             onScrollToIndexFailed={(info) => {
               // Wait a bit and try again
@@ -719,7 +748,9 @@ export const RecommendationsScreen = ({
                     source={require("assets/images/other/purple-pins.webp")}
                   />
                 </View>
-                <Text style={styles.emptyStateText}>Oops! Looks like this list is empty </Text>
+                <Text style={styles.emptyStateText}>
+                  Oops! Looks like this list is empty{" "}
+                </Text>
               </View>
             }
             // Performance optimizations for large lists
@@ -731,7 +762,6 @@ export const RecommendationsScreen = ({
           />
         )}
       </BottomSheet>
-
     </View>
   );
 };

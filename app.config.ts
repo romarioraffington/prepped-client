@@ -1,4 +1,4 @@
-import type { ExpoConfig, ConfigContext } from "expo/config";
+import type { ConfigContext, ExpoConfig } from "expo/config";
 
 const SPLASH_BACKGROUND_COLOR = "#9e00ff";
 const IS_DEV = process.env.APP_VARIANT === "development";

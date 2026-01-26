@@ -1,14 +1,14 @@
 // External Dependencies
 import type { QueryClient } from "@tanstack/react-query";
 
-// Internal Dependencies
-import { parseSlug } from "@/libs/utils";
 import { QUERY_KEYS } from "@/libs/constants";
 import type {
+  ImportDetail,
   RecommendationDetail,
   RecommendationListItem,
-  ImportDetail,
 } from "@/libs/types";
+// Internal Dependencies
+import { parseSlug } from "@/libs/utils";
 
 /**
  * Updates all caches with new wishlistIds for a recommendation
@@ -263,10 +263,7 @@ export const rollbackAllWishlistCaches = ({
     }
   }
 
-  for (const {
-    queryKey,
-    data,
-  } of snapshots.previousCookbookRecommendations) {
+  for (const { queryKey, data } of snapshots.previousCookbookRecommendations) {
     if (data) {
       queryClient.setQueryData(queryKey, data);
     }
@@ -291,7 +288,9 @@ export const invalidateAllWishlistQueries = async ({
   recommendationSlug?: string;
 }): Promise<void> => {
   // Parse slug to extract ID for cache key if provided
-  const recommendationId = recommendationSlug ? parseSlug(recommendationSlug).id : undefined;
+  const recommendationId = recommendationSlug
+    ? parseSlug(recommendationSlug).id
+    : undefined;
 
   await Promise.all([
     // Invalidate recommendation details if ID provided

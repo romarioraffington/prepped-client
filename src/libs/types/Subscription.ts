@@ -1,7 +1,7 @@
 import type {
-  PurchasesPackage,
-  PurchasesOffering,
   PurchasesEntitlementInfo,
+  PurchasesOffering,
+  PurchasesPackage,
 } from "react-native-purchases";
 
 export interface SubscriptionState {

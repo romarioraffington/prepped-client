@@ -1,8 +1,8 @@
 import {
   isAPIError,
   isAuthError,
-  isQuotaError,
   isNetworkRequestError,
+  isQuotaError,
 } from "./errors";
 
 /**

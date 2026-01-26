@@ -1,10 +1,10 @@
+import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
+import { router } from "expo-router";
 // External Dependencies
 import type React from "react";
-import { router } from "expo-router";
-import * as Haptics from "expo-haptics";
-import { Ionicons } from "@expo/vector-icons";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Animated, Pressable, StyleSheet, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // Internal Dependencies
 import { Colors } from "@/libs/constants";
@@ -28,22 +28,22 @@ export const FloatingAddButton: React.FC<FloatingAddButtonProps> = ({
 
   const animatedStyle = animationValue
     ? {
-      opacity: animationValue,
-      transform: disableTranslate
-        ? []
-        : [
-          {
-            translateY: animationValue.interpolate({
-              inputRange: [0, 1],
-              outputRange: [100, 0],
-            }),
-          },
-        ],
-    }
+        opacity: animationValue,
+        transform: disableTranslate
+          ? []
+          : [
+              {
+                translateY: animationValue.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: [100, 0],
+                }),
+              },
+            ],
+      }
     : {
-      opacity: visible ? 1 : 0,
-      transform: disableTranslate ? [] : [{ translateY: visible ? 0 : 100 }],
-    };
+        opacity: visible ? 1 : 0,
+        transform: disableTranslate ? [] : [{ translateY: visible ? 0 : 100 }],
+      };
 
   return (
     <View

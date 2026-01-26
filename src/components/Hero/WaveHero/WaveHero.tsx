@@ -1,13 +1,13 @@
-import React from "react";
 import { Image } from "expo-image";
+import React from "react";
 import Svg, { Path } from "react-native-svg";
 
 import {
-  View,
   Animated,
-  StyleSheet,
-  ScrollView,
   Dimensions,
+  ScrollView,
+  StyleSheet,
+  View,
 } from "react-native";
 
 // Internal Dependencies
@@ -30,7 +30,7 @@ export const WaveHero = ({
   height = 400,
   imageUrls = [],
 }: WaveHeroProps) => {
-  const { width } = Dimensions.get('window');
+  const { width } = Dimensions.get("window");
   const [activeIndex, setActiveIndex] = React.useState(0);
 
   const handleScroll = (event: any) => {
@@ -39,32 +39,35 @@ export const WaveHero = ({
     setActiveIndex(pageNum);
   };
 
-  const animatedStyle = scrollY ? {
-    transform: [
-      {
-        translateY: scrollY.interpolate({
-          inputRange: [-100, 0, 100],
-          outputRange: [15, 0, -15],
-          extrapolate: 'clamp'
-        })
-      },
-    ]
-  } : {};
+  const animatedStyle = scrollY
+    ? {
+        transform: [
+          {
+            translateY: scrollY.interpolate({
+              inputRange: [-100, 0, 100],
+              outputRange: [15, 0, -15],
+              extrapolate: "clamp",
+            }),
+          },
+        ],
+      }
+    : {};
 
   // Animated wave path
   const normalWavePath = "M0,80 C360,150 720,10 1440,80 L1440,120 L0,120 Z";
   const invertedWavePath = "M0,80 C360,10 720,150 1440,80 L1440,120 L0,120 Z";
 
-  const wavePath = scrollY ? scrollY.interpolate({
-    inputRange: [0, 100],
-    outputRange: [normalWavePath, invertedWavePath],
-    extrapolate: 'clamp'
-  }) : normalWavePath;
+  const wavePath = scrollY
+    ? scrollY.interpolate({
+        inputRange: [0, 100],
+        outputRange: [normalWavePath, invertedWavePath],
+        extrapolate: "clamp",
+      })
+    : normalWavePath;
 
   return (
     <View style={[styles.heroBanner, { height }]}>
       <Animated.View style={[StyleSheet.absoluteFill, animatedStyle]}>
-
         {/* Render a cover or a ScrollView if there are multiple images */}
         {imageUrls.length > 1 ? (
           <ScrollView
@@ -81,7 +84,11 @@ export const WaveHero = ({
                   source={{ uri: url }}
                   style={styles.heroImage}
                 />
-                {overlayColor && (<View style={[styles.overlay, { backgroundColor: overlayColor }]} />)}
+                {overlayColor && (
+                  <View
+                    style={[styles.overlay, { backgroundColor: overlayColor }]}
+                  />
+                )}
               </View>
             ))}
           </ScrollView>
@@ -92,7 +99,8 @@ export const WaveHero = ({
               source={{ uri: imageUrls[0] }}
               style={styles.heroImage}
               onError={(error) => {
-                const errorMessage = error instanceof Error ? error.message : String(error);
+                const errorMessage =
+                  error instanceof Error ? error.message : String(error);
                 reportWarning(errorMessage, {
                   component: "WaveHero",
                   action: "Image Loading",
@@ -100,7 +108,11 @@ export const WaveHero = ({
                 });
               }}
             />
-            {overlayColor && (<View style={[styles.overlay, { backgroundColor: overlayColor }]} />)}
+            {overlayColor && (
+              <View
+                style={[styles.overlay, { backgroundColor: overlayColor }]}
+              />
+            )}
           </View>
         )}
 
@@ -113,10 +125,7 @@ export const WaveHero = ({
             viewBox="0 0 1440 100"
             preserveAspectRatio="none"
           >
-            <AnimatedPath
-              fill="#fff"
-              d={wavePath}
-            />
+            <AnimatedPath fill="#fff" d={wavePath} />
           </Svg>
         </View>
       </Animated.View>
@@ -138,10 +147,9 @@ export const WaveHero = ({
           ))}
         </View>
       )}
-
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   heroBanner: {
@@ -166,22 +174,22 @@ const styles = StyleSheet.create({
   },
   pagination: {
     bottom: 70,
-    width: '100%',
-    position: 'absolute',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: "100%",
+    position: "absolute",
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
     zIndex: 1,
   },
   paginationDot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    backgroundColor: "rgba(255, 255, 255, 0.5)",
     marginHorizontal: 4,
   },
   paginationDotActive: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,

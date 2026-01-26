@@ -1,18 +1,18 @@
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
   type StyleProp,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
   type ViewStyle,
 } from "react-native";
 
 import {
-  Ionicons,
   type AntDesign,
   type Feather,
-  type MaterialIcons,
+  Ionicons,
   type MaterialCommunityIcons,
+  type MaterialIcons,
 } from "@expo/vector-icons";
 
 type IconComponentType =

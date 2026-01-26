@@ -1,12 +1,7 @@
-import type React from "react";
 import { Image, type ImageSource } from "expo-image";
+import type React from "react";
 
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 type ProfileIconProps = {
   size?: number;
@@ -17,8 +12,8 @@ type ProfileIconProps = {
 
 export const ProfileIcon: React.FC<ProfileIconProps> = ({
   size = 35,
-  letter = '',
-  imageUrl = '',
+  letter = "",
+  imageUrl = "",
   onPress,
 }) => {
   return (

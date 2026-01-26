@@ -1,6 +1,6 @@
 // External Dependencies
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 // Internal Dependencies
 import { getIconForOffering } from "@/libs/utils";
@@ -15,9 +15,7 @@ export function Offering({ name }: OfferingProps) {
       <View style={styles.offeringIconContainer}>
         {getIconForOffering(name)}
       </View>
-      <Text style={styles.offeringText}>
-        {name}
-      </Text>
+      <Text style={styles.offeringText}>{name}</Text>
     </View>
   );
 }

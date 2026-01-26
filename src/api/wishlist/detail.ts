@@ -1,15 +1,15 @@
 // External Dependencies
 import { useInfiniteQuery } from "@tanstack/react-query";
 
+import { API_ENDPOINTS, QUERY_KEYS, getApiClient } from "@/libs/constants";
+import type { PaginationLinks, PaginationMeta } from "@/libs/types";
 // Internal Dependencies
 import { parseSlug, reportError } from "@/libs/utils";
-import type { PaginationLinks, PaginationMeta } from "@/libs/types";
-import { API_ENDPOINTS, getApiClient, QUERY_KEYS } from "@/libs/constants";
 
 import type {
   Vote,
-  WishlistNote,
   WishlistMember,
+  WishlistNote,
   WishlistRecommendation,
 } from "@/libs/types/Wishlists/Wishlist";
 

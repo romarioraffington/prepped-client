@@ -1,13 +1,13 @@
+import { FontAwesome } from "@expo/vector-icons";
+import { BlurView } from "expo-blur";
+import { isLiquidGlassAvailable } from "expo-glass-effect";
 // External Dependencies
 import type React from "react";
-import { BlurView } from "expo-blur";
-import { FontAwesome } from "@expo/vector-icons";
-import { isLiquidGlassAvailable } from "expo-glass-effect";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
+import { useRecommendationWishlistHandler } from "@/hooks";
 // Internal Dependencies
 import { Colors } from "@/libs/constants";
-import { useRecommendationWishlistHandler } from "@/hooks";
 
 export interface WishlistButtonWithCountProps {
   size?: number;
@@ -25,7 +25,9 @@ const formatWishlistCount = (count: number): string | null => {
   return String(count); // Show actual number for 2 or more
 };
 
-export const WishlistButtonWithCount: React.FC<WishlistButtonWithCountProps> = ({
+export const WishlistButtonWithCount: React.FC<
+  WishlistButtonWithCountProps
+> = ({
   size = 18,
   showBlur = false,
   isScrolled = false,
@@ -33,10 +35,7 @@ export const WishlistButtonWithCount: React.FC<WishlistButtonWithCountProps> = (
   thumbnailUri,
   recommendationSlug,
 }) => {
-  const {
-    handlePress,
-    isPending: isWishlistPending
-  } =
+  const { handlePress, isPending: isWishlistPending } =
     useRecommendationWishlistHandler({
       wishlistIds,
       thumbnailUri,

@@ -1,6 +1,6 @@
 // External Dependencies
 import type React from "react";
-import { View, StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 // Internal Dependencies
 import { Colors } from "@/libs/constants";

@@ -1,7 +1,7 @@
 // External Dependencies
 import { useState } from "react";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
 import WebView from "react-native-webview";
-import { View, StyleSheet, ActivityIndicator } from "react-native";
 
 // Internal Dependencies
 import { LEGAL_URLS } from "@/libs/constants";
@@ -29,15 +29,15 @@ export default function PrivacyPolicy() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   webview: {
     flex: 1,
   },
   loadingContainer: {
     ...StyleSheet.absoluteFillObject,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
   },
 });

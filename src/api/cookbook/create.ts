@@ -1,9 +1,9 @@
 // External Dependencies
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+import { API_ENDPOINTS, QUERY_KEYS, getApiClient } from "@/libs/constants";
 // Internal Dependencies
 import { reportError } from "@/libs/utils";
-import { API_ENDPOINTS, getApiClient, QUERY_KEYS } from "@/libs/constants";
 
 import type {
   CookbookCardData,
@@ -23,7 +23,6 @@ export const transformToCookbookCardData = (
     name: response.name,
     coverImageUri: response.imageUris?.[0] || null,
     savedCount: response.recipesCount,
-    members: [],
   };
 };
 
@@ -79,8 +78,7 @@ export const useCreateCookbookMutation = () => {
       });
 
       // If a recipe was saved to the cookbook, invalidate recipe details
-      const recipeSlug = variables.recipe_id;
-      if (recipeSlug) {
+      if (variables.recipe_id) {
         // Invalidate recipe details if we saved a recipe to the cookbook
         queryClient.invalidateQueries({
           queryKey: [QUERY_KEYS.RECIPE_DETAILS_BASE],

@@ -1,10 +1,10 @@
 // External Dependencies
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 
+import { API_ENDPOINTS, QUERY_KEYS, getApiClient } from "@/libs/constants";
+import type { PaginationLinks, PaginationMeta, Recipe } from "@/libs/types";
 // Internal Dependencies
 import { reportError } from "@/libs/utils";
-import { API_ENDPOINTS, getApiClient, QUERY_KEYS } from "@/libs/constants";
-import type { Recipe, PaginationLinks, PaginationMeta } from "@/libs/types";
 
 interface RecipePageResult {
   data: Recipe[];

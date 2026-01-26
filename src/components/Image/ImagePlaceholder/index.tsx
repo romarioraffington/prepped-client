@@ -1,7 +1,12 @@
 // External Dependencies
 import { Ionicons } from "@expo/vector-icons";
 import type React from "react";
-import { StyleSheet, View, type DimensionValue, type ViewStyle } from "react-native";
+import {
+  type DimensionValue,
+  StyleSheet,
+  View,
+  type ViewStyle,
+} from "react-native";
 
 interface ImagePlaceholderProps {
   height?: DimensionValue;
@@ -29,4 +34,3 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 });
-

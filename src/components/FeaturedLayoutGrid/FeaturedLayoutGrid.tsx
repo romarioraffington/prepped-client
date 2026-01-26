@@ -1,17 +1,20 @@
 // External imports
 import type React from "react";
-import { View, StyleSheet, TouchableOpacity } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 
 // Internal imports
 import type { ImportRecommendation } from "@/libs/types";
 import { LoadingFeaturedLayoutGrid } from "./LoadingFeaturedLayoutGrid";
-import { CARD_MARGIN, REGULAR_CARD_WIDTH, FIRST_CARD_WIDTH } from "./consts";
+import { CARD_MARGIN, FIRST_CARD_WIDTH, REGULAR_CARD_WIDTH } from "./consts";
 
 interface FeaturedLayoutGridProps {
   items?: any[];
   isLoading?: boolean;
   featuredIndex?: number[];
-  renderItem: (item: ImportRecommendation, isFeatured?: boolean) => React.ReactNode;
+  renderItem: (
+    item: ImportRecommendation,
+    isFeatured?: boolean,
+  ) => React.ReactNode;
   onPress?: (item: ImportRecommendation) => void;
 }
 
@@ -23,9 +26,7 @@ export const FeaturedLayoutGrid: React.FC<FeaturedLayoutGridProps> = ({
   onPress,
 }) => {
   if (isLoading) {
-    return (
-      <LoadingFeaturedLayoutGrid featuredIndex={featuredIndex} />
-    );
+    return <LoadingFeaturedLayoutGrid featuredIndex={featuredIndex} />;
   }
 
   return (
@@ -35,7 +36,10 @@ export const FeaturedLayoutGrid: React.FC<FeaturedLayoutGridProps> = ({
           key={item.id}
           activeOpacity={0.9}
           onPress={() => onPress?.(item)}
-          style={[styles.placeCard, featuredIndex.includes(index) && styles.featuredPlaceCard]}
+          style={[
+            styles.placeCard,
+            featuredIndex.includes(index) && styles.featuredPlaceCard,
+          ]}
         >
           {renderItem(item, featuredIndex.includes(index))}
         </TouchableOpacity>

@@ -1,11 +1,16 @@
 //External Dependencies
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 
+import { API_ENDPOINTS, QUERY_KEYS, getApiClient } from "@/libs/constants";
+import type {
+  Import,
+  PaginationLinks,
+  PaginationMeta,
+  Platform,
+} from "@/libs/types";
 //Internal Dependencies
 import { reportError } from "@/libs/utils";
 import { useAuthStore } from "@/stores/authStore";
-import { API_ENDPOINTS, getApiClient, QUERY_KEYS } from "@/libs/constants";
-import type { Import, PaginationLinks, PaginationMeta, Platform } from "@/libs/types";
 
 interface ImportPageResult {
   data: Import[];
@@ -28,15 +33,18 @@ const fetchImports = async (cursor?: string): Promise<ImportPageResult> => {
       | undefined;
 
     if (!response || !Array.isArray(response.data)) {
-      reportError(new Error("Invalid response structure when fetching imports"), {
-        component: "ImportList",
-        action: "Fetch Imports",
-        extra: {
-          response,
-          hasData: !!response?.data,
-          isArray: Array.isArray(response?.data),
+      reportError(
+        new Error("Invalid response structure when fetching imports"),
+        {
+          component: "ImportList",
+          action: "Fetch Imports",
+          extra: {
+            response,
+            hasData: !!response?.data,
+            isArray: Array.isArray(response?.data),
+          },
         },
-      });
+      );
       throw new Error(
         "Invalid response format: expected paginated imports response",
       );

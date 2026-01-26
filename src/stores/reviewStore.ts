@@ -1,7 +1,7 @@
+import * as SecureStore from "expo-secure-store";
 // External Dependencies
 import { create } from "zustand";
-import * as SecureStore from "expo-secure-store";
-import { persist, createJSONStorage } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 // Internal Dependencies
 import { reportWarning } from "@/libs/utils";

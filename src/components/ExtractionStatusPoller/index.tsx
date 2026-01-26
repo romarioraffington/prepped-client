@@ -1,8 +1,8 @@
 // External Dependencies
-import type React from 'react';
+import type React from "react";
 
 // Internal Dependencies
-import { useExtractionStatusPolling } from '@/api';
+import { useExtractionStatusPolling } from "@/api";
 
 interface ExtractionStatusPollerProps {
   extractionId: string | null;
@@ -15,7 +15,7 @@ interface ExtractionStatusPollerProps {
  */
 export const ExtractionStatusPoller: React.FC<ExtractionStatusPollerProps> = ({
   extractionId,
-  progressItemId
+  progressItemId,
 }) => {
   // Start polling when extractionId is provided
   useExtractionStatusPolling(extractionId, progressItemId);

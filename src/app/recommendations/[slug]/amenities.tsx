@@ -1,15 +1,19 @@
-// External Dependencies
-import Animated from "react-native-reanimated";
-import React, { useEffect, useMemo } from "react";
 import { useHeaderHeight } from "@react-navigation/elements";
 import { useLocalSearchParams, useNavigation } from "expo-router";
-import { View, Text, StyleSheet, Alert, FlatList } from "react-native";
+import React, { useEffect, useMemo } from "react";
+import { Alert, FlatList, StyleSheet, Text, View } from "react-native";
+// External Dependencies
+import Animated from "react-native-reanimated";
 
+import { useAmenities } from "@/api/recommendation/amenities";
 // Internal Dependencies
 import { LargeTitle } from "@/components";
 import { useLargeTitleCrossfade } from "@/hooks";
-import { useAmenities } from "@/api/recommendation/amenities";
-import { getIconForOffering, getOfferingGroupName, reportError } from "@/libs/utils";
+import {
+  getIconForOffering,
+  getOfferingGroupName,
+  reportError,
+} from "@/libs/utils";
 
 export default function Amenities() {
   const title = "Amenities";
@@ -120,8 +124,13 @@ export default function Amenities() {
             opacity={largeTitleOpacity}
           />
         }
-        contentContainerStyle={[styles.listContainer, { paddingTop: headerHeight + 16 }]}
-        renderItem={({ item: [groupName, amenitiesList] }) => renderGroup(groupName, amenitiesList)}
+        contentContainerStyle={[
+          styles.listContainer,
+          { paddingTop: headerHeight + 16 },
+        ]}
+        renderItem={({ item: [groupName, amenitiesList] }) =>
+          renderGroup(groupName, amenitiesList)
+        }
       />
     </View>
   );
@@ -151,7 +160,10 @@ const AmenitiesSkeleton = () => {
           </View>
         )}
         keyExtractor={(item) => item.toString()}
-        contentContainerStyle={[styles.listContainer, { paddingTop: headerHeight + 16 }]}
+        contentContainerStyle={[
+          styles.listContainer,
+          { paddingTop: headerHeight + 16 },
+        ]}
       />
     </View>
   );
@@ -164,8 +176,8 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 25,
-    color: '#222',
-    fontWeight: '700',
+    color: "#222",
+    fontWeight: "700",
     marginBottom: 20,
   },
   listContainer: {
@@ -177,58 +189,58 @@ const styles = StyleSheet.create({
   },
   groupTitle: {
     fontSize: 17,
-    color: '#222',
+    color: "#222",
     marginBottom: 20,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   amenitiesList: {
     gap: 0,
   },
   amenityItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingVertical: 20,
     borderBottomWidth: 0.5,
-    borderBottomColor: '#F0F0F0',
+    borderBottomColor: "#F0F0F0",
   },
   amenityIconContainer: {
     width: 40,
     marginRight: 16,
-    alignItems: 'center',
+    alignItems: "center",
   },
   amenityTextContainer: {
     flex: 1,
   },
   amenityName: {
     fontSize: 17,
-    color: '#000',
-    fontWeight: '400',
+    color: "#000",
+    fontWeight: "400",
   },
   skeletonGroupTitle: {
     height: 18,
-    backgroundColor: '#E5E5E5',
+    backgroundColor: "#E5E5E5",
     borderRadius: 20,
     marginBottom: 16,
-    width: '40%',
+    width: "40%",
   },
   skeletonIcon: {
     width: 40,
     height: 40,
     marginRight: 16,
     borderRadius: 10,
-    backgroundColor: '#E5E5E5',
+    backgroundColor: "#E5E5E5",
   },
   skeletonText: {
     flex: 0.7,
     height: 15,
     borderRadius: 20,
-    backgroundColor: '#E5E5E5',
+    backgroundColor: "#E5E5E5",
   },
   emptyContainer: {
     flex: 1,
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    justifyContent: 'center',
+    alignItems: "center",
+    backgroundColor: "#fff",
+    justifyContent: "center",
   },
   emptyTextIcon: {
     fontSize: 28,
@@ -236,6 +248,6 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 17,
-    color: '#667',
+    color: "#667",
   },
 });

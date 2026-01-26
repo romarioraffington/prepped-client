@@ -1,8 +1,8 @@
 import { useCallback, useRef, useState } from "react";
 
 import {
-  useDebouncedCallback,
   type DebouncedState,
+  useDebouncedCallback,
 } from "./useDebouncedCallback";
 
 function valueEquality<T>(left: T, right: T): boolean {

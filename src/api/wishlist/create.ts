@@ -1,17 +1,17 @@
 // External Dependencies
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+import { API_ENDPOINTS, getApiClient } from "@/libs/constants";
 // Internal Dependencies
 import { reportError } from "@/libs/utils";
 import { invalidateAllWishlistQueries } from "./cache";
-import { API_ENDPOINTS, getApiClient } from "@/libs/constants";
 
 import type {
-  WishlistMember,
-  WishlistCardData,
   CreateWishlistRequest,
   CreateWishlistResponse,
   CreateWishlistResponseData,
+  WishlistCardData,
+  WishlistMember,
 } from "@/libs/types";
 
 /**

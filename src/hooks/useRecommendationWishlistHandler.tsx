@@ -1,25 +1,25 @@
-// External Dependencies
-import { Text } from "react-native";
+import { useQueryClient } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 import { useCallback, useRef } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+// External Dependencies
+import { Text } from "react-native";
 
+import { useActionToast } from "@/contexts";
+import { useImageErrorFilter } from "@/hooks";
+import { QUERY_KEYS } from "@/libs/constants";
+import type { RecommendationDetail } from "@/libs/types";
 // Internal Dependencies
 import { parseSlug, reportError } from "@/libs/utils";
-import { useActionToast } from "@/contexts";
-import { QUERY_KEYS } from "@/libs/constants";
-import { useImageErrorFilter } from "@/hooks";
-import type { RecommendationDetail } from "@/libs/types";
 
 import {
-  getCachedWishlist,
-  markMutationAsIgnored,
   clearCachedWishlistId,
-  updateAllWishlistCaches,
+  getCachedWishlist,
   invalidateAllWishlistQueries,
-  useSaveRecommendationToWishlistMutation,
+  markMutationAsIgnored,
+  updateAllWishlistCaches,
   useDeleteRecommendationFromWishlistMutation,
+  useSaveRecommendationToWishlistMutation,
 } from "@/api";
 
 interface UseRecommendationWishlistHandlerParams {
@@ -46,8 +46,10 @@ export const useRecommendationWishlistHandler = ({
   const imageUrls = thumbnailUri ? [thumbnailUri] : [];
   const { validImages } = useImageErrorFilter(imageUrls);
   const validThumbnailUri = validImages.length > 0 ? validImages[0] : null;
-  const { mutate: saveToWishlist, isPending: isSaving } = useSaveRecommendationToWishlistMutation();
-  const { mutate: deleteFromWishlist, isPending: isDeleting } = useDeleteRecommendationFromWishlistMutation();
+  const { mutate: saveToWishlist, isPending: isSaving } =
+    useSaveRecommendationToWishlistMutation();
+  const { mutate: deleteFromWishlist, isPending: isDeleting } =
+    useDeleteRecommendationFromWishlistMutation();
 
   const isPending = isSaving || isDeleting;
 
@@ -83,7 +85,8 @@ export const useRecommendationWishlistHandler = ({
       // Parse slug to extract ID for cache key
       const { id: recommendationId } = parseSlug(recommendationSlug);
       const queryKey = QUERY_KEYS.RECOMMENDATION_DETAILS(recommendationId);
-      const currentData = queryClient.getQueryData<RecommendationDetail>(queryKey);
+      const currentData =
+        queryClient.getQueryData<RecommendationDetail>(queryKey);
       const previousWishlistIds = currentData?.wishlistIds ?? [];
 
       // Reset flags for this interaction
@@ -120,7 +123,10 @@ export const useRecommendationWishlistHandler = ({
 
         for (const [wishlistQueryKey, data] of wishlistQueries) {
           if (data && Array.isArray(data)) {
-            const wishlistsData = data as Array<{ id: string; containsRecommendation?: boolean }>;
+            const wishlistsData = data as Array<{
+              id: string;
+              containsRecommendation?: boolean;
+            }>;
             const updatedWishlists = wishlistsData.map((wishlist) => {
               if (wishlist.id === savedWishlistIdRef.current) {
                 return {
@@ -136,16 +142,11 @@ export const useRecommendationWishlistHandler = ({
 
         // If mutation has already succeeded, we need to
         // delete the recommendation from the wishlist
-        if (
-          savedWishlistIdRef.current &&
-          mutationSucceededRef.current
-        ) {
-          deleteFromWishlist(
-            {
-              recommendationSlug,
-              wishlistId: savedWishlistIdRef.current,
-            },
-          );
+        if (savedWishlistIdRef.current && mutationSucceededRef.current) {
+          deleteFromWishlist({
+            recommendationSlug,
+            wishlistId: savedWishlistIdRef.current,
+          });
         } else {
           // Invalidate other queries asynchronously (they'll refetch in background)
           invalidateAllWishlistQueries({
@@ -197,7 +198,9 @@ export const useRecommendationWishlistHandler = ({
               }
 
               // Haptic feedback - only once when save completes
-              Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+              Haptics.notificationAsync(
+                Haptics.NotificationFeedbackType.Success,
+              );
             },
             onError: (error) => {
               // Don't handle error if "Change" was clicked
@@ -214,8 +217,13 @@ export const useRecommendationWishlistHandler = ({
               });
 
               // Check if error indicates wishlist not found (404 or similar)
-              const errorMessage = error instanceof Error ? error.message : String(error);
-              if (errorMessage.includes("404") || errorMessage.includes("not found") || errorMessage.includes("Not Found")) {
+              const errorMessage =
+                error instanceof Error ? error.message : String(error);
+              if (
+                errorMessage.includes("404") ||
+                errorMessage.includes("not found") ||
+                errorMessage.includes("Not Found")
+              ) {
                 // Clear cache if wishlist was deleted
                 clearCachedWishlistId();
               }
@@ -268,4 +276,3 @@ export const useRecommendationWishlistHandler = ({
     isPending,
   };
 };
-

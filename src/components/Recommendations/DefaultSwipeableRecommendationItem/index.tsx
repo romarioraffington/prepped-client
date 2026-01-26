@@ -1,10 +1,13 @@
 // External Dependencies
-import { memo, type ReactNode } from "react";
+import { type ReactNode, memo } from "react";
 
+import { SwipeableWrapper } from "@/components/SwipeableWrapper";
+import {
+  useRecommendationDeleteHandler,
+  useRecommendationWishlistHandler,
+} from "@/hooks";
 // Internal Dependencies
 import type { RecommendationListItem } from "@/libs/types";
-import { SwipeableWrapper } from "@/components/SwipeableWrapper";
-import { useRecommendationDeleteHandler, useRecommendationWishlistHandler } from "@/hooks";
 
 interface DefaultSwipeableRecommendationItemProps {
   slug: string;
@@ -14,11 +17,12 @@ interface DefaultSwipeableRecommendationItemProps {
 
 export const DefaultSwipeableRecommendationItem = memo(
   ({ item, slug, children }: DefaultSwipeableRecommendationItemProps) => {
-    const { handleDelete, isPending: isDeletePending } = useRecommendationDeleteHandler({
-      recommendationSlug: slug,
-      recommendationName: item.name,
-      thumbnailUri: item.images?.[0],
-    });
+    const { handleDelete, isPending: isDeletePending } =
+      useRecommendationDeleteHandler({
+        recommendationSlug: slug,
+        recommendationName: item.name,
+        thumbnailUri: item.images?.[0],
+      });
 
     const { handlePress: handleAddToWishlist, isPending: isWishlistPending } =
       useRecommendationWishlistHandler({
@@ -39,4 +43,5 @@ export const DefaultSwipeableRecommendationItem = memo(
   },
 );
 
-DefaultSwipeableRecommendationItem.displayName = "DefaultSwipeableRecommendationItem";
+DefaultSwipeableRecommendationItem.displayName =
+  "DefaultSwipeableRecommendationItem";

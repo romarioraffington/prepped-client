@@ -1,11 +1,11 @@
+import { MaterialIcons } from "@expo/vector-icons";
 // External Dependencies
 import React from "react";
-import { MaterialIcons } from "@expo/vector-icons";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
+import { HoursStatus } from "@/components/Hours"; // Imported directly to avoid circular dependency
 // Internal Dependencies
 import { hasValidHours } from "@/libs/utils";
-import { HoursStatus } from "@/components/Hours"; // Imported directly to avoid circular dependency
 
 interface HeaderMetadataSectionProps {
   hours: any;

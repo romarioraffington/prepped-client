@@ -1,11 +1,14 @@
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetFlatList,
+} from "@gorhom/bottom-sheet";
 // External Imports
 import * as Haptics from "expo-haptics";
-import { Portal } from "react-native-portalize";
 import React, { useCallback, useState } from "react";
-import { MaterialIcons, Ionicons } from "@expo/vector-icons";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Portal } from "react-native-portalize";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import BottomSheet, { BottomSheetBackdrop, BottomSheetFlatList } from "@gorhom/bottom-sheet";
 
 // Internal Imports
 import type { ExpandablePreviewList as ExpandablePreviewListType } from "@/libs/types";
@@ -18,10 +21,14 @@ interface ExpandablePreviewListProps {
   items: ExpandablePreviewListType[];
 }
 
-export function ExpandablePreviewList({ items = [] }: ExpandablePreviewListProps) {
+export function ExpandablePreviewList({
+  items = [],
+}: ExpandablePreviewListProps) {
   const insets = useSafeAreaInsets();
   const bottomSheetRef = React.useRef<BottomSheet>(null);
-  const [selectedItem, setSelectedItem] = useState<ExpandablePreviewListType | undefined>();
+  const [selectedItem, setSelectedItem] = useState<
+    ExpandablePreviewListType | undefined
+  >();
 
   const openBottomSheet = useCallback((item: ExpandablePreviewListType) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -35,7 +42,6 @@ export function ExpandablePreviewList({ items = [] }: ExpandablePreviewListProps
     bottomSheetRef.current?.close();
   }, []);
 
-
   const calculateSnapPoints = useCallback((item: ExpandablePreviewListType) => {
     const minHeight = 22; // Minimum height of 22%
     const maxHeight = 80; // Maximum height of 80%
@@ -43,11 +49,8 @@ export function ExpandablePreviewList({ items = [] }: ExpandablePreviewListProps
     const itemHeight = 3.5; // Each item takes roughly ~3.5% of the screen heigh
 
     const calculatedHeight = Math.min(
-      Math.max(
-        headerHeight + (item.items.length * itemHeight),
-        minHeight
-      ),
-      maxHeight
+      Math.max(headerHeight + item.items.length * itemHeight, minHeight),
+      maxHeight,
     );
 
     return [`${calculatedHeight}%`];
@@ -62,7 +65,7 @@ export function ExpandablePreviewList({ items = [] }: ExpandablePreviewListProps
         disappearsOnIndex={-1}
       />
     ),
-    []
+    [],
   );
 
   return (
@@ -114,7 +117,9 @@ export function ExpandablePreviewList({ items = [] }: ExpandablePreviewListProps
               contentContainerStyle={{ paddingBottom: insets.bottom }}
               ListHeaderComponent={
                 <View style={styles.bottomSheetHeader}>
-                  <Text style={styles.bottomSheetTitle}>{selectedItem.title}</Text>
+                  <Text style={styles.bottomSheetTitle}>
+                    {selectedItem.title}
+                  </Text>
                   <TouchableOpacity onPress={handleCloseBottomSheet}>
                     <Ionicons name="close" size={28} color="#222" />
                   </TouchableOpacity>
@@ -130,7 +135,6 @@ export function ExpandablePreviewList({ items = [] }: ExpandablePreviewListProps
                   <Text style={styles.bottomSheetItemText}>{item.name}</Text>
                 </View>
               )}
-
             />
           </BottomSheet>
         )}
@@ -186,21 +190,21 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
   },
   bottomSheetHandleIndicator: {
-    display: 'none',
+    display: "none",
   },
   bottomSheetHeader: {
     marginBottom: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   bottomSheetTitle: {
     fontWeight: "bold",
     fontSize: 22,
   },
   bottomSheetItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 12,
     paddingVertical: 6,
   },

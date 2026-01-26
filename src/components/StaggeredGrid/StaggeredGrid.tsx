@@ -1,16 +1,16 @@
 // External Dependencies
 import { FlashList } from "@shopify/flash-list";
+import { type ComponentRef, forwardRef, useCallback, useMemo } from "react";
 import Animated from "react-native-reanimated";
-import { forwardRef, useCallback, useMemo, type ComponentRef } from "react";
 
 import {
-  View,
-  Dimensions,
-  StyleSheet,
   ActivityIndicator,
+  Dimensions,
   type NativeScrollEvent,
   type NativeSyntheticEvent,
   type RefreshControlProps,
+  StyleSheet,
+  View,
 } from "react-native";
 
 // Create animated FlashList for reanimated scroll handler support
@@ -34,7 +34,9 @@ interface StaggeredGridProps {
   // Render function receives item and index for masonry height variation
   renderItem: (item: any, index: number) => React.ReactNode;
   onScroll?: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
-  animatedScrollHandler?: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
+  animatedScrollHandler?: (
+    event: NativeSyntheticEvent<NativeScrollEvent>,
+  ) => void;
 
   // Threshold (0-10) for triggering onEndReached.
   // 0.5 = halfway through remaining content
@@ -49,7 +51,10 @@ interface StaggeredGridProps {
   bounces?: boolean; // FlashList doesn't support this, but we accept it to avoid prop warnings
 }
 
-export const StaggeredGrid = forwardRef<FlashListInstance | null, StaggeredGridProps>(
+export const StaggeredGrid = forwardRef<
+  FlashListInstance | null,
+  StaggeredGridProps
+>(
   (
     {
       items,

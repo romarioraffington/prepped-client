@@ -1,17 +1,17 @@
 // External Dependencies
 import { FontAwesome } from "@expo/vector-icons";
-import { useLocalSearchParams } from "expo-router";
-import { View, Text, StyleSheet } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
-import { useCallback, useMemo, useRef, useEffect, useState } from "react";
+import { useLocalSearchParams } from "expo-router";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { StyleSheet, Text, View } from "react-native";
 
-// Internal Dependencies
-import { parseSlug } from "@/libs/utils";
-import { Colors } from "@/libs/constants";
 import { useWishlistRecommendations } from "@/api/wishlist";
-import type { RecommendationListItem } from "@/libs/types";
 import { WishlistToggleButton } from "@/components/Wishlist";
 import { RecommendationsScreen } from "@/components/screens/RecommendationScreen";
+import { Colors } from "@/libs/constants";
+import type { RecommendationListItem } from "@/libs/types";
+// Internal Dependencies
+import { parseSlug } from "@/libs/utils";
 
 type RecommendationsParams = {
   slug: string;
@@ -21,17 +21,10 @@ export default function WishlistRecommendations() {
   const { slug } = useLocalSearchParams<RecommendationsParams>();
 
   // Parse the slug to get ID and name
-  const {
-    name: slugName,
-    id: wishlistId
-  } = parseSlug(slug);
+  const { name: slugName, id: wishlistId } = parseSlug(slug);
 
   // Fetch wishlist recommendations
-  const {
-    data,
-    isLoading,
-    refetch,
-  } = useWishlistRecommendations(slug);
+  const { data, isLoading, refetch } = useWishlistRecommendations(slug);
 
   const region = data?.region;
   const wishlistName = data?.name ?? slugName;
@@ -57,30 +50,40 @@ export default function WishlistRecommendations() {
       if (hasInitialDataRef.current) {
         refetch();
       }
-    }, [slug, refetch])
+    }, [slug, refetch]),
   );
 
   // Pending deletions and additions state for undo pattern
-  const [pendingDeletions, setPendingDeletions] = useState<Set<string>>(new Set());
-  const [pendingAdditions, setPendingAdditions] = useState<Set<string>>(new Set());
+  const [pendingDeletions, setPendingDeletions] = useState<Set<string>>(
+    new Set(),
+  );
+  const [pendingAdditions, setPendingAdditions] = useState<Set<string>>(
+    new Set(),
+  );
 
   // Filter out pending deletions from recommendations
   const recommendations = useMemo(
-    () => (data?.recommendations || []).filter(rec => !pendingDeletions.has(rec.id)),
+    () =>
+      (data?.recommendations || []).filter(
+        (rec) => !pendingDeletions.has(rec.id),
+      ),
     [data?.recommendations, pendingDeletions],
   );
 
   // Clear pending deletions and additions for items
   // that are no longer in the data (after refetch)
   useEffect(() => {
-    if (data?.recommendations && (pendingDeletions.size > 0 || pendingAdditions.size > 0)) {
+    if (
+      data?.recommendations &&
+      (pendingDeletions.size > 0 || pendingAdditions.size > 0)
+    ) {
       const allRecommendationIds = new Set(
-        data.recommendations.map(rec => rec.id)
+        data.recommendations.map((rec) => rec.id),
       );
 
       // Remove any pending deletions for items that are back in the data
       // (this happens after a refetch when the item was actually deleted on the server)
-      setPendingDeletions(prev => {
+      setPendingDeletions((prev) => {
         const next = new Set(prev);
         for (const id of prev) {
           if (!allRecommendationIds.has(id)) {
@@ -91,7 +94,7 @@ export default function WishlistRecommendations() {
         return next;
       });
 
-      setPendingAdditions(prev => {
+      setPendingAdditions((prev) => {
         const next = new Set(prev);
         for (const id of prev) {
           if (!allRecommendationIds.has(id)) {
@@ -112,10 +115,10 @@ export default function WishlistRecommendations() {
       const handleActionStart = () => {
         if (isSaved) {
           // Currently saved, so we're removing
-          setPendingDeletions(prev => new Set(prev).add(item.id));
+          setPendingDeletions((prev) => new Set(prev).add(item.id));
         } else {
           // Currently not saved, so we're adding
-          setPendingAdditions(prev => new Set(prev).add(item.id));
+          setPendingAdditions((prev) => new Set(prev).add(item.id));
         }
       };
 
@@ -123,14 +126,14 @@ export default function WishlistRecommendations() {
       const handleUndo = () => {
         if (isSaved) {
           // Currently saved, so undo would be for removal
-          setPendingDeletions(prev => {
+          setPendingDeletions((prev) => {
             const next = new Set(prev);
             next.delete(item.id);
             return next;
           });
         } else {
           // Currently not saved, so undo would be for addition
-          setPendingAdditions(prev => {
+          setPendingAdditions((prev) => {
             const next = new Set(prev);
             next.delete(item.id);
             return next;

@@ -1,9 +1,9 @@
 // External Dependencies
 import { useMutation } from "@tanstack/react-query";
 
+import { API_ENDPOINTS, getApiClient } from "@/libs/constants";
 // Internal Dependencies
 import { reportError } from "@/libs/utils";
-import { API_ENDPOINTS, getApiClient } from "@/libs/constants";
 
 /**
  * Delete a recommendation

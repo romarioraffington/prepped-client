@@ -1,23 +1,23 @@
-import { useState } from "react";
-import * as Haptics from 'expo-haptics';
 import { Ionicons } from "@expo/vector-icons";
-import { useRouter, useLocalSearchParams } from "expo-router";
+import * as Haptics from "expo-haptics";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useSubmitReportMutation } from "@/api/report/submit";
 // Internal Dependencies
 import { reportError } from "@/libs/utils/errorReporting";
-import { useSubmitReportMutation } from "@/api/report/submit";
 
 import {
   Alert,
-  View,
+  Keyboard,
+  KeyboardAvoidingView,
+  StyleSheet,
   Text,
   TextInput,
-  Keyboard,
-  StyleSheet,
   TouchableOpacity,
-  KeyboardAvoidingView,
   TouchableWithoutFeedback,
+  View,
 } from "react-native";
 
 // Internal Dependencies
@@ -43,7 +43,7 @@ const reportReasons: ReportReason[] = [
   {
     id: "feedback",
     label: "Share feedback with us",
-    placeholder: "👋 Tripster. Thanks for sharing your thoughts!"
+    placeholder: "👋 Tripster. Thanks for sharing your thoughts!",
   },
 ];
 
@@ -51,15 +51,20 @@ export default function Feedback() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const [feedback, setFeedback] = useState("");
-  const { reasonId, returnTo, extractionId } = useLocalSearchParams<{ reasonId: ReasonId; returnTo?: string; extractionId?: string }>();
+  const { reasonId, returnTo, extractionId } = useLocalSearchParams<{
+    reasonId: ReasonId;
+    returnTo?: string;
+    extractionId?: string;
+  }>();
 
   const { mutate: submitReport, isPending } = useSubmitReportMutation();
 
   const selectedReasonData = reasonId
-    ? reportReasons.find(reason => reason.id === reasonId)
+    ? reportReasons.find((reason) => reason.id === reasonId)
     : null;
 
-  const isSubmitDisabled = !feedback.trim() || feedback.trim().length < 10 || isPending;
+  const isSubmitDisabled =
+    !feedback.trim() || feedback.trim().length < 10 || isPending;
 
   const handleSubmit = () => {
     // Prepend the reason label and metadata to the feedback
@@ -80,7 +85,7 @@ export default function Feedback() {
         onSuccess: () => {
           router.push({
             pathname: "/feedback/thank-you",
-            params: returnTo ? { returnTo } : {}
+            params: returnTo ? { returnTo } : {},
           });
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         },
@@ -99,10 +104,10 @@ export default function Feedback() {
                 text: "OK",
                 style: "default",
               },
-            ]
+            ],
           );
         },
-      }
+      },
     );
   };
 
@@ -136,7 +141,7 @@ export default function Feedback() {
               onChangeText={setFeedback}
               style={styles.feedbackInput}
               placeholderTextColor="#999999"
-              placeholder='Sorry 🥺, tell us where we went wrong.'
+              placeholder="Sorry 🥺, tell us where we went wrong."
             />
           </View>
 
@@ -144,7 +149,9 @@ export default function Feedback() {
             <TouchableOpacity
               style={[
                 styles.nextButton,
-                isSubmitDisabled ? styles.nextButtonInactive : styles.nextButtonActive,
+                isSubmitDisabled
+                  ? styles.nextButtonInactive
+                  : styles.nextButtonActive,
               ]}
               onPress={handleSubmit}
               disabled={isSubmitDisabled}
@@ -154,7 +161,7 @@ export default function Feedback() {
                   styles.nextButtonText,
                   isSubmitDisabled
                     ? styles.nextButtonTextInactive
-                    : styles.nextButtonTextActive
+                    : styles.nextButtonTextActive,
                 ]}
               >
                 {isPending ? "Sending..." : "Send 💌"}
@@ -178,8 +185,8 @@ const styles = StyleSheet.create({
   },
   header: {
     marginTop: 40,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingHorizontal: 16,
   },
   title: {
@@ -191,7 +198,7 @@ const styles = StyleSheet.create({
   },
   feedbackFormContentContainer: {
     flex: 1,
-    justifyContent: 'space-between',
+    justifyContent: "space-between",
   },
   footer: {
     padding: 16,

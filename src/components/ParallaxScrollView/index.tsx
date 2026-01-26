@@ -45,11 +45,15 @@ export const ParallaxScrollView: React.FC<ParallaxScrollViewProps> = ({
           translateY: interpolate(
             scrollOffset.value,
             [-headerHeight, 0, headerHeight],
-            [-headerHeight / 2, 0, headerHeight * 0.75]
+            [-headerHeight / 2, 0, headerHeight * 0.75],
           ),
         },
         {
-          scale: interpolate(scrollOffset.value, [-headerHeight, 0, headerHeight], [2, 1, 1]),
+          scale: interpolate(
+            scrollOffset.value,
+            [-headerHeight, 0, headerHeight],
+            [2, 1, 1],
+          ),
         },
       ],
     };
@@ -74,9 +78,7 @@ export const ParallaxScrollView: React.FC<ParallaxScrollViewProps> = ({
       >
         {headerImage}
       </Animated.View>
-      <View>
-        {children}
-      </View>
+      <View>{children}</View>
     </Animated.ScrollView>
   );
 };
@@ -86,7 +88,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    overflow: 'hidden',
+    overflow: "hidden",
     backgroundColor: "#fff",
   },
 });

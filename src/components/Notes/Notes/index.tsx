@@ -1,13 +1,13 @@
 // External Dependencies
 import type React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
+import { ProfileIcon } from "@/components/ProfileIcon";
+import { DEFAULT_AVATAR } from "@/libs/constants";
+import type { Vote, WishlistNote } from "@/libs/types/Wishlists/Wishlist";
 // Internal Dependencies
 import { formatRelativeTime } from "@/libs/utils";
 import { useAuthStore } from "@/stores/authStore";
-import { DEFAULT_AVATAR } from "@/libs/constants";
-import { ProfileIcon } from "@/components/ProfileIcon";
-import type { Vote, WishlistNote } from "@/libs/types/Wishlists/Wishlist";
 
 interface NotesProps {
   notes: WishlistNote[];
@@ -30,19 +30,16 @@ export const Notes: React.FC<NotesProps> = ({
 }) => {
   const user = useAuthStore((state) => state.user);
   const userId = user?.id;
-  
-  const { 
-    userVote,
-    totalUpVotes, 
-    totalDownVotes, 
-  } = votes;
+
+  const { userVote, totalUpVotes, totalDownVotes } = votes;
 
   // Count notes by current user
   const totalNotesCount = notes.length;
   const userNoteCount = notes.filter((note) => note.userId === userId).length;
-  const addNoteButtonText = userNoteCount > 0
-    ? `${totalNotesCount} note${totalNotesCount !== 1 ? "s" : ""}`
-    : "Add note";
+  const addNoteButtonText =
+    userNoteCount > 0
+      ? `${totalNotesCount} note${totalNotesCount !== 1 ? "s" : ""}`
+      : "Add note";
 
   const handleAddNote = () => {
     if (onAddNote) {
@@ -61,21 +58,25 @@ export const Notes: React.FC<NotesProps> = ({
     <View style={styles.container}>
       {/* Header with Add Note and Vote Summary */}
       <View style={styles.header}>
-        <TouchableOpacity
-          onPress={handleAddNote}
-          style={styles.addNoteButton}>
+        <TouchableOpacity onPress={handleAddNote} style={styles.addNoteButton}>
           <Text
             style={[
               styles.addNoteButtonText,
               userNoteCount === 0 && styles.addNoteButtonTextLink,
-            ]}>
+            ]}
+          >
             {addNoteButtonText}
           </Text>
         </TouchableOpacity>
 
         <View style={styles.voteSummary}>
           {/* Upvote */}
-          <View style={[styles.voteButton, userVote === "up" && styles.voteButtonHighlighted]}>
+          <View
+            style={[
+              styles.voteButton,
+              userVote === "up" && styles.voteButtonHighlighted,
+            ]}
+          >
             <Text>👍</Text>
             {totalUpVotes > 0 && (
               <Text style={styles.voteCount}>{totalUpVotes}</Text>
@@ -86,7 +87,12 @@ export const Notes: React.FC<NotesProps> = ({
           {!userVote && <View style={styles.voteDivider} />}
 
           {/* Downvote */}
-          <View style={[styles.voteButton, userVote === "down" && styles.voteButtonHighlighted]}>
+          <View
+            style={[
+              styles.voteButton,
+              userVote === "down" && styles.voteButtonHighlighted,
+            ]}
+          >
             <Text>👎</Text>
             {totalDownVotes > 0 && (
               <Text style={styles.voteCount}>{totalDownVotes}</Text>
@@ -99,61 +105,63 @@ export const Notes: React.FC<NotesProps> = ({
       {notes.length > 0 && <View style={styles.divider} />}
 
       {/* Notes List */}
-      {notes.length > 0 && notes.map((note, index) => {
-        const isOwnNote = userId === note.userId;
-        const isEditable = isOwnNote && onEditNote;
+      {notes.length > 0 &&
+        notes.map((note, index) => {
+          const isOwnNote = userId === note.userId;
+          const isEditable = isOwnNote && onEditNote;
 
-        return (
-          <View key={note.id}>
-            <View style={styles.noteItem}>
-              {/* Avatar with vote indicator */}
-              <View style={styles.avatarContainer}>
-                <ProfileIcon
-                  size={30}
-                  imageUrl={note.profilePictureUri ?? DEFAULT_AVATAR}
-                  letter={note.name.charAt(0).toUpperCase()}
-                />
-                {/* Vote indicator badge */}
-                {note.vote === "up" && (
-                  <View style={styles.voteBadge}>
-                    <Text style={styles.voteBadgeText}>👍</Text>
+          return (
+            <View key={note.id}>
+              <View style={styles.noteItem}>
+                {/* Avatar with vote indicator */}
+                <View style={styles.avatarContainer}>
+                  <ProfileIcon
+                    size={30}
+                    imageUrl={note.profilePictureUri ?? DEFAULT_AVATAR}
+                    letter={note.name.charAt(0).toUpperCase()}
+                  />
+                  {/* Vote indicator badge */}
+                  {note.vote === "up" && (
+                    <View style={styles.voteBadge}>
+                      <Text style={styles.voteBadgeText}>👍</Text>
+                    </View>
+                  )}
+                  {note.vote === "down" && (
+                    <View style={styles.voteBadge}>
+                      <Text style={styles.voteBadgeText}>👎</Text>
+                    </View>
+                  )}
+                </View>
+
+                {/* Note Content */}
+                <View style={styles.noteContent}>
+                  <View style={styles.noteHeader}>
+                    <Text style={styles.userName}>{note.name}</Text>
+                    <Text style={styles.timestamp}>
+                      · {formatRelativeTime(note.timestamp) ?? "now"}
+                    </Text>
                   </View>
-                )}
-                {note.vote === "down" && (
-                  <View style={styles.voteBadge}>
-                    <Text style={styles.voteBadgeText}>👎</Text>
+                  <View style={styles.noteTextContainer}>
+                    <Text style={styles.noteText}>
+                      {note.text ? note.text : "Voted"}{" "}
+                      {isEditable && (
+                        <Text
+                          style={styles.editLink}
+                          onPress={() => handleNotePress(note)}
+                        >
+                          Edit
+                        </Text>
+                      )}
+                    </Text>
                   </View>
-                )}
+                </View>
               </View>
 
-              {/* Note Content */}
-              <View style={styles.noteContent}>
-                <View style={styles.noteHeader}>
-                  <Text style={styles.userName}>{note.name}</Text>
-                  <Text style={styles.timestamp}>
-                    · {formatRelativeTime(note.timestamp) ?? "now"}
-                  </Text>
-                </View>
-                <View style={styles.noteTextContainer}>
-                  <Text style={styles.noteText}>
-                    {note.text ? note.text : "Voted"}{" "}
-                    {isEditable && (
-                      <Text
-                        style={styles.editLink}
-                        onPress={() => handleNotePress(note)}>
-                        Edit
-                      </Text>
-                    )}
-                  </Text>
-                </View>
-              </View>
+              {/* Divider between notes */}
+              {index < notes.length - 1 && <View style={styles.noteDivider} />}
             </View>
-
-            {/* Divider between notes */}
-            {index < notes.length - 1 && <View style={styles.noteDivider} />}
-          </View>
-        );
-      })}
+          );
+        })}
     </View>
   );
 };

@@ -1,11 +1,11 @@
-import type React from 'react';
-import { useEffect, useRef, useCallback } from "react";
-import { Alert } from 'react-native';
 import { useShareIntentContext } from "expo-share-intent";
+import type React from "react";
+import { useCallback, useEffect, useRef } from "react";
+import { Alert } from "react-native";
 
+import { useImportContent } from "@/hooks/useImportContent";
 // Internal Dependencies
 import { reportError } from "@/libs/utils";
-import { useImportContent } from "@/hooks/useImportContent";
 
 /**
  * Component that handles share intent imports with queuing support
@@ -21,12 +21,8 @@ import { useImportContent } from "@/hooks/useImportContent";
 export const ShareIntentHandler: React.FC = () => {
   const { importContent } = useImportContent();
 
-  const {
-    error,
-    shareIntent,
-    hasShareIntent,
-    resetShareIntent,
-  } = useShareIntentContext();
+  const { error, shareIntent, hasShareIntent, resetShareIntent } =
+    useShareIntentContext();
 
   // Queue for storing incoming share URLs
   const shareQueueRef = useRef<string[]>([]);
@@ -120,16 +116,10 @@ export const ShareIntentHandler: React.FC = () => {
 
     // Start processing queue
     processNextShare();
-  }, [
-    shareIntent,
-    hasShareIntent,
-    resetShareIntent,
-    processNextShare,
-  ]);
+  }, [shareIntent, hasShareIntent, resetShareIntent, processNextShare]);
 
   return null;
 };
-
 
 // Extract URL from share intent data
 const extractUrlFromShareIntent = (shareIntent: {

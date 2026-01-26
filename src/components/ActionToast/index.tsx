@@ -1,12 +1,20 @@
 // External Dependencies
-import { Image } from "expo-image";
 import * as Haptics from "expo-haptics";
-import { type FC, useEffect, useRef, useState } from "react";
-import { Animated, Easing, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-// Internal Dependencies
+// External Dependencies
+import { Image } from "expo-image";
 import { useActionToast } from "@/contexts";
-import { ImagePlaceholder } from "../ImagePlaceholder";
+import { ImagePlaceholder } from "@/components/Image";
+import { type FC, useEffect, useRef, useState } from "react";
+
+import {
+  Text,
+  View,
+  Easing,
+  Animated,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 
 // Duration of the toast in milliseconds
 const DURATION = 3000;
@@ -20,7 +28,8 @@ export const ActionToast: FC = () => {
   const opacity = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(0)).current;
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const { toast, hideToast, dismissToast, registerToastRef, onExitComplete } = useActionToast();
+  const { toast, hideToast, dismissToast, registerToastRef, onExitComplete } =
+    useActionToast();
 
   // Determine if we should show the CTA button
   const shouldShowCTA = !!toast.cta?.text;
@@ -181,7 +190,11 @@ export const ActionToast: FC = () => {
 
   // Render text - handle both string and ReactNode
   const renderText = () => {
-    return <Text numberOfLines={1} style={styles.toastText}>{toast.text}</Text>;
+    return (
+      <Text numberOfLines={1} style={styles.toastText}>
+        {toast.text}
+      </Text>
+    );
   };
 
   return (
@@ -198,9 +211,7 @@ export const ActionToast: FC = () => {
         <View style={styles.contentRow}>
           <View style={styles.thumbnailContainer}>
             {toast.icon ? (
-              <View style={styles.defaultIconContainer}>
-                {toast.icon}
-              </View>
+              <View style={styles.defaultIconContainer}>{toast.icon}</View>
             ) : toast.thumbnailUri && !imageError ? (
               <Image
                 contentFit="cover"
@@ -210,13 +221,15 @@ export const ActionToast: FC = () => {
               />
             ) : (
               <View style={styles.defaultIconContainer}>
-                <ImagePlaceholder height={45} iconSize={24} style={{ backgroundColor: "#f0f0f0" }} />
+                <ImagePlaceholder
+                  height={45}
+                  iconSize={24}
+                  style={{ backgroundColor: "#f0f0f0" }}
+                />
               </View>
             )}
           </View>
-          <View style={styles.textWrapper}>
-            {renderText()}
-          </View>
+          <View style={styles.textWrapper}>{renderText()}</View>
           {shouldShowCTA && (
             <TouchableOpacity
               style={styles.ctaButton}

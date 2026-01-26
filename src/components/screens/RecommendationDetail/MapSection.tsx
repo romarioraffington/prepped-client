@@ -1,8 +1,14 @@
+import { Feather } from "@expo/vector-icons";
 // External Dependencies
 import React, { useMemo } from "react";
-import { Feather } from "@expo/vector-icons";
+import {
+  Dimensions,
+  Linking,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps";
-import { View, StyleSheet, TouchableOpacity, Dimensions, Linking } from "react-native";
 
 // Internal Dependencies
 import { reportError } from "@/libs/utils";

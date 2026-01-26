@@ -1,11 +1,11 @@
-import { Image } from 'expo-image';
-import { useState, useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
-import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
+import { Image } from "expo-image";
+import { useEffect, useState } from "react";
+import { StyleSheet, View } from "react-native";
+import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 // Local background images
-const imageOne = require('~/assets/images/welcome/key-insights.webp');
-const imageTwo = require('~/assets/images/welcome/auto-tagging.webp');
+const imageOne = require("~/assets/images/welcome/key-insights.webp");
+const imageTwo = require("~/assets/images/welcome/auto-tagging.webp");
 
 interface BackgroundCyclerProps {
   imageBackgroundUris?: any[];
@@ -17,10 +17,7 @@ interface BackgroundCyclerProps {
 const AnimatedImage = Animated.createAnimatedComponent(Image);
 
 // Default background images
-const defaultImageBackgroundUris = [
-  imageOne,
-  imageTwo,
-];
+const defaultImageBackgroundUris = [imageOne, imageTwo];
 
 export function BackgroundCycler({
   children,
@@ -53,9 +50,7 @@ export function BackgroundCycler({
         />
         <View style={[StyleSheet.absoluteFill, styles.overlay]} />
       </View>
-      <View style={styles.content}>
-        {children}
-      </View>
+      <View style={styles.content}>{children}</View>
     </View>
   );
 }
@@ -65,7 +60,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   overlay: {
-    backgroundColor: 'rgba(38, 38, 38, 0.5)', // equivalent to bg-neutral-800/50
+    backgroundColor: "rgba(38, 38, 38, 0.5)", // equivalent to bg-neutral-800/50
   },
   content: {
     flex: 1,

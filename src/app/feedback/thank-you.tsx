@@ -1,7 +1,7 @@
-import { useRouter, useLocalSearchParams } from "expo-router";
-import * as Haptics from 'expo-haptics';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import * as Haptics from "expo-haptics";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function ThankYou() {
   const router = useRouter();
@@ -11,7 +11,7 @@ export default function ThankYou() {
   const handleClose = () => {
     Haptics.selectionAsync();
 
-    if (returnTo === 'recipes') {
+    if (returnTo === "recipes") {
       router.push("/");
     } else {
       router.push("/account");
@@ -24,17 +24,15 @@ export default function ThankYou() {
     <View style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.content}>
         <Text style={styles.title}>Thanks for letting us know</Text>
-        <Text style={styles.subtitle}> We'll use your feedback to help us improve 💖</Text>
+        <Text style={styles.subtitle}>
+          {" "}
+          We'll use your feedback to help us improve 💖
+        </Text>
       </View>
 
       <View style={styles.footer}>
-        <TouchableOpacity
-          onPress={handleClose}
-          style={styles.button}
-        >
-          <Text style={styles.buttonText}>
-            OK
-          </Text>
+        <TouchableOpacity onPress={handleClose} style={styles.button}>
+          <Text style={styles.buttonText}>OK</Text>
         </TouchableOpacity>
       </View>
     </View>

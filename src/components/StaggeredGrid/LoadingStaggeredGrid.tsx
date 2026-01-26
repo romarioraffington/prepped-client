@@ -1,22 +1,18 @@
-import { View } from 'react-native';
-import React, { useEffect } from 'react';
+import React, { useEffect } from "react";
+import { View } from "react-native";
 
 import Animated, {
   withRepeat,
   withTiming,
   useSharedValue,
   useAnimatedStyle,
-} from 'react-native-reanimated';
+} from "react-native-reanimated";
 
 export const LoadingStaggeredGrid = () => {
   const opacity = useSharedValue(0.3);
 
   useEffect(() => {
-    opacity.value = withRepeat(
-      withTiming(0.7, { duration: 1000 }),
-      -1,
-      true
-    );
+    opacity.value = withRepeat(withTiming(0.7, { duration: 1000 }), -1, true);
   }, []);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -27,16 +23,16 @@ export const LoadingStaggeredGrid = () => {
     const cardHeight = isLarge ? 280 : 200;
 
     return (
-      <View style={{ width: '100%', marginBottom: 16 }}>
+      <View style={{ width: "100%", marginBottom: 16 }}>
         <Animated.View
           style={[
             {
               height: cardHeight,
               borderRadius: 12,
-              backgroundColor: '#E1E9EE',
+              backgroundColor: "#E1E9EE",
               marginBottom: 8,
             },
-            animatedStyle
+            animatedStyle,
           ]}
         />
 
@@ -44,13 +40,13 @@ export const LoadingStaggeredGrid = () => {
         <Animated.View
           style={[
             {
-              backgroundColor: '#E1E9EE',
+              backgroundColor: "#E1E9EE",
               height: 16,
-              width: '80%',
+              width: "80%",
               borderRadius: 4,
               marginBottom: 4,
             },
-            animatedStyle
+            animatedStyle,
           ]}
         />
       </View>
@@ -59,16 +55,16 @@ export const LoadingStaggeredGrid = () => {
 
   return (
     <View style={{ padding: 20, paddingTop: 8 }}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
         {/* Left column */}
-        <View style={{ width: '48%' }}>
+        <View style={{ width: "48%" }}>
           {[...Array(4)].map((_, index) => (
             <ImageCardSkeleton key={index} isLarge={index % 3 === 0} />
           ))}
         </View>
 
         {/* Right column */}
-        <View style={{ width: '48%' }}>
+        <View style={{ width: "48%" }}>
           {[...Array(4)].map((_, index) => (
             <ImageCardSkeleton key={index} isLarge={index % 3 === 1} />
           ))}

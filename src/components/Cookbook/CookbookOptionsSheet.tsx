@@ -1,20 +1,23 @@
-// External Dependencies
-import { useMemo, useCallback } from "react";
-import * as Haptics from "expo-haptics";
 import { Feather } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
-import { Alert, Text } from "react-native";
-import { useRouter } from "expo-router";
+import type BottomSheet from "@gorhom/bottom-sheet";
 import { useQueryClient } from "@tanstack/react-query";
 import type { InfiniteData } from "@tanstack/react-query";
-import type BottomSheet from "@gorhom/bottom-sheet";
+import * as Haptics from "expo-haptics";
+import { useRouter } from "expo-router";
+// External Dependencies
+import { useCallback, useMemo } from "react";
+import { Alert, Text } from "react-native";
 
+import { useDeleteCookbookMutation } from "@/api";
+import {
+  ActionBottomSheet,
+  type ActionBottomSheetMenuItem,
+} from "@/components/ActionBottomSheet";
 // Internal Dependencies
 import { useActionToast } from "@/contexts";
 import { Colors, QUERY_KEYS } from "@/libs/constants";
-import { useDeleteCookbookMutation } from "@/api";
 import type { ImageGridItem } from "@/libs/types";
-import { ActionBottomSheet, type ActionBottomSheetMenuItem } from "@/components/ActionBottomSheet";
 
 export interface CookbookOptionsSheetProps {
   cookbookId: string;
@@ -41,10 +44,8 @@ export function CookbookOptionsSheet({
   const queryClient = useQueryClient();
   const { showToast } = useActionToast();
 
-  const {
-    mutateAsync: deleteCookbookAsync,
-    isPending: isDeletePending,
-  } = useDeleteCookbookMutation();
+  const { mutateAsync: deleteCookbookAsync, isPending: isDeletePending } =
+    useDeleteCookbookMutation();
 
   // Calculate snap points (2 items if no recipes, 3 items if has recipes)
   const snapPoints = useMemo(() => [hasRecipes ? "32%" : "28%"], [hasRecipes]);
@@ -115,13 +116,16 @@ export function CookbookOptionsSheet({
                 bottomSheetRef.current?.close();
 
                 // Haptic feedback
-                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                Haptics.notificationAsync(
+                  Haptics.NotificationFeedbackType.Success,
+                );
 
                 // Show success toast
                 showToast({
                   text: (
                     <Text>
-                      Deleted <Text style={{ fontWeight: "600" }}>{cookbookName}</Text>
+                      Deleted{" "}
+                      <Text style={{ fontWeight: "600" }}>{cookbookName}</Text>
                     </Text>
                   ),
                   thumbnailUri: cookbookImage,
@@ -137,12 +141,15 @@ export function CookbookOptionsSheet({
               })
               .catch((error) => {
                 // Haptic feedback for error
-                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+                Haptics.notificationAsync(
+                  Haptics.NotificationFeedbackType.Error,
+                );
 
                 // Show error alert
                 Alert.alert(
                   "Oops!",
-                  error?.message || "Failed to delete cookbook. Please try again.",
+                  error?.message ||
+                    "Failed to delete cookbook. Please try again.",
                   [{ text: "OK" }],
                 );
               });
@@ -175,19 +182,28 @@ export function CookbookOptionsSheet({
       // Bulk Edit Recipes (only if there are recipes)
       ...(hasRecipes
         ? [
-          {
-            label: "Bulk Edit Recipes",
-            onPress: handleBulkEditPress,
-            renderIcon: () => <Feather name="mouse-pointer" size={21} color="#000" opacity={0.7} />,
-          },
-        ]
+            {
+              label: "Bulk Edit Recipes",
+              onPress: handleBulkEditPress,
+              renderIcon: () => (
+                <Feather
+                  name="mouse-pointer"
+                  size={21}
+                  color="#000"
+                  opacity={0.7}
+                />
+              ),
+            },
+          ]
         : []),
       // Delete Cookbook (destructive, always last)
       {
         destructive: true,
         label: "Delete Cookbook",
         onPress: handleDeletePress,
-        renderIcon: () => <Ionicons name="trash-outline" size={20} color={Colors.destructive} />,
+        renderIcon: () => (
+          <Ionicons name="trash-outline" size={20} color={Colors.destructive} />
+        ),
       },
     ];
 

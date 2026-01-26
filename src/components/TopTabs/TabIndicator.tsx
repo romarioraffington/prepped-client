@@ -44,23 +44,23 @@ export const TabIndicator: FC<Props> = ({
 
     const left = isHorizontalListScrollingX.value
       ? interpolate(
-        horizontalListOffsetX.value / windowWidth,
-        tabOffsets.map((_, i) => i),
-        tabOffsets
-      )
+          horizontalListOffsetX.value / windowWidth,
+          tabOffsets.map((_, i) => i),
+          tabOffsets,
+        )
       : withTiming(tabOffsets[activeTabIndex.value], {
-        duration: INDICATOR_ANIM_DURATION,
-      });
+          duration: INDICATOR_ANIM_DURATION,
+        });
 
     const width = isHorizontalListScrollingX.value
       ? interpolate(
-        horizontalListOffsetX.value / windowWidth,
-        tabWidths.map((_, i) => i),
-        tabWidths
-      )
+          horizontalListOffsetX.value / windowWidth,
+          tabWidths.map((_, i) => i),
+          tabWidths,
+        )
       : withTiming(tabWidths[activeTabIndex.value] ?? 0, {
-        duration: INDICATOR_ANIM_DURATION,
-      });
+          duration: INDICATOR_ANIM_DURATION,
+        });
 
     return {
       left,

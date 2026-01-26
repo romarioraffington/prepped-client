@@ -1,10 +1,10 @@
 // External Dependencies
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
 
+import { formatNumber } from "@/libs/utils";
 // Internal Dependencies
-import { RatingStars } from '../RatingStars';
-import { formatNumber } from '@/libs/utils';
+import { RatingStars } from "../RatingStars";
 
 interface RatingInfoProps {
   size?: number;

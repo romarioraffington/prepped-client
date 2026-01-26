@@ -1,24 +1,32 @@
+import { Ionicons } from "@expo/vector-icons";
+import { useQueryClient } from "@tanstack/react-query";
+import * as Haptics from "expo-haptics";
 // External Dependencies
 import { Image } from "expo-image";
-import { router } from "expo-router";
-import React, { useState, useEffect } from "react";
-import * as Haptics from "expo-haptics";
-import { Check } from "lucide-react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { useQueryClient } from "@tanstack/react-query";
+import { router } from "expo-router";
+import { Check } from "lucide-react-native";
+import React, { useState, useEffect } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  Dimensions,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import type { PurchasesPackage } from "react-native-purchases";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSubscription } from "~/src/contexts/SubscriptionContext";
-import { Text, View, Pressable, Dimensions, StyleSheet, Alert, ActivityIndicator } from "react-native";
 
 // Internal Dependencies
-import { ProBadge, Confetti } from "@/components";
-import { isIPad, reportError } from "@/libs/utils";
+import { Confetti, ProBadge } from "@/components";
 import { LEGAL_ROUTES, QUERY_KEYS } from "@/libs/constants";
+import { isIPad, reportError } from "@/libs/utils";
 
 // Hero Constants
-const HERO_RATIO = isIPad() ? 0.35 : 0.49
+const HERO_RATIO = isIPad() ? 0.35 : 0.49;
 const { height: SCREEN_HEIGHT } = Dimensions.get("window");
 const HERO_HEIGHT = SCREEN_HEIGHT * HERO_RATIO;
 
@@ -57,7 +65,9 @@ export default function CreditsPaywall() {
   /**
    * Extract credits offering from offerings
    */
-  const creditsOffering = offerings?.find((offering) => offering.identifier === "credits");
+  const creditsOffering = offerings?.find(
+    (offering) => offering.identifier === "credits",
+  );
 
   /**
    * Get all available credit packages
@@ -67,9 +77,8 @@ export default function CreditsPaywall() {
   /**
    * Set default selected package (first package if available)
    */
-  const [selectedPackage, setSelectedPackage] = useState<PurchasesPackage | null>(
-    creditPackages[0] || null
-  );
+  const [selectedPackage, setSelectedPackage] =
+    useState<PurchasesPackage | null>(creditPackages[0] || null);
 
   // Update selected package when packages are loaded
   useEffect(() => {
@@ -114,7 +123,9 @@ export default function CreditsPaywall() {
       setShowConfetti(true);
 
       // Invalidate quota to refresh after credit purchase
-      await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.RECIPE_QUOTA] });
+      await queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.RECIPE_QUOTA],
+      });
 
       // Purchase successful
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -122,11 +133,14 @@ export default function CreditsPaywall() {
       // Wait for confetti animation, then navigate
       setTimeout(() => {
         setShowConfetti(false);
-        router.replace('/account');
+        router.replace("/account");
       }, 2500);
     } catch (error: any) {
       // User cancelled - don't show error
-      if (error.message?.includes("cancelled") || error.message?.includes("canceled")) {
+      if (
+        error.message?.includes("cancelled") ||
+        error.message?.includes("canceled")
+      ) {
         return;
       }
 
@@ -174,7 +188,7 @@ export default function CreditsPaywall() {
           {
             text: "OK",
           },
-        ]
+        ],
       );
     } catch (error: any) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
@@ -184,7 +198,7 @@ export default function CreditsPaywall() {
       });
       Alert.alert(
         "Restore Failed",
-        error.message || "Unable to restore purchases. Please try again."
+        error.message || "Unable to restore purchases. Please try again.",
       );
     } finally {
       setIsRestoring(false);
@@ -219,12 +233,11 @@ export default function CreditsPaywall() {
         <ProBadge text="Credits" animated />
 
         {/* Headline & Description */}
-        <Text style={styles.title}>
-          Top up your {"\n"}import credits
-        </Text>
+        <Text style={styles.title}>Top up your {"\n"}import credits</Text>
 
         <Text style={styles.subtitle}>
-          Purchase credits to import and organize your travel discoveries — one-time purchase, no expiration.
+          Purchase credits to import and organize your travel discoveries —
+          one-time purchase, no expiration.
         </Text>
 
         {/* Bottom Actions Container */}
@@ -236,7 +249,8 @@ export default function CreditsPaywall() {
             <View style={styles.packagesContainer}>
               {creditPackages.map((pkg) => {
                 const isBestValue = pkg.identifier === CREDIT_PACK_10;
-                const isSelected = selectedPackage?.identifier === pkg.identifier;
+                const isSelected =
+                  selectedPackage?.identifier === pkg.identifier;
 
                 return (
                   <Pressable
@@ -249,7 +263,9 @@ export default function CreditsPaywall() {
                   >
                     {isBestValue && (
                       <View style={styles.bestValueBadge}>
-                        <Text style={styles.bestValueBadgeText}>Best Value</Text>
+                        <Text style={styles.bestValueBadgeText}>
+                          Best Value
+                        </Text>
                       </View>
                     )}
                     <View style={styles.packageButtonContent}>
@@ -261,7 +277,11 @@ export default function CreditsPaywall() {
                           ]}
                         >
                           {isSelected && (
-                            <Check size={14} color={PRIMARY_PURPLE} strokeWidth={3} />
+                            <Check
+                              size={14}
+                              color={PRIMARY_PURPLE}
+                              strokeWidth={3}
+                            />
                           )}
                         </View>
                         <View style={styles.packageButtonTextContainer}>
@@ -291,7 +311,8 @@ export default function CreditsPaywall() {
             onPress={handlePurchase}
             style={[
               styles.continueButton,
-              (isPurchasing || !selectedPackage) && styles.continueButtonDisabled,
+              (isPurchasing || !selectedPackage) &&
+                styles.continueButtonDisabled,
             ]}
             disabled={isPurchasing || !selectedPackage}
           >
@@ -536,4 +557,3 @@ const styles = StyleSheet.create({
     fontWeight: "400",
   },
 });
-

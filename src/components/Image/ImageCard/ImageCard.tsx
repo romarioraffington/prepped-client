@@ -1,6 +1,6 @@
 // External Imports
 import type React from "react";
-import { Text, StyleSheet } from "react-native";
+import { StyleSheet, Text } from "react-native";
 
 // Internal Imports
 import { BaseImageCard } from "./BaseImageCard";

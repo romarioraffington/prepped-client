@@ -1,24 +1,24 @@
+import { type ReactElement, forwardRef, useCallback, useMemo } from "react";
 // External Dependencies
 import Animated from "react-native-reanimated";
-import { forwardRef, useCallback, useMemo, type ReactElement } from "react";
 
 import {
-  Platform,
-  View,
-  Text,
   FlatList,
-  StyleSheet,
-  type ViewStyle,
   type NativeScrollEvent,
   type NativeSyntheticEvent,
+  Platform,
   type RefreshControlProps,
+  StyleSheet,
+  Text,
+  View,
+  type ViewStyle,
 } from "react-native";
 
+import type { ImageGridItem as ImageGridItemType } from "@/libs/types";
+import { formatRelativeTime } from "@/libs/utils/date";
 // Internal Imports
 import { ImageGridItem } from "./ImageGridItem";
 import { LoadingImageGridList } from "./LoadingImageGridList";
-import type { ImageGridItem as ImageGridItemType } from "@/libs/types";
-import { formatRelativeTime } from "@/libs/utils/date";
 
 interface ImageGridListProps {
   isLoading?: boolean;
@@ -39,7 +39,10 @@ interface ImageGridListProps {
   onEndReached?: () => void;
 }
 
-export const ImageGridList = forwardRef<FlatList<ImageGridItemType> | null, ImageGridListProps>(
+export const ImageGridList = forwardRef<
+  FlatList<ImageGridItemType> | null,
+  ImageGridListProps
+>(
   (
     {
       items,
@@ -69,29 +72,31 @@ export const ImageGridList = forwardRef<FlatList<ImageGridItemType> | null, Imag
     const renderItem = useCallback(
       ({ item }: { item: ImageGridItemType }) => {
         // Generate metadata showing recipe count and last updated timestamp
-        const recipeCount = item.count > 0 ? (
-          <Text style={styles.recipeCountText}>
-            {item.count} {item.count === 1 ? 'Recipe' : 'Recipes'}
-          </Text>
-        ) : null;
+        const recipeCount =
+          item.count > 0 ? (
+            <Text style={styles.recipeCountText}>
+              {item.count} {item.count === 1 ? "Recipe" : "Recipes"}
+            </Text>
+          ) : null;
 
         const timestamp = item.lastUpdatedTimestamp
           ? formatRelativeTime(item.lastUpdatedTimestamp)
           : null;
 
         const timestampText = timestamp ? (
-          <Text style={styles.timestampText}>
-            {timestamp}
-          </Text>
+          <Text style={styles.timestampText}>{timestamp}</Text>
         ) : null;
 
-        const metadata = recipeCount || timestampText ? (
-          <View style={styles.metadataRow}>
-            {recipeCount}
-            {recipeCount && timestampText && <Text style={styles.metadataSeparator}> </Text>}
-            {timestampText}
-          </View>
-        ) : null;
+        const metadata =
+          recipeCount || timestampText ? (
+            <View style={styles.metadataRow}>
+              {recipeCount}
+              {recipeCount && timestampText && (
+                <Text style={styles.metadataSeparator}> </Text>
+              )}
+              {timestampText}
+            </View>
+          ) : null;
 
         return (
           <ImageGridItem
@@ -99,7 +104,9 @@ export const ImageGridList = forwardRef<FlatList<ImageGridItemType> | null, Imag
             heading={item.name}
             metadata={metadata}
             onItemPress={onItemPress}
-            onOptionsPress={onItemOptionsPress ? () => onItemOptionsPress(item) : undefined}
+            onOptionsPress={
+              onItemOptionsPress ? () => onItemOptionsPress(item) : undefined
+            }
           />
         );
       },
@@ -109,7 +116,12 @@ export const ImageGridList = forwardRef<FlatList<ImageGridItemType> | null, Imag
     // Always render footer to prevent layout shifts - use empty view when not loading
     // This prevents FlatList from recalculating layouts when footer appears/disappears
     const ListFooterComponent = useMemo(
-      () => isLoadingMore ? <LoadingImageGridList rows={4} /> : <View style={{ height: 0 }} />,
+      () =>
+        isLoadingMore ? (
+          <LoadingImageGridList rows={4} />
+        ) : (
+          <View style={{ height: 0 }} />
+        ),
       [isLoadingMore],
     );
 

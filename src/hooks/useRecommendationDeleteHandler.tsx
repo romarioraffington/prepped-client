@@ -1,16 +1,16 @@
-// External Dependencies
-import { useCallback } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import * as Haptics from "expo-haptics";
 import { useNavigation } from "expo-router";
-import { Text, View, Alert } from "react-native";
-import { useQueryClient } from "@tanstack/react-query";
+// External Dependencies
+import { useCallback } from "react";
+import { Alert, Text, View } from "react-native";
 
+import { useDeleteRecommendationMutation } from "@/api";
+import { useActionToast } from "@/contexts";
+import { useImageErrorFilter } from "@/hooks";
+import { QUERY_KEYS } from "@/libs/constants";
 // Internal Dependencies
 import { parseSlug } from "@/libs/utils";
-import { useActionToast } from "@/contexts";
-import { QUERY_KEYS } from "@/libs/constants";
-import { useImageErrorFilter } from "@/hooks";
-import { useDeleteRecommendationMutation } from "@/api";
 
 interface UseRecommendationDeleteHandlerParams {
   thumbnailUri?: string;
@@ -33,7 +33,8 @@ export const useRecommendationDeleteHandler = ({
   const navigation = useNavigation();
   const queryClient = useQueryClient();
   const { showToast } = useActionToast();
-  const { mutateAsync: deleteRecommendationAsync, isPending } = useDeleteRecommendationMutation();
+  const { mutateAsync: deleteRecommendationAsync, isPending } =
+    useDeleteRecommendationMutation();
 
   // Parse slug to extract ID for API call and cache key
   const { id: recommendationId } = parseSlug(recommendationSlug);
@@ -62,7 +63,9 @@ export const useRecommendationDeleteHandler = ({
             deleteRecommendationAsync(recommendationId)
               .then(async () => {
                 // Haptic feedback
-                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                Haptics.notificationAsync(
+                  Haptics.NotificationFeedbackType.Success,
+                );
 
                 // Show success toast with green checkmark
                 showToast({
@@ -80,7 +83,8 @@ export const useRecommendationDeleteHandler = ({
                 // - React Query will automatically refetch active ones
                 await Promise.all([
                   queryClient.invalidateQueries({
-                    queryKey: QUERY_KEYS.RECOMMENDATION_DETAILS(recommendationId),
+                    queryKey:
+                      QUERY_KEYS.RECOMMENDATION_DETAILS(recommendationId),
                   }),
                   queryClient.invalidateQueries({
                     queryKey: [QUERY_KEYS.RECIPE_RECOMMENDATIONS_BASE],
@@ -95,12 +99,15 @@ export const useRecommendationDeleteHandler = ({
               })
               .catch((error) => {
                 // Haptic feedback for error
-                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+                Haptics.notificationAsync(
+                  Haptics.NotificationFeedbackType.Error,
+                );
 
                 // Show error alert
                 Alert.alert(
                   "Oops!",
-                  error?.message || "Failed to delete recommendation. Please try again.",
+                  error?.message ||
+                    "Failed to delete recommendation. Please try again.",
                   [{ text: "OK" }],
                 );
               });
@@ -126,4 +133,3 @@ export const useRecommendationDeleteHandler = ({
     isPending,
   };
 };
-

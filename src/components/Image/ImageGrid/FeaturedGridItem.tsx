@@ -1,13 +1,6 @@
-// External Imports
 import type React from "react";
 import { Ionicons } from "@expo/vector-icons";
-
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-} from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 // Internal Imports
 import { useImageErrorFilter } from "@/hooks";
@@ -15,7 +8,7 @@ import type { GridItemProps } from "@/libs/types";
 import { columnWidth, itemHeight } from "./consts";
 
 // Import directly to avoid circular dependency with @/components
-import { ShimmerImage } from "@/components/ShimmerImage";
+import { ShimmerImage } from "@/components/Image";
 
 export const FeaturedGridItem = ({
   item,
@@ -24,7 +17,9 @@ export const FeaturedGridItem = ({
   onItemPress,
   onOptionsPress,
 }: GridItemProps & { isLoading?: boolean }) => {
-  const { validImages, handleImageError } = useImageErrorFilter(item.imageUris || []);
+  const { validImages, handleImageError } = useImageErrorFilter(
+    item.imageUris || [],
+  );
 
   const hasImage1 = validImages.length > 0;
   const hasImage2 = validImages.length > 1;
@@ -90,13 +85,14 @@ export const FeaturedGridItem = ({
             />
           )}
         </View>
-
       </View>
 
       {/* Item Name and Info */}
       <View style={styles.featuredTextContainer}>
         <View style={styles.titleRow}>
-          <Text style={styles.featuredItemName} numberOfLines={1}>{heading}</Text>
+          <Text style={styles.featuredItemName} numberOfLines={1}>
+            {heading}
+          </Text>
           {onOptionsPress && (
             <TouchableOpacity
               onPress={(e) => {
@@ -110,9 +106,7 @@ export const FeaturedGridItem = ({
             </TouchableOpacity>
           )}
         </View>
-        <View style={styles.metadataContainer}>
-          {metadata}
-        </View>
+        <View style={styles.metadataContainer}>{metadata}</View>
       </View>
     </TouchableOpacity>
   );
@@ -127,13 +121,13 @@ const styles = StyleSheet.create({
     height: itemHeight,
   },
   featuredImageWrapper: {
-    position: 'absolute',
     width: 100,
-    height: itemHeight,
-    borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'white',
-    backgroundColor: '#E0E0E0',
+    borderRadius: 16,
+    height: itemHeight,
+    position: "absolute",
+    borderColor: "white",
+    backgroundColor: "#E0E0E0",
   },
   firstImageWrapper: {
     zIndex: 5,
@@ -155,7 +149,7 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   featuredImage: {
-    height: '100%',
+    height: "100%",
     borderRadius: 16,
   },
   featuredTextContainer: {},

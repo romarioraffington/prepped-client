@@ -1,22 +1,18 @@
+import { Ionicons } from "@expo/vector-icons";
 // External Dependencies
 import type { FC } from "react";
-import { Ionicons } from "@expo/vector-icons";
 import { Dimensions, Pressable, StyleSheet, Text, View } from "react-native";
 
+import { useImageErrorFilter } from "@/hooks";
+import { ImagePlaceholder, ShimmerImage } from "@/components/Image";
 // Internal Dependencies
 import { Colors } from "@/libs/constants";
-import { useImageErrorFilter } from "@/hooks";
 import type { CookbookCardData } from "@/libs/types";
-import { ProfileIcon } from "@/components/ProfileIcon";
-import { ShimmerImage } from "@/components/ShimmerImage";
-import { ImagePlaceholder } from "@/components/ImagePlaceholder";
-
-const DEFAULT_AVATAR = require("~/assets/images/welcome/leaning-tower-of-pisa-in-pisa-italy.webp");
 
 const CARD_GAP = 14;
 const CARD_RADIUS = 18;
-const CARD_WIDTH = (Dimensions.get("window").width - (CARD_GAP * 3.5)) / 2;
-const CARD_HEIGHT = CARD_WIDTH * 0.90;
+const CARD_WIDTH = (Dimensions.get("window").width - CARD_GAP * 3.5) / 2;
+const CARD_HEIGHT = CARD_WIDTH * 0.9;
 
 export interface CookbookCardProps {
   item: CookbookCardData;
@@ -46,10 +42,8 @@ export const CookbookCard: FC<CookbookCardProps> = ({
   const { validImages, handleImageError } = useImageErrorFilter(imageUrls);
   const hasValidImage = validImages.length > 0;
 
-  const displayMembers = item.members.slice(0, 2);
   const hasImages = Boolean(item.coverImageUri);
-  const extraCount = Math.max(0, item.members.length - displayMembers.length);
-  const isRecentlyViewed = Boolean(item.isRecentlyViewed) && showRecentlyViewed;
+  const isRecentlyViewed = Boolean(showRecentlyViewed);
   const containsRecipe = Boolean(item.containsRecipe);
 
   const getMetaText = (): string => {
@@ -59,7 +53,7 @@ export const CookbookCard: FC<CookbookCardProps> = ({
         return meta;
       }
     }
-    if (item.isRecentlyViewed && item.lastUpdatedText) {
+    if (showRecentlyViewed && item.lastUpdatedText) {
       return item.lastUpdatedText;
     }
 
@@ -69,7 +63,10 @@ export const CookbookCard: FC<CookbookCardProps> = ({
   const renderCollage = () => {
     if (!hasImages) {
       return (
-        <Pressable onPress={onPress} style={[styles.placeholderTile, styles.placeholderTileRecent]}>
+        <Pressable
+          onPress={onPress}
+          style={[styles.placeholderTile, styles.placeholderTileRecent]}
+        >
           <Ionicons name="time-outline" size={32} color="#fff" />
         </Pressable>
       );
@@ -97,53 +94,67 @@ export const CookbookCard: FC<CookbookCardProps> = ({
   };
 
   return (
-    <View style={[
-      styles.card,
-      isRecentlyViewed && styles.cardRecentlyViewed,
-    ]}>
+    <View style={[styles.card, isRecentlyViewed && styles.cardRecentlyViewed]}>
       {isEditing && !isRecentlyViewed && onDelete ? (
         <Pressable onPress={onDelete} style={styles.deleteBadge}>
           <Ionicons name="close" size={18} color="#222" />
         </Pressable>
       ) : null}
       {(containsRecipe || isSelectedForAddition) && (
-        <View style={[
-          styles.recipeBadge,
-          isSelectedForRemoval && styles.recipeBadgeSelected,
-          isSelectedForAddition && styles.recipeBadgeAddition,
-        ]}>
+        <View
+          style={[
+            styles.recipeBadge,
+            isSelectedForRemoval && styles.recipeBadgeSelected,
+            isSelectedForAddition && styles.recipeBadgeAddition,
+          ]}
+        >
           {isSelectedForRemoval ? (
             <>
-              <Ionicons name="remove-circle" size={14} color={Colors.pinkAccentColor} />
-              <Text style={[
-                styles.recipeBadgeText,
-                styles.recipeBadgeTextSelected,
-              ]}>
+              <Ionicons
+                name="remove-circle"
+                size={14}
+                color={Colors.pinkAccentColor}
+              />
+              <Text
+                style={[styles.recipeBadgeText, styles.recipeBadgeTextSelected]}
+              >
                 Remove
               </Text>
             </>
           ) : isSelectedForAddition ? (
             <>
-              <Ionicons name="add-circle" size={14} color={Colors.successColor} />
-              <Text style={[
-                styles.recipeBadgeText,
-                styles.recipeBadgeTextAddition,
-              ]}>Add</Text>
+              <Ionicons
+                name="add-circle"
+                size={14}
+                color={Colors.successColor}
+              />
+              <Text
+                style={[styles.recipeBadgeText, styles.recipeBadgeTextAddition]}
+              >
+                Add
+              </Text>
             </>
           ) : (
             <>
-              <Ionicons name="checkmark-circle" size={14} color={Colors.primary} />
+              <Ionicons
+                name="checkmark-circle"
+                size={14}
+                color={Colors.primary}
+              />
               <Text style={styles.recipeBadgeText}>Included</Text>
             </>
           )}
         </View>
       )}
 
-      <View style={[
-        styles.imageWrapper,
-        { height: CARD_HEIGHT, borderRadius: CARD_RADIUS },
-        (isSelectedForRemoval || isSelectedForAddition) && styles.imageWrapperSelected,
-      ]}>
+      <View
+        style={[
+          styles.imageWrapper,
+          { height: CARD_HEIGHT, borderRadius: CARD_RADIUS },
+          (isSelectedForRemoval || isSelectedForAddition) &&
+          styles.imageWrapperSelected,
+        ]}
+      >
         {isRecentlyViewed ? (
           renderCollage()
         ) : (
@@ -164,23 +175,6 @@ export const CookbookCard: FC<CookbookCardProps> = ({
             )}
           </Pressable>
         )}
-        {item.members.length > 0 ? (
-          <View style={styles.avatarOverlay}>
-            {displayMembers.map((member, index) => (
-              <View key={member.id} style={[styles.avatarWrapper, index > 0 && styles.avatarOffset]}>
-                <ProfileIcon
-                  size={20}
-                  imageUrl={member.profilePictureUri || DEFAULT_AVATAR}
-                />
-              </View>
-            ))}
-            {extraCount > 0 ? (
-              <View style={[styles.avatarWrapper, styles.avatarOverflow, displayMembers.length > 0 && styles.avatarOffset]}>
-                <Text style={styles.avatarOverflowText}>{`+${extraCount}`}</Text>
-              </View>
-            ) : null}
-          </View>
-        ) : null}
       </View>
 
       <Pressable onPress={onPress} style={styles.textWrapper}>
@@ -215,29 +209,6 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
-  avatarOverlay: {
-    right: 10,
-    bottom: 10,
-    position: "absolute",
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  recentlyViewedGrid: {
-    flex: 1,
-    flexDirection: "row",
-    flexWrap: "wrap",
-  },
-  collageItem: {
-    width: "50%",
-    height: "50%",
-    overflow: "hidden",
-    borderColor: "#fff",
-    borderWidth: 0.5,
-  },
-  collageImage: {
-    width: "100%",
-    height: "100%",
-  },
   textWrapper: {
     paddingHorizontal: 10,
     paddingVertical: 10,
@@ -252,25 +223,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "400",
     color: "#555",
-  },
-  avatarWrapper: {
-    borderWidth: 2,
-    borderColor: "#fff",
-    borderRadius: 13,
-    overflow: "hidden",
-  },
-  avatarOffset: {
-    marginLeft: -8,
-  },
-  avatarOverflow: {
-    backgroundColor: "#e5e5e5",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  avatarOverflowText: {
-    fontSize: 10,
-    fontWeight: "600",
-    color: "#222",
   },
   deleteBadge: {
     position: "absolute",

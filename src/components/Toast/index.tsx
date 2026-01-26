@@ -9,7 +9,13 @@ interface ToastProps {
   icon?: React.ReactNode;
 }
 
-export const Toast: React.FC<ToastProps> = ({ visible, message, duration = 2500, onHide, icon }) => {
+export const Toast: React.FC<ToastProps> = ({
+  visible,
+  message,
+  duration = 2500,
+  onHide,
+  icon,
+}) => {
   const opacity = React.useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -69,13 +75,13 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   contentRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   iconContainer: {
     marginRight: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   messageContainer: {
     flex: 1,

@@ -1,10 +1,10 @@
 // External Dependencies
 import { memo } from "react";
 
+import { RecommendationOptionsButton } from "@/components/Recommendations/RecommendationOptionsButton";
+import { WishlistButtonWithCount } from "@/components/Wishlist/WishlistButtonWithCount";
 // Internal Dependencies
 import type { RecommendationListItem } from "@/libs/types";
-import { WishlistButtonWithCount } from "@/components/Wishlist/WishlistButtonWithCount";
-import { RecommendationOptionsButton } from "@/components/Recommendations/RecommendationOptionsButton";
 
 interface DefaultRecommendationItemActionsProps {
   item: RecommendationListItem;
@@ -19,11 +19,10 @@ export const DefaultRecommendationItemActions = memo(
         wishlistIds={item.wishlistIds ?? []}
         thumbnailUri={item.images?.[0]}
       />
-      <RecommendationOptionsButton 
-        recommendationSlug={slug} 
-      />
+      <RecommendationOptionsButton recommendationSlug={slug} />
     </>
   ),
 );
 
-DefaultRecommendationItemActions.displayName = "DefaultRecommendationItemActions";
+DefaultRecommendationItemActions.displayName =
+  "DefaultRecommendationItemActions";

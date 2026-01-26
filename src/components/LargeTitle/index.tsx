@@ -78,7 +78,9 @@ export const LargeTitle = forwardRef<Animated.View, LargeTitleProps>(
         onLayout={onLayout}
         style={[styles.titleContainer, animatedStyle]}
       >
-        <Animated.Text style={[styles.currentTitle, titleStyle]}>{currentTitle}</Animated.Text>
+        <Animated.Text style={[styles.currentTitle, titleStyle]}>
+          {currentTitle}
+        </Animated.Text>
         {previousTitle ? (
           <Animated.Text style={styles.previousTitle}>
             {`${previousTitle},`}

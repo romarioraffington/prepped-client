@@ -1,11 +1,18 @@
-// External Dependencies
-import { Image } from "expo-image";
-import { BlurView } from "expo-blur";
-import type { ComponentProps } from "react";
 import type BottomSheet from "@gorhom/bottom-sheet";
 import { useHeaderHeight } from "@react-navigation/elements";
-import { useLocalSearchParams, useRouter, useNavigation } from "expo-router";
-import { useEffect, useRef, useMemo, useCallback, useLayoutEffect, memo } from "react";
+import { BlurView } from "expo-blur";
+// External Dependencies
+import { Image } from "expo-image";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
+import type { ComponentProps } from "react";
+import {
+  memo,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+} from "react";
 
 import Animated, {
   withRepeat,
@@ -17,27 +24,27 @@ import Animated, {
 
 import {
   Feather,
-  Ionicons,
   FontAwesome6,
-  MaterialIcons,
+  Ionicons,
   MaterialCommunityIcons,
+  MaterialIcons,
 } from "@expo/vector-icons";
 
 import {
-  View,
-  Text,
   Alert,
-  Linking,
   FlatList,
-  StyleSheet,
+  Linking,
   Pressable,
+  StyleSheet,
+  Text,
   TouchableOpacity,
+  View,
 } from "react-native";
 
 // Internal Dependencies
 import { useImportDetails } from "@/api";
 import type { ImportRecommendation } from "@/libs/types";
-import { formatCompactNumber, parseSlug, createFullSlug } from "@/libs/utils";
+import { createFullSlug, formatCompactNumber, parseSlug } from "@/libs/utils";
 
 import {
   useLargeTitleCrossfade,
@@ -47,13 +54,13 @@ import {
 import { reportWarning } from "@/libs/utils/errorReporting";
 
 import {
-  LargeTitle,
-  ImageCarousel,
   EmptyImageState,
-  SwipeableWrapper,
+  ImageCarousel,
+  LargeTitle,
   RecipeOptionsSheet,
-  WishlistButtonWithCount,
   RecommendationOptionsButton,
+  SwipeableWrapper,
+  WishlistButtonWithCount,
 } from "@/components";
 
 type FontAwesome6IconName = ComponentProps<typeof FontAwesome6>["name"];
@@ -70,11 +77,7 @@ export default function RecipeDetails() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const { id } = parseSlug(slug);
 
-  const {
-    error,
-    isLoading,
-    data: importedData,
-  } = useImportDetails(slug || '');
+  const { error, isLoading, data: importedData } = useImportDetails(slug || "");
 
   // Get the title for the hook
   const title = importedData?.title || "";
@@ -145,14 +148,8 @@ export default function RecipeDetails() {
     return null;
   }
 
-  const {
-    asset,
-    author,
-    siteName,
-    likeCount,
-    viewCount,
-    sourceUri,
-  } = importedData || {};
+  const { asset, author, siteName, likeCount, viewCount, sourceUri } =
+    importedData || {};
 
   // Get the recommendations
   const recommendations = importedData?.recommendations || [];
@@ -160,7 +157,7 @@ export default function RecipeDetails() {
   // Check if recommendations are available and not loading
   const hasRecommendations = useMemo(
     () => recommendations.length > 0 && !isLoading,
-    [recommendations.length, isLoading]
+    [recommendations.length, isLoading],
   );
 
   // Memoize recipeOptionsData to avoid recreating object on every render
@@ -175,9 +172,10 @@ export default function RecipeDetails() {
       cookTime: 0,
       platformId: (importedData as any).platformId || 1,
       author: {
-        name: importedData.author?.name && importedData.author.name.trim() !== ""
-          ? importedData.author.name
-          : "",
+        name:
+          importedData.author?.name && importedData.author.name.trim() !== ""
+            ? importedData.author.name
+            : "",
         avatarUri: importedData.author?.photoUri || "",
         profileUri: importedData.author?.profileUri || "",
       },
@@ -229,105 +227,113 @@ export default function RecipeDetails() {
   }, [sourceUri]);
 
   // Memoize header to avoid re-renders on scroll
-  const renderHeader = useMemo(() => (
-    <View style={styles.header}>
-      {/* Large Title with dynamic crossfade */}
-      {title && (
-        <LargeTitle
-          ref={titleRef}
-          offsetY={offsetY}
-          currentTitle={title}
-          onLayout={measureTitle}
-          opacity={largeTitleOpacity}
-        />
-      )}
-
-      {/* Author */}
-      {author && (
-        <TouchableOpacity
-          style={styles.authorContainer}
-          onPress={handleAuthorPress}
-        >
-          {author?.photoUri && (
-            <Image
-              style={styles.authorAvatar}
-              source={{ uri: author?.photoUri }}
-            />
-          )}
-          {author?.name && (
-            <Text style={styles.authorName}>{author?.name}</Text>
-          )}
-        </TouchableOpacity>
-      )}
-
-      <View style={styles.metaContainer}>
-        {/* Views */}
-        {viewCount && (
-          <View style={styles.metaCountContainer}>
-            <Ionicons name="play" size={16} color="#667" />
-            <Text style={styles.metaCountText}>{formatCompactNumber(viewCount)}</Text>
-          </View>
+  const renderHeader = useMemo(
+    () => (
+      <View style={styles.header}>
+        {/* Large Title with dynamic crossfade */}
+        {title && (
+          <LargeTitle
+            ref={titleRef}
+            offsetY={offsetY}
+            currentTitle={title}
+            onLayout={measureTitle}
+            opacity={largeTitleOpacity}
+          />
         )}
 
-        {/* Likes */}
-        {likeCount && (
-          <View style={styles.metaCountContainer}>
-            <Ionicons name="heart" size={16} color="red" />
-            <Text style={styles.metaCountText}>
-              {formatCompactNumber(likeCount)}
-            </Text>
-          </View>
+        {/* Author */}
+        {author && (
+          <TouchableOpacity
+            style={styles.authorContainer}
+            onPress={handleAuthorPress}
+          >
+            {author?.photoUri && (
+              <Image
+                style={styles.authorAvatar}
+                source={{ uri: author?.photoUri }}
+              />
+            )}
+            {author?.name && (
+              <Text style={styles.authorName}>{author?.name}</Text>
+            )}
+          </TouchableOpacity>
         )}
 
-        {/* Social Platform */}
-        {isFromSocialPlatform && (
+        <View style={styles.metaContainer}>
+          {/* Views */}
+          {viewCount && (
+            <View style={styles.metaCountContainer}>
+              <Ionicons name="play" size={16} color="#667" />
+              <Text style={styles.metaCountText}>
+                {formatCompactNumber(viewCount)}
+              </Text>
+            </View>
+          )}
+
+          {/* Likes */}
+          {likeCount && (
+            <View style={styles.metaCountContainer}>
+              <Ionicons name="heart" size={16} color="red" />
+              <Text style={styles.metaCountText}>
+                {formatCompactNumber(likeCount)}
+              </Text>
+            </View>
+          )}
+
+          {/* Social Platform */}
+          {isFromSocialPlatform && (
+            <View style={styles.importContainer}>
+              <Text style={styles.metaCountText}>•</Text>
+              <FontAwesome6
+                size={14}
+                color="#000"
+                style={styles.headerSocialIcon}
+                name={getSocialPlatformIcon(siteName)}
+              />
+            </View>
+          )}
+        </View>
+
+        {/* Website link */}
+        {!isFromSocialPlatform && siteName && (
           <View style={styles.importContainer}>
-            <Text style={styles.metaCountText}>•</Text>
-            <FontAwesome6
-              size={14}
-              color="#000"
-              style={styles.headerSocialIcon}
-              name={getSocialPlatformIcon(siteName)}
-            />
+            <Text style={styles.metaCountText}> from </Text>
+            <TouchableOpacity onPress={handleAssetPress}>
+              <Text style={[styles.metaCountText, styles.linkText]}>
+                {siteName}
+              </Text>
+            </TouchableOpacity>
           </View>
         )}
       </View>
+    ),
+    [
+      title,
+      titleRef,
+      offsetY,
+      author,
+      siteName,
+      viewCount,
+      likeCount,
+      largeTitleOpacity,
+      isFromSocialPlatform,
+      measureTitle,
+      handleAssetPress,
+      handleAuthorPress,
+    ],
+  );
 
-      {/* Website link */}
-      {!isFromSocialPlatform && siteName && (
-        <View style={styles.importContainer}>
-          <Text style={styles.metaCountText}> from </Text>
-          <TouchableOpacity onPress={handleAssetPress}>
-            <Text style={[styles.metaCountText, styles.linkText]}>
-              {siteName}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      )}
-    </View>
-  ), [
-    title,
-    titleRef,
-    offsetY,
-    author,
-    siteName,
-    viewCount,
-    likeCount,
-    largeTitleOpacity,
-    isFromSocialPlatform,
-    measureTitle,
-    handleAssetPress,
-    handleAuthorPress,
-  ]);
-
-  const handlePlacePress = useCallback((place: ImportRecommendation) => {
-    router.push({
-      pathname: "/recommendations/[slug]",
-      params: {
-        slug: createFullSlug(place.title, place.id),
-      },
-    });
-  }, [router]);
+  const handlePlacePress = useCallback(
+    (place: ImportRecommendation) => {
+      router.push({
+        pathname: "/recommendations/[slug]",
+        params: {
+          slug: createFullSlug(place.title, place.id),
+        },
+      });
+    },
+    [router],
+  );
 
   // Memoize renderItem to avoid re-creations and VirtualizedList churn
   const renderItem = useCallback(
@@ -349,7 +355,6 @@ export default function RecipeDetails() {
     if (bottomSheetRef.current) {
       bottomSheetRef.current.close();
     }
-
   }, [router, slug, bottomSheetRef]);
 
   const handleMorePress = () => {
@@ -384,8 +389,10 @@ export default function RecipeDetails() {
             description="All recommendations have been deleted"
           />
         }
-        contentContainerStyle={[styles.scrollViewContentContainer, { paddingTop: contentPaddingTop }]}
-
+        contentContainerStyle={[
+          styles.scrollViewContentContainer,
+          { paddingTop: contentPaddingTop },
+        ]}
         // Performance optimizations
         windowSize={7}
         removeClippedSubviews
@@ -394,9 +401,7 @@ export default function RecipeDetails() {
       />
 
       {/* Floating Nav */}
-      <Animated.View
-        style={[styles.floatingNavContainer, fadeAnimatedStyle]}
-      >
+      <Animated.View style={[styles.floatingNavContainer, fadeAnimatedStyle]}>
         <BlurView intensity={5} tint="extraLight" style={styles.floatingNav}>
           <View style={styles.navContainer}>
             {/* Map */}
@@ -465,71 +470,65 @@ type ImportRecommendationItemProps = {
   recommendationSlug: string;
 };
 
-const ImportRecommendationItem = memo(({
-  item,
-  onPress,
-  recommendationSlug,
-}: ImportRecommendationItemProps) => {
-  const {
-    handleDelete,
-    isPending: isDeletePending,
-  } = useRecommendationDeleteHandler({
-    recommendationSlug,
-    recommendationName: item.title,
-    thumbnailUri: item.imageUris?.[0],
-  });
+const ImportRecommendationItem = memo(
+  ({ item, onPress, recommendationSlug }: ImportRecommendationItemProps) => {
+    const { handleDelete, isPending: isDeletePending } =
+      useRecommendationDeleteHandler({
+        recommendationSlug,
+        recommendationName: item.title,
+        thumbnailUri: item.imageUris?.[0],
+      });
 
-  const {
-    handlePress: handleAddToWishlist,
-    isPending: isWishlistPending,
-  } = useRecommendationWishlistHandler({
-    recommendationSlug,
-    thumbnailUri: item.imageUris?.[0],
-    wishlistIds: item.wishlistIds ?? [],
-  });
+    const { handlePress: handleAddToWishlist, isPending: isWishlistPending } =
+      useRecommendationWishlistHandler({
+        recommendationSlug,
+        thumbnailUri: item.imageUris?.[0],
+        wishlistIds: item.wishlistIds ?? [],
+      });
 
-  const isSwipePending = isDeletePending || isWishlistPending;
+    const isSwipePending = isDeletePending || isWishlistPending;
 
-  // Create title actions with wishlist and options buttons
-  const titleActions = (
-    <>
-      <WishlistButtonWithCount
-        size={18}
-        thumbnailUri={item.imageUris?.[0]}
-        wishlistIds={item.wishlistIds ?? []}
-        recommendationSlug={recommendationSlug}
-      />
-      <RecommendationOptionsButton
-        size={18}
-        orientation="vertical"
-        recommendationSlug={recommendationSlug}
-      />
-    </>
-  );
+    // Create title actions with wishlist and options buttons
+    const titleActions = (
+      <>
+        <WishlistButtonWithCount
+          size={18}
+          thumbnailUri={item.imageUris?.[0]}
+          wishlistIds={item.wishlistIds ?? []}
+          recommendationSlug={recommendationSlug}
+        />
+        <RecommendationOptionsButton
+          size={18}
+          orientation="vertical"
+          recommendationSlug={recommendationSlug}
+        />
+      </>
+    );
 
-  return (
-    <SwipeableWrapper
-      onSwipeLeft={handleDelete}
-      isPending={isSwipePending}
-      onSwipeRight={handleAddToWishlist}
-    >
-      <Pressable onPress={onPress}>
-        <View style={styles.placeContainer}>
-          <ImageCarousel imageUrls={item.imageUris} imageHeight={160} />
-          <View style={styles.placeInfo}>
-            <View style={styles.placeTitleRow}>
-              <Text style={styles.placeTitle} numberOfLines={1}>{item.title}</Text>
-              <View style={styles.placeTitleActions}>
-                {titleActions}
+    return (
+      <SwipeableWrapper
+        onSwipeLeft={handleDelete}
+        isPending={isSwipePending}
+        onSwipeRight={handleAddToWishlist}
+      >
+        <Pressable onPress={onPress}>
+          <View style={styles.placeContainer}>
+            <ImageCarousel imageUrls={item.imageUris} imageHeight={160} />
+            <View style={styles.placeInfo}>
+              <View style={styles.placeTitleRow}>
+                <Text style={styles.placeTitle} numberOfLines={1}>
+                  {item.title}
+                </Text>
+                <View style={styles.placeTitleActions}>{titleActions}</View>
               </View>
+              <Text style={styles.subtitle}>{item.editorialSummary}</Text>
             </View>
-            <Text style={styles.subtitle}>{item.editorialSummary}</Text>
           </View>
-        </View>
-      </Pressable>
-    </SwipeableWrapper>
-  );
-});
+        </Pressable>
+      </SwipeableWrapper>
+    );
+  },
+);
 
 // Loading skeleton component
 const LoadingImportDetails = () => {
@@ -541,10 +540,10 @@ const LoadingImportDetails = () => {
     opacity.value = withRepeat(
       withSequence(
         withTiming(0.7, { duration: 1000 }),
-        withTiming(0.3, { duration: 1000 })
+        withTiming(0.3, { duration: 1000 }),
       ),
       -1,
-      true
+      true,
     );
   }, []);
 
@@ -574,7 +573,9 @@ const LoadingImportDetails = () => {
   );
 
   // Create skeleton data for FlatList
-  const skeletonData = [...Array(4)].map((_, index) => ({ id: `skeleton-${index}` }));
+  const skeletonData = [...Array(4)].map((_, index) => ({
+    id: `skeleton-${index}`,
+  }));
 
   // Render skeleton item
   const renderSkeletonItem = () => (
@@ -583,10 +584,7 @@ const LoadingImportDetails = () => {
         {[...Array(3)].map((_, index) => (
           <Animated.View
             key={index}
-            style={[
-              styles.skeletonImage,
-              animatedStyle
-            ]}
+            style={[styles.skeletonImage, animatedStyle]}
           />
         ))}
       </View>
@@ -605,7 +603,10 @@ const LoadingImportDetails = () => {
       keyExtractor={(item) => item.id}
       showsVerticalScrollIndicator={false}
       ListHeaderComponent={renderHeaderSkeleton}
-      contentContainerStyle={[styles.scrollViewContentContainer, { paddingTop: contentPaddingTop }]}
+      contentContainerStyle={[
+        styles.scrollViewContentContainer,
+        { paddingTop: contentPaddingTop },
+      ]}
     />
   );
 };
@@ -826,35 +827,35 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginBottom: 5,
     width: "80%",
-    backgroundColor: '#E1E1E1',
+    backgroundColor: "#E1E1E1",
   },
   loadingAuthorContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
   },
   skeletonAvatar: {
     width: 24,
     height: 24,
     borderRadius: 20,
-    backgroundColor: '#E1E1E1',
+    backgroundColor: "#E1E1E1",
   },
   skeletonAuthorName: {
     height: 16,
     width: 100,
-    backgroundColor: '#E1E1E1',
+    backgroundColor: "#E1E1E1",
     borderRadius: 20,
   },
   loadingMetaContainer: {
     gap: 5,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   skeletonMetaItem: {
     height: 14,
     width: 60,
     borderRadius: 10,
-    backgroundColor: '#E1E1E1',
+    backgroundColor: "#E1E1E1",
   },
   loadingPlaceContainer: {
     flex: 1,
@@ -862,31 +863,31 @@ const styles = StyleSheet.create({
   },
   imageCarouselContainer: {
     height: 160,
-    flexDirection: 'row',
+    flexDirection: "row",
   },
   skeletonImage: {
     height: 160,
     width: 200,
     marginRight: 5,
     borderRadius: 8,
-    backgroundColor: '#E1E1E1',
+    backgroundColor: "#E1E1E1",
   },
   loadingPlaceInfo: {
     paddingVertical: 12,
-    alignItems: 'flex-start',
+    alignItems: "flex-start",
   },
   skeletonPlaceTitle: {
     height: 16,
-    width: '40%',
+    width: "40%",
     borderRadius: 10,
     marginBottom: 4,
-    backgroundColor: '#E1E1E1',
+    backgroundColor: "#E1E1E1",
   },
   skeletonPlaceSubtitle: {
     height: 14,
-    width: '80%',
-    backgroundColor: '#E1E1E1',
-    borderRadius: 10
+    width: "80%",
+    backgroundColor: "#E1E1E1",
+    borderRadius: 10,
   },
 
   // Header Right

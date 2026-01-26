@@ -1,44 +1,65 @@
+import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
+import type { default as BottomSheet } from "@gorhom/bottom-sheet";
+import { useHeaderHeight } from "@react-navigation/elements";
 // External Dependencies
 import * as Haptics from "expo-haptics";
-import { useHeaderHeight } from "@react-navigation/elements";
-import { Ionicons, Feather, MaterialIcons } from "@expo/vector-icons";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import type { default as BottomSheet } from "@gorhom/bottom-sheet";
 import { router, useLocalSearchParams, useNavigation } from "expo-router";
-import { Alert, Platform, StyleSheet, Text, View, TouchableOpacity } from "react-native";
-import React, { useRef, useState, useMemo, forwardRef, useLayoutEffect, useCallback, useEffect } from "react";
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing, type SharedValue } from "react-native-reanimated";
+import React, {
+  useRef,
+  useState,
+  useMemo,
+  forwardRef,
+  useLayoutEffect,
+  useCallback,
+  useEffect,
+} from "react";
+import {
+  Alert,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withTiming,
+  Easing,
+  type SharedValue,
+} from "react-native-reanimated";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useLargeTitleCrossfade } from "@/hooks";
+import { COLLECTION_TYPE, Colors } from "@/libs/constants";
 // Internal Dependencies
 import type { Recipe } from "@/libs/types";
-import { useLargeTitleCrossfade } from "@/hooks";
 import { createShortSlug, parseSlug } from "@/libs/utils";
-import { Colors, COLLECTION_TYPE } from "@/libs/constants";
 
 import {
+  AddToCookbookSheet,
+  CookbookOptionsSheet,
   LargeTitle,
+  LoadingStaggeredGrid,
+  PinterestRefreshIndicator,
   RecipeCard,
+  RecipeOptionsSheet,
   StaggeredGrid,
   WithPullToRefresh,
-  RecipeOptionsSheet,
-  LoadingStaggeredGrid,
-  CookbookOptionsSheet,
-  AddToCookbookSheet,
-  PinterestRefreshIndicator,
 } from "@/components";
 
 // API
 import {
-  useCookbookDetails,
-  useBulkRemoveRecipesFromCookbookMutation,
   useBulkDeleteRecipesMutation,
+  useBulkRemoveRecipesFromCookbookMutation,
+  useCookbookDetails,
 } from "@/api";
 
 // Contexts
 import { useActionToast } from "@/contexts";
 
 // Stable noop function for fallback (prevents creating new functions on every render)
-const noop = () => { };
+const noop = () => {};
 
 export default function CookbookDetails() {
   const navigation = useNavigation();
@@ -51,7 +72,9 @@ export default function CookbookDetails() {
 
   // Bulk edit mode state
   const [isBulkEditMode, setIsBulkEditMode] = useState(false);
-  const [selectedRecipeIds, setSelectedRecipeIds] = useState<Set<string>>(new Set());
+  const [selectedRecipeIds, setSelectedRecipeIds] = useState<Set<string>>(
+    new Set(),
+  );
   const cookbookOptionsSheetRef = useRef<BottomSheet | null>(null);
   const [isOptionsSheetOpen, setIsOptionsSheetOpen] = useState(false);
 
@@ -66,24 +89,16 @@ export default function CookbookDetails() {
   const { showToast } = useActionToast();
 
   // Bulk operation mutations
-  const {
-    mutateAsync: bulkRemoveRecipesAsync,
-    isPending: isRemovePending,
-  } = useBulkRemoveRecipesFromCookbookMutation();
+  const { mutateAsync: bulkRemoveRecipesAsync, isPending: isRemovePending } =
+    useBulkRemoveRecipesFromCookbookMutation();
 
-  const {
-    mutateAsync: bulkDeleteRecipesAsync,
-    isPending: isDeletePending,
-  } = useBulkDeleteRecipesMutation();
+  const { mutateAsync: bulkDeleteRecipesAsync, isPending: isDeletePending } =
+    useBulkDeleteRecipesMutation();
 
   // Calculate bottom padding: safe area bottom + extra space for comfortable scrolling
   const contentBottomPadding = insets.bottom + 20;
 
-  const {
-    data,
-    refetch,
-    isLoading,
-  } = useCookbookDetails(cookbookId);
+  const { data, refetch, isLoading } = useCookbookDetails(cookbookId);
 
   // Footer animation - starts off-screen (100 = hidden below screen)
   const footerTranslateY = useSharedValue(100);
@@ -258,56 +273,53 @@ export default function CookbookDetails() {
 
   // Memoize headerRight component to prevent unnecessary recreations
   // Show "Done" button in bulk edit mode, otherwise show edit/options button
-  const HeaderRightComponent = useMemo(
-    () => {
-      // In bulk edit mode, show "Done" button
-      if (isBulkEditMode) {
-        return (
-          <View style={styles.headerRightContainer}>
-            <TouchableOpacity
-              style={styles.headerOptionsButton}
-              onPress={handleDonePress}
-            >
-              <Text style={styles.headerDoneButtonText}>Done</Text>
-            </TouchableOpacity>
-          </View>
-        );
-      }
-
-      // Show edit button for UNORGANIZED collections
-      if (collectionType === COLLECTION_TYPE.UNORGANIZED) {
-        return (
-          <View style={styles.headerRightContainer}>
-            <TouchableOpacity
-              style={styles.headerOptionsButton}
-              onPress={handleEditPress}
-            >
-              <Text style={styles.headerOptionsButtonText}>Edit</Text>
-            </TouchableOpacity>
-          </View>
-        );
-      }
-
-      // Show options button for organized collections
+  const HeaderRightComponent = useMemo(() => {
+    // In bulk edit mode, show "Done" button
+    if (isBulkEditMode) {
       return (
         <View style={styles.headerRightContainer}>
           <TouchableOpacity
             style={styles.headerOptionsButton}
-            onPress={handleOptionsPress}
+            onPress={handleDonePress}
           >
-            <Ionicons name="ellipsis-horizontal" size={20} color="#667" />
+            <Text style={styles.headerDoneButtonText}>Done</Text>
           </TouchableOpacity>
         </View>
       );
-    },
-    [
-      handleOptionsPress,
-      handleEditPress,
-      handleDonePress,
-      collectionType,
-      isBulkEditMode,
-    ],
-  );
+    }
+
+    // Show edit button for UNORGANIZED collections
+    if (collectionType === COLLECTION_TYPE.UNORGANIZED) {
+      return (
+        <View style={styles.headerRightContainer}>
+          <TouchableOpacity
+            style={styles.headerOptionsButton}
+            onPress={handleEditPress}
+          >
+            <Text style={styles.headerOptionsButtonText}>Edit</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+
+    // Show options button for organized collections
+    return (
+      <View style={styles.headerRightContainer}>
+        <TouchableOpacity
+          style={styles.headerOptionsButton}
+          onPress={handleOptionsPress}
+        >
+          <Ionicons name="ellipsis-horizontal" size={20} color="#667" />
+        </TouchableOpacity>
+      </View>
+    );
+  }, [
+    handleOptionsPress,
+    handleEditPress,
+    handleDonePress,
+    collectionType,
+    isBulkEditMode,
+  ]);
 
   // Single setOptions call using hook-provided options
   useLayoutEffect(() => {
@@ -334,12 +346,9 @@ export default function CookbookDetails() {
   }, []);
 
   // Handle menu press - open options sheet for the selected recipe
-  const handleMenuPress = useCallback(
-    (recipe: Recipe) => {
-      setSelectedRecipe(recipe);
-    },
-    [],
-  );
+  const handleMenuPress = useCallback((recipe: Recipe) => {
+    setSelectedRecipe(recipe);
+  }, []);
 
   // Open bottom sheet when recipe is selected
   useEffect(() => {
@@ -381,21 +390,29 @@ export default function CookbookDetails() {
             bulkRemoveRecipesAsync({ cookbookId, recipeIds })
               .then(() => {
                 // Haptic feedback for success
-                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                Haptics.notificationAsync(
+                  Haptics.NotificationFeedbackType.Success,
+                );
 
                 // Show success toast
                 showToast({
                   text: `Removed ${recipeCount} ${recipeText}`,
                   icon: (
-                    <View style={{
-                      width: 45,
-                      height: 45,
-                      borderRadius: 8,
-                      alignItems: "center",
-                      justifyContent: "center",
-                      backgroundColor: "rgba(255, 59, 48, 0.12)",
-                    }}>
-                      <MaterialIcons name="bookmark-remove" size={22} color={Colors.destructive} />
+                    <View
+                      style={{
+                        width: 45,
+                        height: 45,
+                        borderRadius: 8,
+                        alignItems: "center",
+                        justifyContent: "center",
+                        backgroundColor: "rgba(255, 59, 48, 0.12)",
+                      }}
+                    >
+                      <MaterialIcons
+                        name="bookmark-remove"
+                        size={22}
+                        color={Colors.destructive}
+                      />
                     </View>
                   ),
                 });
@@ -405,12 +422,15 @@ export default function CookbookDetails() {
               })
               .catch((error) => {
                 // Haptic feedback for error
-                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+                Haptics.notificationAsync(
+                  Haptics.NotificationFeedbackType.Error,
+                );
 
                 // Show error alert
                 Alert.alert(
                   "Oops!",
-                  error?.message || "Failed to remove recipes from cookbook. Please try again.",
+                  error?.message ||
+                    "Failed to remove recipes from cookbook. Please try again.",
                   [{ text: "OK" }],
                 );
               });
@@ -451,14 +471,29 @@ export default function CookbookDetails() {
             bulkDeleteRecipesAsync(recipeIds)
               .then(() => {
                 // Haptic feedback for success
-                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                Haptics.notificationAsync(
+                  Haptics.NotificationFeedbackType.Success,
+                );
 
                 // Show success toast
                 showToast({
                   text: `Deleted ${recipeCount} ${recipeText}`,
                   icon: (
-                    <View style={{ backgroundColor: "rgba(255, 59, 48, 0.12)", borderRadius: 8, width: 45, height: 45, alignItems: "center", justifyContent: "center" }}>
-                      <MaterialIcons name="bookmark-remove" size={22} color={Colors.destructive} />
+                    <View
+                      style={{
+                        backgroundColor: "rgba(255, 59, 48, 0.12)",
+                        borderRadius: 8,
+                        width: 45,
+                        height: 45,
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <MaterialIcons
+                        name="bookmark-remove"
+                        size={22}
+                        color={Colors.destructive}
+                      />
                     </View>
                   ),
                 });
@@ -468,12 +503,15 @@ export default function CookbookDetails() {
               })
               .catch((error) => {
                 // Haptic feedback for error
-                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+                Haptics.notificationAsync(
+                  Haptics.NotificationFeedbackType.Error,
+                );
 
                 // Show error alert
                 Alert.alert(
                   "Oops!",
-                  error?.message || "Failed to delete recipes. Please try again.",
+                  error?.message ||
+                    "Failed to delete recipes. Please try again.",
                   [{ text: "OK" }],
                 );
               });
@@ -582,39 +620,90 @@ export default function CookbookDetails() {
 
       {/* Bulk Edit Footer */}
       <Animated.View
-        style={[styles.bulkEditFooter, { paddingBottom: insets.bottom }, footerAnimatedStyle]}
+        style={[
+          styles.bulkEditFooter,
+          { paddingBottom: insets.bottom },
+          footerAnimatedStyle,
+        ]}
         pointerEvents={isBulkEditMode ? "auto" : "none"}
       >
         <View style={styles.bulkEditButtonRow}>
           <TouchableOpacity
-            style={[styles.bulkEditButton, (!hasSelections || isMutationPending) && styles.bulkEditButtonDisabled]}
+            style={[
+              styles.bulkEditButton,
+              (!hasSelections || isMutationPending) &&
+                styles.bulkEditButtonDisabled,
+            ]}
             onPress={handleBulkAdd}
             disabled={!hasSelections || isMutationPending}
           >
-            <MaterialIcons name="bookmark-add" size={25} color={hasSelections && !isMutationPending ? "#667" : "#999"} />
-            <Text style={[styles.bulkEditButtonText, (!hasSelections || isMutationPending) && styles.bulkEditButtonTextDisabled]}>
+            <MaterialIcons
+              name="bookmark-add"
+              size={25}
+              color={hasSelections && !isMutationPending ? "#667" : "#999"}
+            />
+            <Text
+              style={[
+                styles.bulkEditButtonText,
+                (!hasSelections || isMutationPending) &&
+                  styles.bulkEditButtonTextDisabled,
+              ]}
+            >
               Add
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.bulkEditButton, (!hasSelections || isMutationPending) && styles.bulkEditButtonDisabled]}
+            style={[
+              styles.bulkEditButton,
+              (!hasSelections || isMutationPending) &&
+                styles.bulkEditButtonDisabled,
+            ]}
             onPress={handleBulkRemove}
             disabled={!hasSelections || isMutationPending}
           >
-            <MaterialIcons name="bookmark-remove" size={24} color={hasSelections && !isMutationPending ? "#667" : "#999"} />
-            <Text style={[styles.bulkEditButtonText, (!hasSelections || isMutationPending) && styles.bulkEditButtonTextDisabled]}>
+            <MaterialIcons
+              name="bookmark-remove"
+              size={24}
+              color={hasSelections && !isMutationPending ? "#667" : "#999"}
+            />
+            <Text
+              style={[
+                styles.bulkEditButtonText,
+                (!hasSelections || isMutationPending) &&
+                  styles.bulkEditButtonTextDisabled,
+              ]}
+            >
               Remove
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[styles.bulkEditButton, (!hasSelections || isMutationPending) && styles.bulkEditButtonDisabled]}
+            style={[
+              styles.bulkEditButton,
+              (!hasSelections || isMutationPending) &&
+                styles.bulkEditButtonDisabled,
+            ]}
             onPress={handleBulkDelete}
             disabled={!hasSelections || isMutationPending}
           >
-            <Ionicons name="trash-outline" size={20} color={hasSelections && !isMutationPending ? Colors.destructive : "#999"} />
-            <Text style={[styles.bulkEditButtonText, styles.bulkEditButtonTextDestructive, (!hasSelections || isMutationPending) && styles.bulkEditButtonTextDisabled]}>
+            <Ionicons
+              name="trash-outline"
+              size={20}
+              color={
+                hasSelections && !isMutationPending
+                  ? Colors.destructive
+                  : "#999"
+              }
+            />
+            <Text
+              style={[
+                styles.bulkEditButtonText,
+                styles.bulkEditButtonTextDestructive,
+                (!hasSelections || isMutationPending) &&
+                  styles.bulkEditButtonTextDisabled,
+              ]}
+            >
               Delete
             </Text>
           </TouchableOpacity>
@@ -719,7 +808,8 @@ const CookbookHeader = forwardRef<Animated.View, CookbookHeaderProps>(
                 <>
                   <Text style={styles.metadataSeparator}> • </Text>
                   <Text style={styles.metadataTextSelected}>
-                    {selectedCount} {selectedCount === 1 ? "item" : "items"} selected
+                    {selectedCount} {selectedCount === 1 ? "item" : "items"}{" "}
+                    selected
                   </Text>
                 </>
               )}
@@ -788,7 +878,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 6,
     marginRight: 6,
-    backgroundColor: 'rgba(234, 88, 12, 0.8)',
+    backgroundColor: "rgba(234, 88, 12, 0.8)",
   },
   cookbookBadgeText: {
     fontFamily: Platform.select({

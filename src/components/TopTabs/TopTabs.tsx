@@ -1,11 +1,21 @@
-// External Imports
-import { useAnimatedReaction, type SharedValue, runOnJS } from "react-native-reanimated";
 import React, { type FC, type RefObject, useState, useCallback } from "react";
-import { Dimensions, type FlatList, View, StyleSheet, type LayoutChangeEvent } from "react-native";
+import {
+  Dimensions,
+  type FlatList,
+  type LayoutChangeEvent,
+  StyleSheet,
+  View,
+} from "react-native";
+// External Imports
+import {
+  type SharedValue,
+  runOnJS,
+  useAnimatedReaction,
+} from "react-native-reanimated";
 
+import { TabIndicator } from "./TabIndicator";
 // Internal Imports
 import { TabItem } from "./TabItem";
-import { TabIndicator } from "./TabIndicator";
 
 export type TabData = { label: string; value: number };
 export type TabsData = TabData[];
@@ -34,7 +44,9 @@ export const TopTabs: FC<Props> = ({
   >(new Array(tabs.length).fill({ width: 0, x: 0 }));
 
   // Track active tab index in React state for re-renders
-  const [currentActiveIndex, setCurrentActiveIndex] = useState(activeTabIndex.value);
+  const [currentActiveIndex, setCurrentActiveIndex] = useState(
+    activeTabIndex.value,
+  );
 
   // Sync shared value changes to React state
   useAnimatedReaction(
@@ -44,7 +56,7 @@ export const TopTabs: FC<Props> = ({
         runOnJS(setCurrentActiveIndex)(current);
       }
     },
-    [activeTabIndex]
+    [activeTabIndex],
   );
 
   const handleTabLayout = useCallback(
@@ -56,7 +68,7 @@ export const TopTabs: FC<Props> = ({
         return updated;
       });
     },
-    []
+    [],
   );
 
   const handleTabPress = useCallback(
@@ -72,7 +84,7 @@ export const TopTabs: FC<Props> = ({
         });
       }
     },
-    [activeTabIndex, horizontalListRef, onTabPress]
+    [activeTabIndex, horizontalListRef, onTabPress],
   );
 
   return (

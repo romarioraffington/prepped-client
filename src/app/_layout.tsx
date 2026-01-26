@@ -1,24 +1,40 @@
+import * as Sentry from "@sentry/react-native";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 // External Dependencies
-import { isRunningInExpoGo } from 'expo';
-import Constants from 'expo-constants';
-import { useEffect, useState } from 'react';
-import { Host } from 'react-native-portalize';
-import * as Sentry from '@sentry/react-native';
-import * as SplashScreen from 'expo-splash-screen';
-import { ShareIntentProvider } from 'expo-share-intent';
-import { StyleSheet, View, ActivityIndicator } from 'react-native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { Stack, useNavigationContainerRef, useRouter, useSegments } from 'expo-router';
+import { isRunningInExpoGo } from "expo";
+import Constants from "expo-constants";
+import {
+  Stack,
+  useNavigationContainerRef,
+  useRouter,
+  useSegments,
+} from "expo-router";
+import { ShareIntentProvider } from "expo-share-intent";
+import * as SplashScreen from "expo-splash-screen";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { Host } from "react-native-portalize";
 
 // Internal Dependencies
-import { useImportQuota } from '@/api';
-import { useAppUpdates } from '@/hooks';
-import { reportWarning } from '@/libs/utils';
-import { hasHomeButton, isIPad } from '@/libs/utils/platform';
-import { setupConsoleErrorInterceptor } from '@/libs/utils/consoleInterceptor';
-import { ImportProgressManager, ShareIntentHandler, ErrorFallback, ActionToast } from '@/components';
-import { ImportProgressProvider, AuthProvider, SubscriptionProvider, ActionToastProvider, useAuth } from '@/contexts';
+import { useImportQuota } from "@/api";
+import {
+  ActionToast,
+  ErrorFallback,
+  ImportProgressManager,
+  ShareIntentHandler,
+} from "@/components";
+import {
+  ActionToastProvider,
+  AuthProvider,
+  ImportProgressProvider,
+  SubscriptionProvider,
+  useAuth,
+} from "@/contexts";
+import { useAppUpdates } from "@/hooks";
+import { reportWarning } from "@/libs/utils";
+import { setupConsoleErrorInterceptor } from "@/libs/utils/consoleInterceptor";
+import { hasHomeButton, isIPad } from "@/libs/utils/platform";
 
 // Get environment configuration
 const isDev = __DEV__;
@@ -29,7 +45,7 @@ if (!isDev) {
     dsn: Constants.expoConfig?.extra?.SENTRY_DSN,
 
     // Environment configuration
-    environment: 'production',
+    environment: "production",
 
     // Adds more context data to events (IP address, cookies, user, etc.)
     // For more information, visit: https://docs.sentry.io/platforms/react-native/data-management/data-collected/
@@ -45,9 +61,7 @@ if (!isDev) {
     // Configure Session Replay
     replaysSessionSampleRate: 0.1,
     replaysOnErrorSampleRate: 1.0,
-    integrations: [
-      Sentry.mobileReplayIntegration(),
-    ],
+    integrations: [Sentry.mobileReplayIntegration()],
 
     // uncomment the line below to enable Spotlight (https://spotlightjs.com)
     // spotlight: __DEV__,
@@ -83,16 +97,16 @@ const queryClient = new QueryClient({
   },
 });
 
-
 const navigationIntegration = !isDev
   ? Sentry.reactNavigationIntegration({
-    enableTimeToInitialDisplay: !isRunningInExpoGo(),
-  })
+      enableTimeToInitialDisplay: !isRunningInExpoGo(),
+    })
   : null;
 
 export default function HomeLayout() {
   const ref = useNavigationContainerRef();
-  const { isUpdateAvailable, isUpdatePending, fetchAndReload } = useAppUpdates();
+  const { isUpdateAvailable, isUpdatePending, fetchAndReload } =
+    useAppUpdates();
 
   // Handle splash screen hide with cleanup
   useEffect(() => {
@@ -116,11 +130,14 @@ export default function HomeLayout() {
       fetchAndReload().catch((error) => {
         // If automatic update fails, the error is handled in the hook
         // The app will continue running, allowing for manual retry if needed
-        reportWarning('Automatic update failed, app will continue with current version', {
-          component: 'RootLayout',
-          action: 'Automatic Update',
-          extra: { error },
-        });
+        reportWarning(
+          "Automatic update failed, app will continue with current version",
+          {
+            component: "RootLayout",
+            action: "Automatic Update",
+            extra: { error },
+          },
+        );
       });
     }
   }, [isUpdateAvailable, isUpdatePending, fetchAndReload]);
@@ -167,7 +184,7 @@ export default function HomeLayout() {
           <ErrorFallback error={error as Error} resetError={resetError} />
         )}
         beforeCapture={(scope) => {
-          scope.setTag('errorBoundary', 'root');
+          scope.setTag("errorBoundary", "root");
         }}
       >
         {content}
@@ -198,9 +215,9 @@ function RootLayoutNavigator() {
         // iPhone X and newer devices: use larger modal (56% of screen)
         setModalDetent(hasButton || isIPad() ? 0.56 : 0.42);
       } catch (error) {
-        reportWarning('Error detecting device type', {
-          component: 'ModalConfigScreen',
-          action: 'Load Detent',
+        reportWarning("Error detecting device type", {
+          component: "ModalConfigScreen",
+          action: "Load Detent",
           extra: { error },
         });
         // Keep default value (0.42) if detection fails
@@ -263,28 +280,28 @@ function RootLayoutNavigator() {
         headerShown: false,
         headerTransparent: true,
         headerShadowVisible: false,
-      }}>
+      }}
+    >
       <Stack.Screen name="(navigation)" />
-      <Stack.Screen name="recommendations"
-      />
+      <Stack.Screen name="recommendations" />
       <Stack.Screen
         name="feedback"
         options={{
-          presentation: 'fullScreenModal',
+          presentation: "fullScreenModal",
         }}
       />
       <Stack.Screen
         name="(paywall)"
         options={{
           headerShown: false,
-          presentation: 'fullScreenModal',
+          presentation: "fullScreenModal",
         }}
       />
       <Stack.Screen
         name="(modal)/create/index"
         options={{
           sheetCornerRadius: 20,
-          presentation: 'formSheet',
+          presentation: "formSheet",
           sheetAllowedDetents: [modalDetent],
         }}
       />
@@ -293,7 +310,7 @@ function RootLayoutNavigator() {
         options={{
           headerShown: false,
           sheetCornerRadius: 30,
-          presentation: 'formSheet',
+          presentation: "formSheet",
           sheetAllowedDetents: [0.34],
         }}
       />
@@ -301,13 +318,13 @@ function RootLayoutNavigator() {
         name="(modal)/manage-cookbooks/index"
         options={{
           headerShown: false,
-          presentation: 'modal',
+          presentation: "modal",
         }}
       />
       <Stack.Screen
         name="login"
         options={{
-          headerShown: false
+          headerShown: false,
         }}
       />
     </Stack>
@@ -317,12 +334,12 @@ function RootLayoutNavigator() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    height: '100%',
+    height: "100%",
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#fff',
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
   },
 });

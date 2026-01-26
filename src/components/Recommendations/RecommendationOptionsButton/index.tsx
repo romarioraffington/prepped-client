@@ -1,12 +1,12 @@
+import { Ionicons } from "@expo/vector-icons";
+import type { default as BottomSheet } from "@gorhom/bottom-sheet";
+import { BlurView } from "expo-blur";
+import { isLiquidGlassAvailable } from "expo-glass-effect";
+import * as Haptics from "expo-haptics";
 // External Dependencies
 import type React from "react";
-import { BlurView } from "expo-blur";
-import * as Haptics from "expo-haptics";
-import { Ionicons } from "@expo/vector-icons";
-import { useRef, useCallback, useState } from "react";
-import { isLiquidGlassAvailable } from "expo-glass-effect";
+import { useCallback, useRef, useState } from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
-import type { default as BottomSheet } from "@gorhom/bottom-sheet";
 
 // Internal Dependencies
 import { RecommendationOptionsSheet } from "@/components/Recommendations/RecommendationOptionsSheet";
@@ -20,7 +20,9 @@ export interface RecommendationOptionsButtonProps {
   orientation?: "horizontal" | "vertical";
 }
 
-export const RecommendationOptionsButton: React.FC<RecommendationOptionsButtonProps> = ({
+export const RecommendationOptionsButton: React.FC<
+  RecommendationOptionsButtonProps
+> = ({
   onPress,
   size = 18,
   showBlur = false,
@@ -52,7 +54,8 @@ export const RecommendationOptionsButton: React.FC<RecommendationOptionsButtonPr
   const blurIntensity = !isScrolled ? 80 : 0;
   const useBlur = showBlur ?? !isLiquidGlassAvailable();
   const iconSize = size ?? (isLiquidGlassAvailable() ? 20 : 18);
-  const iconName = orientation === "vertical" ? "ellipsis-vertical" : "ellipsis-horizontal";
+  const iconName =
+    orientation === "vertical" ? "ellipsis-vertical" : "ellipsis-horizontal";
 
   return (
     <>
@@ -64,7 +67,7 @@ export const RecommendationOptionsButton: React.FC<RecommendationOptionsButtonPr
             !isScrolled && {
               paddingVertical: 10,
               paddingHorizontal: 10,
-            }
+            },
           ]}
           hitSlop={{ top: 20, bottom: 20, left: 20, right: 20 }}
         >
@@ -105,4 +108,3 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 });
-

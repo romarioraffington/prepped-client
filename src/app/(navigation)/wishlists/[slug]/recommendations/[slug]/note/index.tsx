@@ -1,12 +1,12 @@
+import * as Haptics from "expo-haptics";
+import { router, useLocalSearchParams } from "expo-router";
 // External Dependencies
 import { Alert } from "react-native";
-import * as Haptics from "expo-haptics";
-import { useLocalSearchParams, router } from "expo-router";
 
+import { useCreateNoteMutation } from "@/api/wishlist/note";
 // Internal Dependencies
 import { NoteForm } from "@/components/Notes";
 import { reportError } from "@/libs/utils/errorReporting";
-import { useCreateNoteMutation } from "@/api/wishlist/note";
 
 type CreateNoteParams = {
   wishlistSlug: string;
@@ -15,7 +15,8 @@ type CreateNoteParams = {
 
 export default function CreateNote() {
   const { mutate: createNote, isPending } = useCreateNoteMutation();
-  const { wishlistSlug, recommendationSlug } = useLocalSearchParams<CreateNoteParams>();
+  const { wishlistSlug, recommendationSlug } =
+    useLocalSearchParams<CreateNoteParams>();
 
   const handleSave = async (noteText: string) => {
     console.log("handleSave", noteText);
@@ -44,11 +45,9 @@ export default function CreateNote() {
               action: "Create Note",
               extra: { wishlistSlug, recommendationSlug },
             });
-            Alert.alert(
-              "Oops!",
-              "Failed to create note. Please try again.",
-              [{ text: "OK" }],
-            );
+            Alert.alert("Oops!", "Failed to create note. Please try again.", [
+              { text: "OK" },
+            ]);
             reject(error);
           },
         },

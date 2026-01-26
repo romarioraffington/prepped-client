@@ -1,7 +1,15 @@
+import { Ionicons } from "@expo/vector-icons";
 // External Dependencies
 import type React from "react";
-import { Ionicons } from "@expo/vector-icons";
-import { View, Text, Image, StyleSheet, ScrollView, type ImageSourcePropType, type RefreshControlProps } from "react-native";
+import {
+  Image,
+  type ImageSourcePropType,
+  type RefreshControlProps,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 interface EmptyImageStateProps {
   title?: string;
@@ -25,14 +33,10 @@ export const EmptyImageState: React.FC<EmptyImageStateProps> = ({
       {/* Art Grid Background or Single Image */}
       {imageUri ? (
         <View style={styles.singleImageContainer}>
-          <Image
-            source={imageUri}
-            style={styles.singleImage}
-          />
+          <Image source={imageUri} style={styles.singleImage} />
         </View>
       ) : (
         <View style={[styles.artGrid, { height: imageHeight }]}>
-
           {/* Left column*/}
           <View style={styles.artLeftColumn}>
             <View>
@@ -42,7 +46,12 @@ export const EmptyImageState: React.FC<EmptyImageStateProps> = ({
               />
               {showPlayIcons && (
                 <View style={[styles.overlay, styles.overlayLeftTop]}>
-                  <Ionicons style={{ opacity: 0.8 }} name="play-circle" size={28} color="white" />
+                  <Ionicons
+                    style={{ opacity: 0.8 }}
+                    name="play-circle"
+                    size={28}
+                    color="white"
+                  />
                 </View>
               )}
             </View>
@@ -53,7 +62,12 @@ export const EmptyImageState: React.FC<EmptyImageStateProps> = ({
               />
               {showPlayIcons && (
                 <View style={[styles.overlay, styles.overlayLeftBottom]}>
-                  <Ionicons style={{ opacity: 0.8 }} name="play-circle" size={25} color="white" />
+                  <Ionicons
+                    style={{ opacity: 0.8 }}
+                    name="play-circle"
+                    size={25}
+                    color="white"
+                  />
                 </View>
               )}
             </View>
@@ -92,7 +106,12 @@ export const EmptyImageState: React.FC<EmptyImageStateProps> = ({
               />
               {showPlayIcons && (
                 <View style={[styles.overlay, styles.overlayRightTop]}>
-                  <Ionicons style={{ opacity: 0.8 }} name="play-circle" size={30} color="white" />
+                  <Ionicons
+                    style={{ opacity: 0.8 }}
+                    name="play-circle"
+                    size={30}
+                    color="white"
+                  />
                 </View>
               )}
             </View>
@@ -103,7 +122,12 @@ export const EmptyImageState: React.FC<EmptyImageStateProps> = ({
               />
               {showPlayIcons && (
                 <View style={[styles.overlay, styles.overlayRightBottom]}>
-                  <Ionicons style={{ opacity: 0.8 }} name="play-circle" size={25} color="white" />
+                  <Ionicons
+                    style={{ opacity: 0.8 }}
+                    name="play-circle"
+                    size={25}
+                    color="white"
+                  />
                 </View>
               )}
             </View>
@@ -258,7 +282,7 @@ const styles = StyleSheet.create({
     width: "100%",
     resizeMode: "cover",
     opacity: 0.5,
-    top: -18
+    top: -18,
   },
   overlayRightBottom: {
     height: "55%",

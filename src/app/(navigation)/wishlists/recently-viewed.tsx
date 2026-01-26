@@ -16,7 +16,9 @@ export default function RecentlyViewedScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Recently viewed</Text>
-      <Text style={styles.subtitle}>Homes you’ve checked out in the last 30 days will appear here.</Text>
+      <Text style={styles.subtitle}>
+        Homes you’ve checked out in the last 30 days will appear here.
+      </Text>
       <Pressable style={styles.button}>
         <Text style={styles.buttonText}>Start exploring</Text>
       </Pressable>
@@ -56,4 +58,3 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
 });
-

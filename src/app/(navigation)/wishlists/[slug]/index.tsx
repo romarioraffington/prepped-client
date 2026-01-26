@@ -1,24 +1,43 @@
-// External Dependencies
-import Animated from "react-native-reanimated";
-import { useFocusEffect } from "@react-navigation/native";
 import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import { useHeaderHeight } from "@react-navigation/elements";
+import { useFocusEffect } from "@react-navigation/native";
 import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
-import React, { useLayoutEffect, useCallback, useMemo, useState, useEffect } from "react";
-import { View, StyleSheet, TouchableOpacity, Text, Alert, type FlatList } from "react-native";
+import React, {
+  useLayoutEffect,
+  useCallback,
+  useMemo,
+  useState,
+  useEffect,
+} from "react";
+import {
+  Alert,
+  type FlatList,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+// External Dependencies
+import Animated from "react-native-reanimated";
 
+import { useWishlistDetails } from "@/api/wishlist";
+import {
+  DotsLoader,
+  LargeTitle,
+  PinterestRefreshIndicator,
+  WithPullToRefresh,
+} from "@/components";
+import { HeroSlideShow } from "@/components/HeroSlideShow";
 // Internal Dependencies
 import { Notes } from "@/components/Notes";
-import { useLargeTitleCrossfade } from "@/hooks";
-import { useWishlistDetails } from "@/api/wishlist";
-import { createFullSlug, parseSlug } from "@/libs/utils";
-import { HeroSlideShow } from "@/components/HeroSlideShow";
-import type { WishlistRecommendation } from "@/libs/types/Wishlists/Wishlist";
 import { WishlistMembers, WishlistToggleButton } from "@/components/Wishlist";
-import { DotsLoader, LargeTitle, PinterestRefreshIndicator, WithPullToRefresh } from "@/components";
+import { useLargeTitleCrossfade } from "@/hooks";
+import type { WishlistRecommendation } from "@/libs/types/Wishlists/Wishlist";
+import { createFullSlug, parseSlug } from "@/libs/utils";
 
 const HIT_SLOP = { top: 10, bottom: 10, left: 10, right: 10 };
-const NOT_IMPLEMENTED = () => Alert.alert("Not yet implemented", "Coming soon!");
+const NOT_IMPLEMENTED = () =>
+  Alert.alert("Not yet implemented", "Coming soon!");
 
 export default function WishlistDetailScreen() {
   const router = useRouter();
@@ -32,8 +51,12 @@ export default function WishlistDetailScreen() {
 
   // Pending deletions and additions state for undo pattern
   const [refreshing, setRefreshing] = useState(false);
-  const [pendingDeletions, setPendingDeletions] = useState<Set<string>>(new Set());
-  const [pendingAdditions, setPendingAdditions] = useState<Set<string>>(new Set());
+  const [pendingDeletions, setPendingDeletions] = useState<Set<string>>(
+    new Set(),
+  );
+  const [pendingAdditions, setPendingAdditions] = useState<Set<string>>(
+    new Set(),
+  );
 
   const {
     data,
@@ -65,8 +88,11 @@ export default function WishlistDetailScreen() {
    * Also include pending additions (items that were added but can be undone)
    */
   const recommendations = useMemo(() => {
-    const allRecommendations = data?.pages.flatMap((page) => page.recommendations) ?? [];
-    const filtered = allRecommendations.filter(rec => !pendingDeletions.has(rec.id));
+    const allRecommendations =
+      data?.pages.flatMap((page) => page.recommendations) ?? [];
+    const filtered = allRecommendations.filter(
+      (rec) => !pendingDeletions.has(rec.id),
+    );
 
     // Note: pendingAdditions are already in the list, we just track them for undo
     // If we need to show them optimistically before they appear in data,
@@ -99,19 +125,20 @@ export default function WishlistDetailScreen() {
       if (hasInitialDataRef.current) {
         refetch();
       }
-    }, [refetch])
+    }, [refetch]),
   );
 
   // Clean up pending deletions and additions: if an item was successfully deleted on server,
   // it won't be in the refetched data, so remove it from pending set
   useEffect(() => {
-    if (!data || (pendingDeletions.size === 0 && pendingAdditions.size === 0)) return;
+    if (!data || (pendingDeletions.size === 0 && pendingAdditions.size === 0))
+      return;
 
     const currentIds = new Set(
-      data.pages.flatMap(page => page.recommendations.map(rec => rec.id))
+      data.pages.flatMap((page) => page.recommendations.map((rec) => rec.id)),
     );
 
-    setPendingDeletions(prev => {
+    setPendingDeletions((prev) => {
       const next = new Set(prev);
       for (const id of prev) {
         if (!currentIds.has(id)) {
@@ -121,7 +148,7 @@ export default function WishlistDetailScreen() {
       return next;
     });
 
-    setPendingAdditions(prev => {
+    setPendingAdditions((prev) => {
       const next = new Set(prev);
       for (const id of prev) {
         if (!currentIds.has(id)) {
@@ -162,7 +189,10 @@ export default function WishlistDetailScreen() {
 
   const handleSlideShowPress = useCallback(
     (recommendationId: string, recommendationName: string) => {
-      const recommendationSlug = createFullSlug(recommendationName, recommendationId);
+      const recommendationSlug = createFullSlug(
+        recommendationName,
+        recommendationId,
+      );
       router.push({
         pathname: "/recommendations/[slug]",
         params: { slug: recommendationSlug },
@@ -175,7 +205,7 @@ export default function WishlistDetailScreen() {
    * Handle undo for removal - removes from pending deletions
    */
   const handleUndoRemove = useCallback((recommendationId: string) => {
-    setPendingDeletions(prev => {
+    setPendingDeletions((prev) => {
       const next = new Set(prev);
       next.delete(recommendationId);
       return next;
@@ -186,7 +216,7 @@ export default function WishlistDetailScreen() {
    * Handle undo for addition - removes from pending additions
    */
   const handleUndoAdd = useCallback((recommendationId: string) => {
-    setPendingAdditions(prev => {
+    setPendingAdditions((prev) => {
       const next = new Set(prev);
       next.delete(recommendationId);
       return next;
@@ -243,20 +273,22 @@ export default function WishlistDetailScreen() {
     );
   }, []);
 
-
   const renderRecommendationItem = useCallback(
     ({ item: recommendation }: { item: WishlistRecommendation }) => {
-      const recommendationSlug = createFullSlug(recommendation.name, recommendation.id);
+      const recommendationSlug = createFullSlug(
+        recommendation.name,
+        recommendation.id,
+      );
       const isSaved = recommendation.wishlistIds.includes(wishlistId);
 
       // Track when action starts (add to pending sets)
       const handleActionStart = () => {
         if (isSaved) {
           // Currently saved, so we're removing
-          setPendingDeletions(prev => new Set(prev).add(recommendation.id));
+          setPendingDeletions((prev) => new Set(prev).add(recommendation.id));
         } else {
           // Currently not saved, so we're adding
-          setPendingAdditions(prev => new Set(prev).add(recommendation.id));
+          setPendingAdditions((prev) => new Set(prev).add(recommendation.id));
         }
       };
 
@@ -372,7 +404,12 @@ export default function WishlistDetailScreen() {
 
   if (isLoading) {
     return (
-      <View style={[styles.container, { justifyContent: "center", alignItems: "center" }]}>
+      <View
+        style={[
+          styles.container,
+          { justifyContent: "center", alignItems: "center" },
+        ]}
+      >
         <DotsLoader />
       </View>
     );
@@ -424,7 +461,8 @@ const WishlistEmptyState: React.FC = () => {
     <View style={styles.emptyStateContainer}>
       <Text style={styles.emptyStateHeading}>No saves yet</Text>
       <Text style={styles.emptyStateDescription}>
-        As you search, tap the heart icon to save your favorite recommendations to a wishlist.
+        As you search, tap the heart icon to save your favorite recommendations
+        to a wishlist.
       </Text>
       <TouchableOpacity
         activeOpacity={0.8}

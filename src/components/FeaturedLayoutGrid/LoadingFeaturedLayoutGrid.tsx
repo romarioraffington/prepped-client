@@ -1,30 +1,28 @@
 // External imports
-import React, { useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { useEffect } from "react";
+import { StyleSheet, View } from "react-native";
 
 import Animated, {
   withRepeat,
   withTiming,
   useSharedValue,
   useAnimatedStyle,
-} from 'react-native-reanimated';
+} from "react-native-reanimated";
 
 // Internal imports
-import { CARD_MARGIN, REGULAR_CARD_WIDTH, FIRST_CARD_WIDTH } from "./consts";
+import { CARD_MARGIN, FIRST_CARD_WIDTH, REGULAR_CARD_WIDTH } from "./consts";
 
 interface LoadingFeaturedLayoutGridProps {
   featuredIndex?: number[];
 }
 
-export const LoadingFeaturedLayoutGrid = ({ featuredIndex = [] }: LoadingFeaturedLayoutGridProps) => {
+export const LoadingFeaturedLayoutGrid = ({
+  featuredIndex = [],
+}: LoadingFeaturedLayoutGridProps) => {
   const opacity = useSharedValue(0.3);
 
   useEffect(() => {
-    opacity.value = withRepeat(
-      withTiming(0.7, { duration: 1000 }),
-      -1,
-      true
-    );
+    opacity.value = withRepeat(withTiming(0.7, { duration: 1000 }), -1, true);
   }, []);
 
   const animatedStyle = useAnimatedStyle(() => ({
@@ -38,26 +36,14 @@ export const LoadingFeaturedLayoutGrid = ({ featuredIndex = [] }: LoadingFeature
     return (
       <View style={[styles.placeCard, { width: cardWidth }]}>
         <Animated.View
-          style={[
-            styles.placeImage,
-            { height: imageHeight },
-            animatedStyle
-          ]}
+          style={[styles.placeImage, { height: imageHeight }, animatedStyle]}
         />
         <View style={styles.placeInfo}>
           <Animated.View
-            style={[
-              styles.skeletonText,
-              { width: '80%' },
-              animatedStyle
-            ]}
+            style={[styles.skeletonText, { width: "80%" }, animatedStyle]}
           />
           <Animated.View
-            style={[
-              styles.skeletonText,
-              { width: '60%' },
-              animatedStyle
-            ]}
+            style={[styles.skeletonText, { width: "60%" }, animatedStyle]}
           />
         </View>
       </View>

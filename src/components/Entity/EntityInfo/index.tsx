@@ -1,7 +1,7 @@
 // External dependencies
-import { MaterialIcons } from '@expo/vector-icons';
-import { View, Text, StyleSheet } from 'react-native';
-import type { StyleProp, TextStyle, TextProps } from 'react-native';
+import { MaterialIcons } from "@expo/vector-icons";
+import { StyleSheet, Text, View } from "react-native";
+import type { StyleProp, TextProps, TextStyle } from "react-native";
 
 interface EntityInfoProps {
   category: string;
@@ -17,7 +17,9 @@ export const EntityInfo = ({
   textStyle,
 }: EntityInfoProps) => {
   const mergedTextStyle = StyleSheet.flatten([styles.text, textStyle]);
-  const StyledText = (props: TextProps) => <Text {...props} style={mergedTextStyle} />;
+  const StyledText = (props: TextProps) => (
+    <Text {...props} style={mergedTextStyle} />
+  );
 
   return (
     <View style={styles.typeContainer}>
@@ -29,7 +31,7 @@ export const EntityInfo = ({
           <MaterialIcons
             size={16}
             color="#0b57d0"
-            name={isAccessible ? "accessible-forward" : 'not-accessible'}
+            name={isAccessible ? "accessible-forward" : "not-accessible"}
           />
         </>
       )}

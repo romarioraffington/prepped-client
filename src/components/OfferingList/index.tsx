@@ -1,6 +1,6 @@
 // External Dependencies
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 // Internal Dependencies
 import { Offering } from "@/components/Offering"; // Imported directly to avoid circular dependency
@@ -11,7 +11,11 @@ interface OfferingListProps {
   onShowAll?: () => void;
 }
 
-export function OfferingList({ offerings, maxOfferings = 6, onShowAll }: OfferingListProps) {
+export function OfferingList({
+  offerings,
+  maxOfferings = 6,
+  onShowAll,
+}: OfferingListProps) {
   const offeringsList = offerings.slice(0, maxOfferings);
 
   return (

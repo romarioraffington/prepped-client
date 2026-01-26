@@ -1,10 +1,10 @@
 // External Dependencies
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
+import { API_ENDPOINTS, QUERY_KEYS, getApiClient } from "@/libs/constants";
+import type { WishlistNote } from "@/libs/types/Wishlists/Wishlist";
 // Internal Dependencies
 import { parseSlug, reportError } from "@/libs/utils";
-import type { WishlistNote } from "@/libs/types/Wishlists/Wishlist";
-import { API_ENDPOINTS, getApiClient, QUERY_KEYS } from "@/libs/constants";
 
 export interface CreateNoteRequest {
   note: string;

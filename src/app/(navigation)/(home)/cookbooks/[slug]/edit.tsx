@@ -1,10 +1,10 @@
 // External Dependencies
 import { useLocalSearchParams } from "expo-router";
-import { View, Text, StyleSheet } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 // Internal Dependencies
 import { Colors } from "@/libs/constants";
-import { parseSlug, capitalizeWords } from "@/libs/utils";
+import { capitalizeWords, parseSlug } from "@/libs/utils";
 
 type EditParams = {
   slug: string;

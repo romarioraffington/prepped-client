@@ -1,7 +1,7 @@
-import Svg, { Path } from "react-native-svg";
-import { View, Text, StyleSheet } from "react-native";
 import { memo } from "react";
 import type { ReactNode } from "react";
+import { StyleSheet, Text, View } from "react-native";
+import Svg, { Path } from "react-native-svg";
 
 export type MapLocationMarkerProps = {
   content?: string | ReactNode;

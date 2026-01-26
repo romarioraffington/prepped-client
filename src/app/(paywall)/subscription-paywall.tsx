@@ -1,19 +1,27 @@
+import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 // External Dependencies
 import { Image } from "expo-image";
-import { router } from "expo-router";
-import React, { useState } from "react";
-import * as Haptics from "expo-haptics";
-import { Check } from "lucide-react-native";
-import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
+import { Check } from "lucide-react-native";
+import React, { useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  Dimensions,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 import type { PurchasesPackage } from "react-native-purchases";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSubscription } from "~/src/contexts/SubscriptionContext";
-import { Text, View, Pressable, Dimensions, StyleSheet, Alert, ActivityIndicator } from "react-native";
 
+import { Confetti, ProBadge } from "@/components";
 // Internal Dependencies
 import { LEGAL_ROUTES } from "@/libs/constants";
-import { ProBadge, Confetti } from "@/components";
 import { isIPad, reportError } from "@/libs/utils";
 
 // Hero Constants
@@ -55,7 +63,9 @@ export default function SubscriptionPaywall() {
   /**
    * Extract packages from offerings
    */
-  const defaultOffering = offerings?.find((offering) => offering.identifier === "default") || offerings?.[0];
+  const defaultOffering =
+    offerings?.find((offering) => offering.identifier === "default") ||
+    offerings?.[0];
 
   /**
    * Find monthly package
@@ -74,7 +84,7 @@ export default function SubscriptionPaywall() {
   const monthlyPrice = `${monthlyPackage?.product?.priceString}/mo`;
   const monthlyTitle = "Monthly";
 
-  let monthlySubtitle = ''
+  let monthlySubtitle = "";
   if (monthlyPackage?.product?.pricePerWeekString) {
     monthlySubtitle = `~${monthlyPackage?.product?.pricePerWeekString} weekly`;
   }
@@ -85,8 +95,11 @@ export default function SubscriptionPaywall() {
   /**
    * Set default plan and selected package
    */
-  const [plan, setPlan] = useState<typeof PLAN_MONTHLY | typeof PLAN_WEEKLY>(PLAN_MONTHLY);
-  const [selectedPackage, setSelectedPackage] = useState<PurchasesPackage | null>(monthlyPackage || null);
+  const [plan, setPlan] = useState<typeof PLAN_MONTHLY | typeof PLAN_WEEKLY>(
+    PLAN_MONTHLY,
+  );
+  const [selectedPackage, setSelectedPackage] =
+    useState<PurchasesPackage | null>(monthlyPackage || null);
 
   const closeModal = () => {
     router.back();
@@ -275,7 +288,9 @@ export default function SubscriptionPaywall() {
                   </View>
                   <View style={styles.planButtonTextContainer}>
                     <Text style={styles.planButtonTitle}>{monthlyTitle}</Text>
-                    <Text style={styles.planButtonSubtitle}>{monthlySubtitle}</Text>
+                    <Text style={styles.planButtonSubtitle}>
+                      {monthlySubtitle}
+                    </Text>
                   </View>
                 </View>
                 <Text style={styles.planButtonPrice}>{monthlyPrice}</Text>
@@ -314,7 +329,8 @@ export default function SubscriptionPaywall() {
             onPress={handlePurchase}
             style={[
               styles.continueButton,
-              (isPurchasing || !selectedPackage) && styles.continueButtonDisabled,
+              (isPurchasing || !selectedPackage) &&
+                styles.continueButtonDisabled,
             ]}
             disabled={isPurchasing || !selectedPackage}
           >

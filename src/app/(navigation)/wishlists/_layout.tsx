@@ -5,8 +5,8 @@ export default function WishlistLayout() {
   return (
     <Stack
       screenOptions={{
-        headerTintColor: '#000',
-        headerBackButtonDisplayMode: 'minimal',
+        headerTintColor: "#000",
+        headerBackButtonDisplayMode: "minimal",
       }}
     >
       <Stack.Screen
@@ -17,7 +17,7 @@ export default function WishlistLayout() {
           contentStyle: {
             backgroundColor: "#fff",
             paddingHorizontal: 8,
-          }
+          },
         }}
       />
       <Stack.Screen
@@ -31,7 +31,7 @@ export default function WishlistLayout() {
         name="[slug]/options"
         options={{
           headerShown: false,
-          presentation: 'formSheet',
+          presentation: "formSheet",
           sheetAllowedDetents: [0.29],
           sheetCornerRadius: 30,
           contentStyle: {
@@ -43,7 +43,7 @@ export default function WishlistLayout() {
         name="[slug]/recommendations/[slug]/note/index"
         options={{
           headerShown: false,
-          presentation: 'formSheet',
+          presentation: "formSheet",
           sheetAllowedDetents: [0.34],
           sheetCornerRadius: 30,
         }}
@@ -52,7 +52,7 @@ export default function WishlistLayout() {
         name="[slug]/recommendations/[slug]/note/[id]"
         options={{
           headerShown: false,
-          presentation: 'formSheet',
+          presentation: "formSheet",
           sheetAllowedDetents: [0.34],
           sheetCornerRadius: 30,
         }}
@@ -61,7 +61,7 @@ export default function WishlistLayout() {
         name="[slug]/edit-wishlist"
         options={{
           headerShown: false,
-          presentation: 'formSheet',
+          presentation: "formSheet",
           sheetAllowedDetents: [0.34],
           sheetCornerRadius: 30,
         }}
@@ -77,4 +77,3 @@ export default function WishlistLayout() {
     </Stack>
   );
 }
-

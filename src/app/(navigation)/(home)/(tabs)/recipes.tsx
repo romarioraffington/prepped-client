@@ -1,10 +1,16 @@
+import type { default as BottomSheet } from "@gorhom/bottom-sheet";
 // External Dependencies
 import { useRouter } from "expo-router";
-import { Alert, View, StyleSheet, FlatList } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import type { default as BottomSheet } from "@gorhom/bottom-sheet";
+import React, {
+  useRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import { Alert, FlatList, StyleSheet, View } from "react-native";
 import type { useAnimatedScrollHandler } from "react-native-reanimated";
-import React, { useRef, useCallback, useEffect, useMemo, useState } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 // Internal Dependencies
 import { useRecipes } from "@/api";
@@ -12,13 +18,13 @@ import type { Recipe } from "@/libs/types";
 import { createShortSlug } from "@/libs/utils";
 
 import {
-  RecipeCard,
-  StaggeredGrid,
   EmptyImageState,
-  WithPullToRefresh,
-  RecipeOptionsSheet,
   LoadingStaggeredGrid,
   PinterestRefreshIndicator,
+  RecipeCard,
+  RecipeOptionsSheet,
+  StaggeredGrid,
+  WithPullToRefresh,
 } from "@/components";
 
 type ScrollableRef = {
@@ -101,12 +107,9 @@ export default function Recipes({
   );
 
   // Handle menu press - open options sheet for the selected recipe
-  const handleMenuPress = useCallback(
-    (recipe: Recipe) => {
-      setSelectedRecipe(recipe);
-    },
-    [],
-  );
+  const handleMenuPress = useCallback((recipe: Recipe) => {
+    setSelectedRecipe(recipe);
+  }, []);
 
   // Open bottom sheet when recipe is selected
   useEffect(() => {
@@ -156,10 +159,12 @@ export default function Recipes({
             data={[]}
             renderItem={() => null}
             ListHeaderComponent={
-              <View style={[
-                styles.emptyStateContainer,
-                { paddingTop: headerHeight },
-              ]}>
+              <View
+                style={[
+                  styles.emptyStateContainer,
+                  { paddingTop: headerHeight },
+                ]}
+              >
                 <EmptyImageState
                   title="No Recipes"
                   showPlayIcons={true}

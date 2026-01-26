@@ -1,19 +1,19 @@
+import { FontAwesome } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
 // External Dependencies
 import type React from "react";
 import { useCallback } from "react";
-import * as Haptics from "expo-haptics";
-import { FontAwesome } from "@expo/vector-icons";
 import { StyleSheet, TouchableOpacity } from "react-native";
 
-// Internal Dependencies
-import { reportError } from "@/libs/utils";
-import { Colors } from "@/libs/constants";
 import { useActionToast } from "@/contexts";
 import { useImageErrorFilter } from "@/hooks";
+import { Colors } from "@/libs/constants";
+// Internal Dependencies
+import { reportError } from "@/libs/utils";
 
 import {
-  useSaveRecommendationToWishlistMutation,
   useDeleteRecommendationFromWishlistMutation,
+  useSaveRecommendationToWishlistMutation,
 } from "@/api/wishlist";
 
 export interface WishlistToggleButtonProps {
@@ -46,18 +46,14 @@ export const WishlistToggleButton: React.FC<WishlistToggleButtonProps> = ({
   const { validImages } = useImageErrorFilter(imageUrls);
   const validThumbnailUri = validImages.length > 0 ? validImages[0] : null;
 
-  const {
-    isPending: isSaving,
-    mutateAsync: saveToWishlistAsync,
-  } = useSaveRecommendationToWishlistMutation();
+  const { isPending: isSaving, mutateAsync: saveToWishlistAsync } =
+    useSaveRecommendationToWishlistMutation();
 
-  const {
-    isPending: isDeleting,
-    mutateAsync: deleteFromWishlistAsync,
-  } = useDeleteRecommendationFromWishlistMutation();
+  const { isPending: isDeleting, mutateAsync: deleteFromWishlistAsync } =
+    useDeleteRecommendationFromWishlistMutation();
 
   const isPending = isSaving || isDeleting;
-  const wishlistNameText = wishlistName ?? 'wishlist';
+  const wishlistNameText = wishlistName ?? "wishlist";
 
   const onPress = useCallback(async () => {
     if (isPending) return;

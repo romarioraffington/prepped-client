@@ -1,6 +1,6 @@
 import React from "react";
+import { Dimensions, StyleSheet, View } from "react-native";
 import Svg, { Path } from "react-native-svg";
-import { View, StyleSheet, Dimensions } from "react-native";
 
 import Animated, {
   withTiming,
@@ -34,26 +34,26 @@ export const WaveHeroLoading = ({
     opacity.value = withRepeat(
       withSequence(
         withTiming(0.8, { duration: 1000 }),
-        withTiming(0.5, { duration: 1000 })
+        withTiming(0.5, { duration: 1000 }),
       ),
       -1,
-      true
+      true,
     );
   }, []);
 
   const animatedStyle = scrollY
     ? useAnimatedStyle(() => ({
-      transform: [
-        {
-          translateY: interpolate(
-            scrollY.value,
-            [-100, 0, 100],
-            [15, 0, -15],
-            "clamp"
-          ),
-        },
-      ],
-    }))
+        transform: [
+          {
+            translateY: interpolate(
+              scrollY.value,
+              [-100, 0, 100],
+              [15, 0, -15],
+              "clamp",
+            ),
+          },
+        ],
+      }))
     : {};
 
   // Animated wave path
@@ -64,19 +64,14 @@ export const WaveHeroLoading = ({
 
   const animatedPathProps = useAnimatedProps(() => {
     if (scrollY) {
-      const newPath = interpolate(
-        scrollY.value,
-        [0, 100],
-        [0, 1],
-        "clamp"
-      );
+      const newPath = interpolate(scrollY.value, [0, 100], [0, 1], "clamp");
       wavePath.value = withTiming(
         newPath === 0 ? normalWavePath : invertedWavePath,
-        { duration: 0 }
+        { duration: 0 },
       );
     }
     return {
-      d: wavePath.value
+      d: wavePath.value,
     };
   });
 

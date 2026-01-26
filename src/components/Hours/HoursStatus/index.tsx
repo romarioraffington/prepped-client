@@ -1,10 +1,10 @@
 // External Dependencies
 import {
-  View,
-  Text,
-  StyleSheet,
   type StyleProp,
+  StyleSheet,
+  Text,
   type TextStyle,
+  View,
 } from "react-native";
 
 // Internal Dependencies
@@ -21,7 +21,10 @@ export const HoursStatus = ({ hours, textStyle }: HoursStatusProps) => {
   const openTextStyle = StyleSheet.flatten([styles.openText, textStyle]);
   const closedTextStyle = StyleSheet.flatten([styles.closedText, textStyle]);
   const hoursTextStyle = StyleSheet.flatten([styles.hoursText, textStyle]);
-  const typeSeparatorStyle = StyleSheet.flatten([styles.typeSeparator, textStyle]);
+  const typeSeparatorStyle = StyleSheet.flatten([
+    styles.typeSeparator,
+    textStyle,
+  ]);
 
   if (!hours) {
     return null;

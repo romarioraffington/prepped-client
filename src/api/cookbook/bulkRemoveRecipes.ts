@@ -1,9 +1,9 @@
 // External Dependencies
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+import { API_ENDPOINTS, QUERY_KEYS, getApiClient } from "@/libs/constants";
 // Internal Dependencies
 import { reportError } from "@/libs/utils";
-import { API_ENDPOINTS, QUERY_KEYS, getApiClient } from "@/libs/constants";
 
 /**
  * Bulk remove recipes from a cookbook

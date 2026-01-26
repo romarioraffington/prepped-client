@@ -1,9 +1,9 @@
-import type React from "react";
-import { BlurView } from "expo-blur";
-import { type FC, memo } from "react";
-import { LinearGradient } from "expo-linear-gradient";
 import MaskedView from "@react-native-masked-view/masked-view";
-import { Dimensions, Image, View, StyleSheet } from "react-native";
+import { BlurView } from "expo-blur";
+import { LinearGradient } from "expo-linear-gradient";
+import type React from "react";
+import { type FC, memo } from "react";
+import { Dimensions, Image, StyleSheet, View } from "react-native";
 
 import Animated, {
   FadeIn,
@@ -58,7 +58,11 @@ const MarqueeItemComponent: FC<Props> = ({
 
   return (
     <Animated.View
-      style={[styles.container, constainerStyle, { width: _itemWidth, transformOrigin: "bottom" }]}
+      style={[
+        styles.container,
+        constainerStyle,
+        { width: _itemWidth, transformOrigin: "bottom" },
+      ]}
     >
       <View style={styles.shadowContainer}>
         <View style={styles.imageContainer}>

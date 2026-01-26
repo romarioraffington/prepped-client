@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 
+import { API_ENDPOINTS, QUERY_KEYS, getApiClient } from "@/libs/constants";
 import { parseSlug, reportError } from "@/libs/utils";
-import { API_ENDPOINTS, getApiClient, QUERY_KEYS } from "@/libs/constants";
 
 export interface PhotoAuthorAttribution {
   displayName: string;

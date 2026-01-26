@@ -1,12 +1,12 @@
+import * as Sentry from "@sentry/react-native";
+import { fetch as expoFetch } from "expo/fetch";
 // External Dependencies
 import { Alert } from "react-native";
-import { fetch as expoFetch } from "expo/fetch";
-import * as Sentry from "@sentry/react-native";
 
+import { useAuthStore } from "@/stores/authStore";
+import { APIError, type BackendErrorResponse, isAuthError } from "./errors";
 // Internal Dependencies
 import { withRetry } from "./retry";
-import { useAuthStore } from "@/stores/authStore";
-import { APIError, isAuthError, type BackendErrorResponse } from "./errors";
 
 interface ApiClientOptions extends RequestInit {
   retry?: boolean;

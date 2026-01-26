@@ -3,24 +3,36 @@ import type { RefObject } from "react";
 import * as Haptics from "expo-haptics";
 import { Ionicons } from "@expo/vector-icons";
 import { Portal } from "react-native-portalize";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { BottomSheetBackdropProps } from "@gorhom/bottom-sheet";
-import BottomSheet, { BottomSheetBackdrop, BottomSheetFlatList } from "@gorhom/bottom-sheet";
-import { ActivityIndicator, Alert, Platform, Pressable, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetFlatList,
+} from "@gorhom/bottom-sheet";
+
+import {
+  Alert,
+  Text,
+  View,
+  Platform,
+  Pressable,
+  StyleSheet,
+  ActivityIndicator,
+  TouchableOpacity,
+} from "react-native";
+
+import { useBulkAddRecipesToCookbookMutation, useCookbooks } from "@/api";
 
 // Internal Dependencies
 import { useActionToast } from "@/contexts";
-import type { Recipe, ImageGridItem } from "@/libs/types";
-import { Colors, COLLECTION_TYPE } from "@/libs/constants";
-import { useCookbooks, useBulkAddRecipesToCookbookMutation } from "@/api";
-
-// Components
 import { DotsLoader } from "@/components/DotsLoader";
-import { ShimmerImage } from "@/components/ShimmerImage";
+import type { ImageGridItem, Recipe } from "@/libs/types";
+import { COLLECTION_TYPE, Colors } from "@/libs/constants";
 import { BlurBackButton } from "@/components/BlurBackButton";
 import { RecipeCarousel } from "@/components/Recipe/RecipeCarousel";
-import { ImagePlaceholder } from "@/components/ImagePlaceholder";
+import { ImagePlaceholder, ShimmerImage } from "@/components/Image";
 
 const IMAGE_SIZE = 56;
 const IMAGE_RADIUS = 10;
@@ -45,7 +57,9 @@ export function AddToCookbookSheet({
   const insets = useSafeAreaInsets();
   const { showToast } = useActionToast();
   const snapPoints = ["100%"];
-  const [selectedCookbookIds, setSelectedCookbookIds] = useState<Set<string>>(new Set());
+  const [selectedCookbookIds, setSelectedCookbookIds] = useState<Set<string>>(
+    new Set(),
+  );
 
   // Fetch all cookbooks
   const {
@@ -60,10 +74,8 @@ export function AddToCookbookSheet({
   const isLoadingCookbooks = isCookbooksLoading || isFetchingNextPage;
 
   // Bulk add mutation
-  const {
-    isPending,
-    mutateAsync: bulkAddAsync,
-  } = useBulkAddRecipesToCookbookMutation();
+  const { isPending, mutateAsync: bulkAddAsync } =
+    useBulkAddRecipesToCookbookMutation();
 
   // Load more cookbooks when user scrolls to the end
   const handleEndReached = useCallback(() => {
@@ -108,28 +120,34 @@ export function AddToCookbookSheet({
   }, [bottomSheetRef, isPending]);
 
   // Handle sheet change - detect when sheet closes
-  const handleSheetChange = useCallback((index: number) => {
-    if (index === -1) {
-      // Reset selections when sheet closes
-      setSelectedCookbookIds(new Set());
-      onClose?.();
-    }
-  }, [onClose]);
+  const handleSheetChange = useCallback(
+    (index: number) => {
+      if (index === -1) {
+        // Reset selections when sheet closes
+        setSelectedCookbookIds(new Set());
+        onClose?.();
+      }
+    },
+    [onClose],
+  );
 
   // Handle cookbook selection (toggle checkbox)
-  const handleSelectCookbook = useCallback((cookbookId: string) => {
-    if (isPending) return;
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setSelectedCookbookIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(cookbookId)) {
-        next.delete(cookbookId);
-      } else {
-        next.add(cookbookId);
-      }
-      return next;
-    });
-  }, [isPending]);
+  const handleSelectCookbook = useCallback(
+    (cookbookId: string) => {
+      if (isPending) return;
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      setSelectedCookbookIds((prev) => {
+        const next = new Set(prev);
+        if (next.has(cookbookId)) {
+          next.delete(cookbookId);
+        } else {
+          next.add(cookbookId);
+        }
+        return next;
+      });
+    },
+    [isPending],
+  );
 
   // Handle save (add to cookbooks)
   const handleSave = useCallback(async () => {
@@ -156,15 +174,21 @@ export function AddToCookbookSheet({
         const cookbookName = cookbook?.name ?? "cookbook";
         showToast({
           icon: (
-            <View style={{
-              width: 45,
-              height: 45,
-              borderRadius: 8,
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: "rgba(234, 88, 12, 0.12)",
-            }}>
-              <Ionicons name="checkmark-done-circle" size={22} color={Colors.primary} />
+            <View
+              style={{
+                width: 45,
+                height: 45,
+                borderRadius: 8,
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: "rgba(234, 88, 12, 0.12)",
+              }}
+            >
+              <Ionicons
+                name="checkmark-done-circle"
+                size={22}
+                color={Colors.primary}
+              />
             </View>
           ),
           text: (
@@ -176,15 +200,21 @@ export function AddToCookbookSheet({
       } else {
         showToast({
           icon: (
-            <View style={{
-              width: 45,
-              height: 45,
-              borderRadius: 8,
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: "rgba(234, 88, 12, 0.12)",
-            }}>
-              <Ionicons name="checkmark-done-circle" size={22} color={Colors.primary} />
+            <View
+              style={{
+                width: 45,
+                height: 45,
+                borderRadius: 8,
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: "rgba(234, 88, 12, 0.12)",
+              }}
+            >
+              <Ionicons
+                name="checkmark-done-circle"
+                size={22}
+                color={Colors.primary}
+              />
             </View>
           ),
           text: (
@@ -205,7 +235,9 @@ export function AddToCookbookSheet({
 
       Alert.alert(
         "Oops!",
-        error instanceof Error ? error.message : "Failed to add recipes. Please try again.",
+        error instanceof Error
+          ? error.message
+          : "Failed to add recipes. Please try again.",
         [{ text: "OK" }],
       );
     }
@@ -267,7 +299,10 @@ export function AddToCookbookSheet({
         <Pressable
           disabled={isPending}
           onPress={() => handleSelectCookbook(item.id)}
-          style={[styles.cookbookItem, isPending && styles.cookbookItemDisabled]}
+          style={[
+            styles.cookbookItem,
+            isPending && styles.cookbookItemDisabled,
+          ]}
         >
           {/* Thumbnail */}
           <View style={styles.cookbookImageContainer}>
@@ -298,10 +333,19 @@ export function AddToCookbookSheet({
 
           {/* Checkbox */}
           <View style={styles.checkboxContainer}>
-            <View style={[styles.checkboxOuter, isSelected && styles.checkboxOuterSelected]}>
+            <View
+              style={[
+                styles.checkboxOuter,
+                isSelected && styles.checkboxOuterSelected,
+              ]}
+            >
               <View style={styles.checkboxInner}>
                 {isSelected && (
-                  <Ionicons name="checkmark-done-sharp" size={14} color={Colors.primary} />
+                  <Ionicons
+                    name="checkmark-done-sharp"
+                    size={14}
+                    color={Colors.primary}
+                  />
                 )}
               </View>
             </View>
@@ -316,32 +360,36 @@ export function AddToCookbookSheet({
    * Render Header
    */
   const isSaveButtonDisabled = selectedCookbookIds.size === 0 || isPending;
-  const renderHeader = useCallback(() => (
-    <View style={[styles.headerContainer, { paddingTop: insets.top }]}>
-      <View style={styles.header}>
-        <BlurBackButton onPress={handleClose} disabled={isPending} />
-        <Text style={styles.headerTitle}>Add to Cookbook</Text>
-        <TouchableOpacity
-          onPress={handleSave}
-          style={styles.saveButton}
-          disabled={isSaveButtonDisabled}
-          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-        >
-          {isPending && <ActivityIndicator size="small" color={Colors.primary} />}
-          <Text style={[styles.saveButtonText, isSaveButtonDisabled && styles.saveButtonTextDisabled]}>
-            {isPending ? "Saving" : "Save"}
-          </Text>
-        </TouchableOpacity>
+  const renderHeader = useCallback(
+    () => (
+      <View style={[styles.headerContainer, { paddingTop: insets.top }]}>
+        <View style={styles.header}>
+          <BlurBackButton onPress={handleClose} disabled={isPending} />
+          <Text style={styles.headerTitle}>Add to Cookbook</Text>
+          <TouchableOpacity
+            onPress={handleSave}
+            style={styles.saveButton}
+            disabled={isSaveButtonDisabled}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            {isPending && (
+              <ActivityIndicator size="small" color={Colors.primary} />
+            )}
+            <Text
+              style={[
+                styles.saveButtonText,
+                isSaveButtonDisabled && styles.saveButtonTextDisabled,
+              ]}
+            >
+              {isPending ? "Saving" : "Save"}
+            </Text>
+          </TouchableOpacity>
+        </View>
+        <View style={styles.divider} />
       </View>
-      <View style={styles.divider} />
-    </View>
-  ), [
-    isPending,
-    insets.top,
-    handleSave,
-    handleClose,
-    isSaveButtonDisabled,
-  ]);
+    ),
+    [isPending, insets.top, handleSave, handleClose, isSaveButtonDisabled],
+  );
 
   return (
     <Portal>
@@ -362,7 +410,8 @@ export function AddToCookbookSheet({
         {/* Recipe preview section */}
         <View style={styles.recipeSection}>
           <Text style={styles.sectionLabel}>
-            Adding {recipes.length === 1 ? "1 RECIPE" : `${recipes.length} RECIPES`}
+            Adding{" "}
+            {recipes.length === 1 ? "1 RECIPE" : `${recipes.length} RECIPES`}
           </Text>
           <View style={styles.carouselContainer}>
             <RecipeCarousel recipes={recipes} />
@@ -386,10 +435,12 @@ export function AddToCookbookSheet({
               style={styles.createButtonIcon}
               color={isPending ? Colors.matureForeground : Colors.primary}
             />
-            <Text style={[
-              styles.createButtonText,
-              isPending && styles.createButtonTextDisabled,
-            ]}>
+            <Text
+              style={[
+                styles.createButtonText,
+                isPending && styles.createButtonTextDisabled,
+              ]}
+            >
               Create
             </Text>
           </TouchableOpacity>

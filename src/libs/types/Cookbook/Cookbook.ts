@@ -3,21 +3,12 @@
 import type { PaginationLinks, PaginationMeta } from "../Pagination";
 
 // Types for CookbookCard component
-export type CookbookMember = {
-  id: string;
-  name?: string;
-  profilePictureUri: string;
-};
-
 export type CookbookCardData = {
   id: string;
   name: string;
   savedCount: number;
-  dateRange?: string;
   coverImageUri: string | null;
   lastUpdatedText?: string;
-  members: CookbookMember[];
-  isRecentlyViewed?: boolean;
   containsRecipe?: boolean;
 };
 

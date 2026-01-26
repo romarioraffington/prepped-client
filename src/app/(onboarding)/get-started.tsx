@@ -1,36 +1,36 @@
+import { router } from "expo-router";
 // External Components
 import type React from "react";
 import { useState } from "react";
 import { Text } from "react-native";
-import { router } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import {
   Entypo,
-  Ionicons,
-  Foundation,
   FontAwesome6,
-  MaterialIcons,
+  Foundation,
+  Ionicons,
   MaterialCommunityIcons,
+  MaterialIcons,
 } from "@expo/vector-icons";
 
 import {
   runOnJS,
-  useSharedValue,
   useAnimatedReaction,
+  useSharedValue,
 } from "react-native-reanimated";
 
 import {
-  View,
   StyleSheet,
   TouchableOpacity,
+  View,
   useWindowDimensions,
 } from "react-native";
 
+import { ImageBg, Marquee, _itemWidth } from "@/components";
 // Internal Components
 import { useDebounce } from "@/hooks";
 import { isIPad } from "@/libs/utils/platform";
-import { Marquee, _itemWidth, ImageBg } from "@/components";
 
 export default function GetStarted() {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -92,7 +92,9 @@ export default function GetStarted() {
         {!isIPad() && (
           <View>
             <View style={styles.titleContainer}>
-              <Text style={styles.title}>Save travel ideas {"\n"}with ease</Text>
+              <Text style={styles.title}>
+                Save travel ideas {"\n"}with ease
+              </Text>
               <Text style={styles.description}>
                 Turn any travel content into your {"\n"}personal itinerary.
               </Text>

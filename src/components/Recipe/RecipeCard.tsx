@@ -1,12 +1,20 @@
 // External Dependencies
+import { Colors } from "@/libs/constants";
 import { memo, useCallback } from "react";
 import { Ionicons } from "@expo/vector-icons";
-import { Platform, View, Text, StyleSheet, TouchableOpacity, Pressable } from "react-native";
+import { PreviewCard } from "@/components/Image/ImageCard/PreviewCard";
+
+import {
+  Text,
+  View,
+  Platform,
+  Pressable,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 
 // Internal Dependencies
 import type { Recipe } from "@/libs/types";
-import { Colors } from "@/libs/constants";
-import { PreviewCard } from "@/components/ImageCard/PreviewCard";
 
 interface RecipeCardProps {
   recipe: Recipe; // Primary source of data
@@ -60,7 +68,9 @@ const RecipeCardComponent = ({
             {caloriesPerServing && (
               <View style={styles.recipeMetadataItem}>
                 <Ionicons name="flame" size={16} color={Colors.primary} />
-                <Text style={styles.recipeMetadataText}>{caloriesPerServing}</Text>
+                <Text style={styles.recipeMetadataText}>
+                  {caloriesPerServing}
+                </Text>
               </View>
             )}
           </View>

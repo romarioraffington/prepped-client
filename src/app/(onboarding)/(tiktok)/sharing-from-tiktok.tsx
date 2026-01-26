@@ -1,10 +1,23 @@
-// External Dependencies
-import React, { useState, useRef } from "react";
+import {
+  FontAwesome5,
+  Ionicons,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 import { router } from "expo-router";
 import { VideoView, useVideoPlayer } from "expo-video";
+// External Dependencies
+import React, { useState, useRef } from "react";
+import {
+  ActivityIndicator,
+  AppState,
+  Linking,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Ionicons, FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Linking, AppState } from "react-native";
 
 // Internal Dependencies
 import { useCompleteOnboarding } from "@/api";
@@ -31,14 +44,13 @@ export default function SharingFromTikTok() {
   React.useEffect(() => {
     let loadingTimeout: ReturnType<typeof setTimeout>;
 
-    const subscription = player.addListener('statusChange', (status) => {
-
-      if (status.status === 'readyToPlay' || status.status === 'idle') {
+    const subscription = player.addListener("statusChange", (status) => {
+      if (status.status === "readyToPlay" || status.status === "idle") {
         setShowLoadingIndicator(false);
         if (loadingTimeout) {
           clearTimeout(loadingTimeout);
         }
-      } else if (status.status === 'loading') {
+      } else if (status.status === "loading") {
         // Only show loading indicator after 500ms delay
         loadingTimeout = setTimeout(() => {
           setShowLoadingIndicator(true);
@@ -56,8 +68,8 @@ export default function SharingFromTikTok() {
 
   // Also listen to AppState to detect when app goes to background
   React.useEffect(() => {
-    const subscription = AppState.addEventListener('change', (nextAppState) => {
-      if (nextAppState === 'background' && isTikTokOpened) {
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      if (nextAppState === "background" && isTikTokOpened) {
         // When app goes to background after TikTok opened, ensure video plays
         if (player && !player.playing) {
           setTimeout(() => {
@@ -88,14 +100,14 @@ export default function SharingFromTikTok() {
 
         // Give video a moment to start playing before opening TikTok
         // This helps establish PiP before TikTok takes focus
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise((resolve) => setTimeout(resolve, 200));
       }
 
-      const tiktokUrl = 'https://vt.tiktok.com/ZSyE2equf'
+      const tiktokUrl = "https://vt.tiktok.com/ZSyE2equf";
       await Linking.openURL(tiktokUrl);
-
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       reportWarning(errorMessage, {
         component: "SharingFromTikTok",
         action: "Open TikTok",
@@ -114,9 +126,11 @@ export default function SharingFromTikTok() {
       // Try to stop PiP using VideoView ref
       if (videoViewRef.current) {
         try {
-          if (typeof videoViewRef.current.stopPictureInPicture === 'function') {
+          if (typeof videoViewRef.current.stopPictureInPicture === "function") {
             videoViewRef.current.stopPictureInPicture();
-          } else if (typeof videoViewRef.current.exitPictureInPicture === 'function') {
+          } else if (
+            typeof videoViewRef.current.exitPictureInPicture === "function"
+          ) {
             videoViewRef.current.exitPictureInPicture();
           }
         } catch (pipError) {
@@ -125,12 +139,15 @@ export default function SharingFromTikTok() {
       }
 
       // Also try on player directly
-      if (player && typeof (player as any).stopPictureInPicture === 'function') {
+      if (
+        player &&
+        typeof (player as any).stopPictureInPicture === "function"
+      ) {
         (player as any).stopPictureInPicture();
       }
     } catch (error) {
       // Ignore errors - PiP might not be active
-      console.log('Error stopping PiP:', error);
+      console.log("Error stopping PiP:", error);
     }
     try {
       // Mark onboarding as complete
@@ -147,7 +164,12 @@ export default function SharingFromTikTok() {
   };
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top + 16, paddingBottom: insets.bottom }]}>
+    <View
+      style={[
+        styles.container,
+        { paddingTop: insets.top + 16, paddingBottom: insets.bottom },
+      ]}
+    >
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
@@ -185,17 +207,19 @@ export default function SharingFromTikTok() {
           <View style={styles.instructionItem}>
             <Text style={styles.instructionNumber}>1.</Text>
             <Text style={styles.instructionText}>
-              From Tiktok, tap the <MaterialCommunityIcons name="share" size={24} color="white" /> <Text style={styles.bold}>button.</Text>
+              From Tiktok, tap the{" "}
+              <MaterialCommunityIcons name="share" size={24} color="white" />{" "}
+              <Text style={styles.bold}>button.</Text>
             </Text>
           </View>
 
           <View style={styles.instructionItem}>
             <Text style={styles.instructionNumber}>2.</Text>
             <Text style={styles.instructionText}>
-              Select the <Text style={styles.bold}>"Share to" menu option.</Text>
+              Select the{" "}
+              <Text style={styles.bold}>"Share to" menu option.</Text>
             </Text>
           </View>
-
 
           <View style={styles.instructionItem}>
             <Text style={styles.instructionNumber}>3.</Text>
@@ -213,8 +237,15 @@ export default function SharingFromTikTok() {
             onPress={handleOpenTikTok}
             style={[styles.button, styles.primaryButton]}
           >
-            <Ionicons name="logo-tiktok" size={16} color="white" style={{ marginRight: 6 }} />
-            <Text style={[styles.buttonText, styles.primaryButtonText]}>Open TikTok </Text>
+            <Ionicons
+              name="logo-tiktok"
+              size={16}
+              color="white"
+              style={{ marginRight: 6 }}
+            />
+            <Text style={[styles.buttonText, styles.primaryButtonText]}>
+              Open TikTok{" "}
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -224,10 +255,12 @@ export default function SharingFromTikTok() {
             style={[
               styles.button,
               styles.secondaryButton,
-              completeOnboardingMutation.isPending && styles.disabledButton
+              completeOnboardingMutation.isPending && styles.disabledButton,
             ]}
           >
-            <Text style={[styles.buttonText, styles.secondaryButtonText]}>Done 🎉</Text>
+            <Text style={[styles.buttonText, styles.secondaryButtonText]}>
+              Done 🎉
+            </Text>
           </TouchableOpacity>
         </View>
       </View>

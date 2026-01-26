@@ -1,15 +1,15 @@
 // External Imports
 import {
+  Extrapolation,
   type ScrollEvent,
   type SharedValue,
-  withTiming,
-  Extrapolation,
   interpolate,
-  useSharedValue,
-  useDerivedValue,
-  useAnimatedStyle,
   useAnimatedReaction,
   useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useDerivedValue,
+  useSharedValue,
+  withTiming,
 } from "react-native-reanimated";
 
 // Internal Imports

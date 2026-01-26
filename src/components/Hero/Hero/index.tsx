@@ -1,12 +1,19 @@
 // External Dependencies
-import React from "react";
 import { Image } from "expo-image";
-import { View, StyleSheet, Dimensions, ScrollView, Text, TouchableOpacity } from "react-native";
+import React from "react";
+import {
+  Text,
+  View,
+  Dimensions,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
 
 // Internal Dependencies
 import { useImageErrorFilter } from "@/hooks";
+import { ImagePlaceholder } from "@/components/Image";
 import { reportWarning } from "@/libs/utils/errorReporting";
-import { ImagePlaceholder } from "@/components/ImagePlaceholder";
 
 interface HeroProps {
   height?: number;
@@ -14,11 +21,17 @@ interface HeroProps {
   onImagePress?: () => void;
 }
 
-export const Hero: React.FC<HeroProps> = ({ imageUrls, height = 400, onImagePress }) => {
-  const { width } = Dimensions.get('window');
+export const Hero: React.FC<HeroProps> = ({
+  imageUrls,
+  height = 400,
+  onImagePress,
+}) => {
+  const { width } = Dimensions.get("window");
   const [activeIndex, setActiveIndex] = React.useState(0);
 
-  const { validImages, handleImageError } = useImageErrorFilter(imageUrls || []);
+  const { validImages, handleImageError } = useImageErrorFilter(
+    imageUrls || [],
+  );
 
   const handleScroll = (event: any) => {
     const contentOffset = event.nativeEvent.contentOffset.x;
@@ -45,7 +58,12 @@ export const Hero: React.FC<HeroProps> = ({ imageUrls, height = 400, onImagePres
           showsHorizontalScrollIndicator={false}
         >
           {validImages.map((url, index) => (
-            <TouchableOpacity key={`${url}-${index}`} style={[{ width }]} onPress={onImagePress} activeOpacity={0.9}>
+            <TouchableOpacity
+              key={`${url}-${index}`}
+              style={[{ width }]}
+              onPress={onImagePress}
+              activeOpacity={0.9}
+            >
               <Image
                 contentFit="cover"
                 source={{ uri: url }}
@@ -109,12 +127,12 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     paddingVertical: 4,
     paddingHorizontal: 8,
-    position: 'absolute',
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    position: "absolute",
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
   },
   pageCounterText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 13,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });

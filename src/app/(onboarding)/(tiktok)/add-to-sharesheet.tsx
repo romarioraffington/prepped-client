@@ -1,11 +1,24 @@
+import { AntDesign } from "@expo/vector-icons";
+import {
+  FontAwesome5,
+  Ionicons,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 // External Dependencies
 import { router } from "expo-router";
-import { AntDesign } from "@expo/vector-icons";
-import React, { useState, useRef } from "react";
 import { VideoView, useVideoPlayer } from "expo-video";
+import React, { useState, useRef } from "react";
+import {
+  ActivityIndicator,
+  AppState,
+  Linking,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Ionicons, FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Linking, AppState } from "react-native";
 
 // Internal Dependencies
 import { reportWarning } from "@/libs/utils/errorReporting";
@@ -31,14 +44,13 @@ export default function AddTripSpireToShareSheet() {
   React.useEffect(() => {
     let loadingTimeout: ReturnType<typeof setTimeout>;
 
-    const subscription = player.addListener('statusChange', (status) => {
-
-      if (status.status === 'readyToPlay' || status.status === 'idle') {
+    const subscription = player.addListener("statusChange", (status) => {
+      if (status.status === "readyToPlay" || status.status === "idle") {
         setShowLoadingIndicator(false);
         if (loadingTimeout) {
           clearTimeout(loadingTimeout);
         }
-      } else if (status.status === 'loading') {
+      } else if (status.status === "loading") {
         // Only show loading indicator after 500ms delay
         loadingTimeout = setTimeout(() => {
           setShowLoadingIndicator(true);
@@ -56,8 +68,8 @@ export default function AddTripSpireToShareSheet() {
 
   // Also listen to AppState to detect when app goes to background
   React.useEffect(() => {
-    const subscription = AppState.addEventListener('change', (nextAppState) => {
-      if (nextAppState === 'background' && isTikTokOpened) {
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      if (nextAppState === "background" && isTikTokOpened) {
         // When app goes to background after TikTok opened, ensure video plays
         if (player && !player.playing) {
           setTimeout(() => {
@@ -88,14 +100,14 @@ export default function AddTripSpireToShareSheet() {
 
         // Give video a moment to start playing before opening TikTok
         // This helps establish PiP before TikTok takes focus
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise((resolve) => setTimeout(resolve, 200));
       }
 
-      const tiktokUrl = 'https://vt.tiktok.com/ZSyE2equf'
+      const tiktokUrl = "https://vt.tiktok.com/ZSyE2equf";
       await Linking.openURL(tiktokUrl);
-
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       reportWarning(errorMessage, {
         component: "AddToSharesheet",
         action: "Open TikTok",
@@ -114,9 +126,11 @@ export default function AddTripSpireToShareSheet() {
       // Try to stop PiP using VideoView ref
       if (videoViewRef.current) {
         try {
-          if (typeof videoViewRef.current.stopPictureInPicture === 'function') {
+          if (typeof videoViewRef.current.stopPictureInPicture === "function") {
             videoViewRef.current.stopPictureInPicture();
-          } else if (typeof videoViewRef.current.exitPictureInPicture === 'function') {
+          } else if (
+            typeof videoViewRef.current.exitPictureInPicture === "function"
+          ) {
             videoViewRef.current.exitPictureInPicture();
           }
         } catch (pipError) {
@@ -125,12 +139,15 @@ export default function AddTripSpireToShareSheet() {
       }
 
       // Also try on player directly
-      if (player && typeof (player as any).stopPictureInPicture === 'function') {
+      if (
+        player &&
+        typeof (player as any).stopPictureInPicture === "function"
+      ) {
         (player as any).stopPictureInPicture();
       }
     } catch (error) {
       // Ignore errors - PiP might not be active
-      console.log('Error stopping PiP:', error);
+      console.log("Error stopping PiP:", error);
     }
 
     // Navigate to the next onboarding step
@@ -138,7 +155,12 @@ export default function AddTripSpireToShareSheet() {
   };
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top + 16, paddingBottom: insets.bottom }]}>
+    <View
+      style={[
+        styles.container,
+        { paddingTop: insets.top + 16, paddingBottom: insets.bottom },
+      ]}
+    >
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
@@ -151,7 +173,8 @@ export default function AddTripSpireToShareSheet() {
             <Text style={styles.title}>Add to Share Menu</Text>
           </View>
           <Text style={styles.subtitle}>
-            This will allow you to easily share content from any app to TripSpire.
+            This will allow you to easily share content from any app to
+            TripSpire.
           </Text>
         </View>
 
@@ -176,42 +199,53 @@ export default function AddTripSpireToShareSheet() {
           <View style={styles.instructionItem}>
             <Text style={styles.instructionNumber}>1.</Text>
             <Text style={styles.instructionText}>
-              From Tiktok, tap the <MaterialCommunityIcons name="share" size={24} color="white" /> <Text style={styles.bold}>button.</Text>
+              From Tiktok, tap the{" "}
+              <MaterialCommunityIcons name="share" size={24} color="white" />{" "}
+              <Text style={styles.bold}>button.</Text>
             </Text>
           </View>
 
           <View style={styles.instructionItem}>
             <Text style={styles.instructionNumber}>2.</Text>
             <Text style={styles.instructionText}>
-              First list: Scroll right on the app list and tap the <Ionicons name="ellipsis-horizontal" size={16} color="white" /> <Text style={styles.bold}> More button</Text>
+              First list: Scroll right on the app list and tap the{" "}
+              <Ionicons name="ellipsis-horizontal" size={16} color="white" />{" "}
+              <Text style={styles.bold}> More button</Text>
             </Text>
           </View>
 
           <View style={styles.instructionItem}>
             <Text style={styles.instructionNumber}>3.</Text>
             <Text style={styles.instructionText}>
-              Second list: Scroll right on the app list and tap the <Ionicons name="ellipsis-horizontal" size={16} color="white" /> <Text style={styles.bold}> More button</Text>
+              Second list: Scroll right on the app list and tap the{" "}
+              <Ionicons name="ellipsis-horizontal" size={16} color="white" />{" "}
+              <Text style={styles.bold}> More button</Text>
             </Text>
           </View>
 
           <View style={styles.instructionItem}>
             <Text style={styles.instructionNumber}>4.</Text>
             <Text style={styles.instructionText}>
-              At the top right of the screen, tap <Text style={styles.bold}>Edit.</Text>
+              At the top right of the screen, tap{" "}
+              <Text style={styles.bold}>Edit.</Text>
             </Text>
           </View>
 
           <View style={styles.instructionItem}>
             <Text style={styles.instructionNumber}>5.</Text>
             <Text style={styles.instructionText}>
-              Scroll down until you find <Text style={styles.bold}>TripSpire</Text> then tap the <Ionicons name="add-circle" size={16} color="white" /> <Text style={styles.bold}>button next to it.</Text>
+              Scroll down until you find{" "}
+              <Text style={styles.bold}>TripSpire</Text> then tap the{" "}
+              <Ionicons name="add-circle" size={16} color="white" />{" "}
+              <Text style={styles.bold}>button next to it.</Text>
             </Text>
           </View>
 
           <View style={styles.instructionItem}>
             <Text style={styles.instructionNumber}>6.</Text>
             <Text style={styles.instructionText}>
-              Tap <Text style={styles.bold}>Done</Text> at the top right of the screen (and then again at the top left) to exit.
+              Tap <Text style={styles.bold}>Done</Text> at the top right of the
+              screen (and then again at the top left) to exit.
             </Text>
           </View>
 
@@ -228,8 +262,15 @@ export default function AddTripSpireToShareSheet() {
             onPress={handleOpenTikTok}
             style={[styles.button, styles.primaryButton]}
           >
-            <Ionicons name="logo-tiktok" size={14} color="white" style={{ marginRight: 4 }} />
-            <Text style={[styles.buttonText, styles.primaryButtonText]}>Open TikTok </Text>
+            <Ionicons
+              name="logo-tiktok"
+              size={14}
+              color="white"
+              style={{ marginRight: 4 }}
+            />
+            <Text style={[styles.buttonText, styles.primaryButtonText]}>
+              Open TikTok{" "}
+            </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -237,7 +278,9 @@ export default function AddTripSpireToShareSheet() {
             onPress={handleNext}
             style={[styles.button, styles.secondaryButton]}
           >
-            <Text style={[styles.buttonText, styles.secondaryButtonText]}>Continue </Text>
+            <Text style={[styles.buttonText, styles.secondaryButtonText]}>
+              Continue{" "}
+            </Text>
             <AntDesign name="caret-right" size={16} color="#FFFFFF" />
           </TouchableOpacity>
         </View>

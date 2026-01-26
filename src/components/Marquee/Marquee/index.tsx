@@ -1,19 +1,19 @@
 // External Components
 import type React from "react";
 import { type FC, memo } from "react";
-import { View, StyleSheet } from "react-native";
-import { GestureDetector, Gesture } from "react-native-gesture-handler";
+import { StyleSheet, View } from "react-native";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
 import {
   Easing,
-  withTiming,
-  useSharedValue,
-  useFrameCallback,
   type SharedValue,
+  useFrameCallback,
+  useSharedValue,
+  withTiming,
 } from "react-native-reanimated";
 
 // Internal Components
-import { _itemWidth, MarqueeItem } from "../MarqueeItem";
+import { MarqueeItem, _itemWidth } from "../MarqueeItem";
 
 const DEFAULT_SCROLL_SPEED = 25; // Units per second
 

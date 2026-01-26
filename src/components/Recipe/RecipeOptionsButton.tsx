@@ -1,10 +1,10 @@
+import { Ionicons } from "@expo/vector-icons";
+import type { default as BottomSheet } from "@gorhom/bottom-sheet";
+import * as Haptics from "expo-haptics";
 // External Dependencies
 import type React from "react";
-import * as Haptics from "expo-haptics";
-import { Ionicons } from "@expo/vector-icons";
-import { useRef, useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { StyleSheet, TouchableOpacity } from "react-native";
-import type { default as BottomSheet } from "@gorhom/bottom-sheet";
 
 // Internal Dependencies
 import type { Recipe, RecipeOptionsVariant } from "@/libs/types";
@@ -48,7 +48,8 @@ export const RecipeOptionsButton: React.FC<RecipeOptionsButtonProps> = ({
   // Use external onPress if provided, otherwise use internal handler
   const handlePress = onPress ?? handleOptionsPress;
 
-  const iconName = orientation === "vertical" ? "ellipsis-vertical" : "ellipsis-horizontal";
+  const iconName =
+    orientation === "vertical" ? "ellipsis-vertical" : "ellipsis-horizontal";
 
   return (
     <>

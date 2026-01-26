@@ -1,11 +1,16 @@
 // External Imports
 import { BlurView } from "expo-blur";
 import { StatusBar } from "expo-status-bar";
-import type { FlatList } from "react-native";
-import { scheduleOnRN } from "react-native-worklets";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { DeviceEventEmitter, StyleSheet, View, Animated as RNAnimated } from "react-native";
+import type { FlatList } from "react-native";
+import {
+  DeviceEventEmitter,
+  Animated as RNAnimated,
+  StyleSheet,
+  View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { scheduleOnRN } from "react-native-worklets";
 
 import Animated, {
   useSharedValue,
@@ -13,17 +18,23 @@ import Animated, {
   useAnimatedScrollHandler,
 } from "react-native-reanimated";
 
+import {
+  CONTENT_WIDTH,
+  FloatingAddButton,
+  type TabData,
+  type TabsData,
+  TopTabs,
+} from "@/components";
+import { TabScrollProvider, useTabScroll } from "@/contexts";
 // Internal Imports
 import { useHeaderAnimation } from "@/hooks";
-import type { ImageGridItem } from "@/libs/types";
-import { Colors } from "@/libs/constants";
-import { TabScrollProvider, useTabScroll } from "@/contexts";
 import { BOTTOM_NAV_SCROLL_EVENT } from "@/hooks/useBottomNavigationAnimation";
-import { FloatingAddButton, TopTabs, CONTENT_WIDTH, type TabData, type TabsData } from "@/components";
+import { Colors } from "@/libs/constants";
+import type { ImageGridItem } from "@/libs/types";
 
+import Cookbooks from "./index";
 // Content Components
 import Recipes from "./recipes";
-import Cookbooks from "./index";
 
 enum Tab {
   Cookbooks = 0,
@@ -50,7 +61,8 @@ function TabsContent() {
   const blurOpacity = headerHeight > 0 ? 1 : 0;
 
   // From context
-  const { scrollDirection, handleTabScroll, resetScrollDirection } = useTabScroll();
+  const { scrollDirection, handleTabScroll, resetScrollDirection } =
+    useTabScroll();
 
   // Horizontal tabs state
   const activeTabIndex = useSharedValue(0);
@@ -61,19 +73,23 @@ function TabsContent() {
   const cookbooksListRef = useRef<FlatList<ImageGridItem> | null>(null);
 
   // Header animation
-  const { rHeaderStyle, rBlurStyle, scrollHandler, resetHeaderForTabSwitch } = useHeaderAnimation({
-    headerHeight,
-    scrollDirection,
-    handleTabScroll,
-    isHorizontalScrolling: isHorizontalListScrollingX,
-  });
+  const { rHeaderStyle, rBlurStyle, scrollHandler, resetHeaderForTabSwitch } =
+    useHeaderAnimation({
+      headerHeight,
+      scrollDirection,
+      handleTabScroll,
+      isHorizontalScrolling: isHorizontalListScrollingX,
+    });
 
   // Status bar visibility: hide on scroll down, show on scroll up
   useAnimatedReaction(
     () => scrollDirection.value,
     (currentDirection, previousDirection) => {
       const shouldHide = currentDirection === "to-bottom";
-      if (previousDirection === undefined || currentDirection !== previousDirection) {
+      if (
+        previousDirection === undefined ||
+        currentDirection !== previousDirection
+      ) {
         scheduleOnRN(setStatusBarHidden, shouldHide);
       }
     },
@@ -142,17 +158,14 @@ function TabsContent() {
     </View>
   );
 
-  const scrollTabToTop = useCallback(
-    (tabIndex: number) => {
-      if (tabIndex === Tab.Cookbooks) {
-        cookbooksListRef.current?.scrollToOffset?.({ offset: 0, animated: true });
-      }
-      if (tabIndex === Tab.Recipes) {
-        recipesListRef.current?.scrollToOffset?.({ offset: 0, animated: true });
-      }
-    },
-    [],
-  );
+  const scrollTabToTop = useCallback((tabIndex: number) => {
+    if (tabIndex === Tab.Cookbooks) {
+      cookbooksListRef.current?.scrollToOffset?.({ offset: 0, animated: true });
+    }
+    if (tabIndex === Tab.Recipes) {
+      recipesListRef.current?.scrollToOffset?.({ offset: 0, animated: true });
+    }
+  }, []);
 
   const switchToTab = useCallback(
     (index: number) => {
@@ -165,7 +178,12 @@ function TabsContent() {
       resetScrollDirection();
       resetHeaderForTabSwitch();
     },
-    [activeTabIndex, horizontalListRef, resetHeaderForTabSwitch, resetScrollDirection],
+    [
+      activeTabIndex,
+      horizontalListRef,
+      resetHeaderForTabSwitch,
+      resetScrollDirection,
+    ],
   );
 
   const handleTopTabPress = useCallback(
@@ -180,14 +198,17 @@ function TabsContent() {
   );
 
   useEffect(() => {
-    const homeListener = DeviceEventEmitter.addListener(HOME_TAB_PRESS_EVENT, () => {
-      const currentIndex = activeTabIndex.value;
-      if (currentIndex === Tab.Recipes) {
-        switchToTab(Tab.Cookbooks);
-        return;
-      }
-      scrollTabToTop(currentIndex);
-    });
+    const homeListener = DeviceEventEmitter.addListener(
+      HOME_TAB_PRESS_EVENT,
+      () => {
+        const currentIndex = activeTabIndex.value;
+        if (currentIndex === Tab.Recipes) {
+          switchToTab(Tab.Cookbooks);
+          return;
+        }
+        scrollTabToTop(currentIndex);
+      },
+    );
 
     return () => {
       homeListener.remove();

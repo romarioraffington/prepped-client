@@ -1,9 +1,9 @@
 // External Dependencies
 import * as StoreReview from "expo-store-review";
 
+import { reportWarning } from "@/libs/utils/errorReporting";
 // Internal Dependencies
 import { useReviewStore } from "@/stores/reviewStore";
-import { reportWarning } from "@/libs/utils/errorReporting";
 
 /**
  * Show native review prompt

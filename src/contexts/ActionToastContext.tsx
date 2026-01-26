@@ -1,7 +1,14 @@
 // External Dependencies
 import type React from "react";
 import type { ReactNode } from "react";
-import { createContext, useContext, useState, useCallback, useMemo, useRef } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 /**
  * Parameters for showing a toast notification
@@ -51,10 +58,14 @@ interface ActionToastProviderProps {
 }
 
 // Create context
-const ActionToastContext = createContext<ActionToastContextType | undefined>(undefined);
+const ActionToastContext = createContext<ActionToastContextType | undefined>(
+  undefined,
+);
 
 // ActionToastProvider
-export const ActionToastProvider: React.FC<ActionToastProviderProps> = ({ children }) => {
+export const ActionToastProvider: React.FC<ActionToastProviderProps> = ({
+  children,
+}) => {
   const [toast, setToast] = useState<ActionToastState>({
     text: "",
     cta: null,
@@ -170,29 +181,32 @@ export const ActionToastProvider: React.FC<ActionToastProviderProps> = ({ childr
    * Show the action toast
    * @param params - Toast parameters
    */
-  const showToast = useCallback((params: ActionToastParams) => {
-    // If a toast is currently visible and animating, queue this one
-    if (toast.isVisible && isAnimatingRef.current) {
-      queueRef.current.push(params);
-      // Trigger exit animation for current toast
-      toastRefRef.current?.forceExit();
-      return;
-    }
+  const showToast = useCallback(
+    (params: ActionToastParams) => {
+      // If a toast is currently visible and animating, queue this one
+      if (toast.isVisible && isAnimatingRef.current) {
+        queueRef.current.push(params);
+        // Trigger exit animation for current toast
+        toastRefRef.current?.forceExit();
+        return;
+      }
 
-    // Store callback in ref
-    onDismissRef.current = params.onDismiss;
+      // Store callback in ref
+      onDismissRef.current = params.onDismiss;
 
-    // Show immediately
-    setToast({
-      isVisible: true,
-      text: params.text,
-      cta: params.cta ?? null,
-      icon: params.icon ?? null,
-      thumbnailUri: params.thumbnailUri ?? null,
-    });
+      // Show immediately
+      setToast({
+        isVisible: true,
+        text: params.text,
+        cta: params.cta ?? null,
+        icon: params.icon ?? null,
+        thumbnailUri: params.thumbnailUri ?? null,
+      });
 
-    isAnimatingRef.current = true;
-  }, [toast.isVisible]);
+      isAnimatingRef.current = true;
+    },
+    [toast.isVisible],
+  );
 
   /**
    * Hide the action toast and execute the onDismiss callback if present
@@ -236,7 +250,14 @@ export const ActionToastProvider: React.FC<ActionToastProviderProps> = ({ childr
       registerToastRef,
       onExitComplete,
     }),
-    [toast, showToast, hideToast, dismissToast, registerToastRef, onExitComplete],
+    [
+      toast,
+      showToast,
+      hideToast,
+      dismissToast,
+      registerToastRef,
+      onExitComplete,
+    ],
   );
 
   return (
@@ -253,7 +274,9 @@ export const ActionToastProvider: React.FC<ActionToastProviderProps> = ({ childr
 export const useActionToast = (): ActionToastContextType => {
   const context = useContext(ActionToastContext);
   if (context === undefined) {
-    throw new Error("useActionToast must be used within an ActionToastProvider");
+    throw new Error(
+      "useActionToast must be used within an ActionToastProvider",
+    );
   }
   return context;
 };

@@ -1,11 +1,11 @@
+import * as SecureStore from "expo-secure-store";
 // External Dependencies
 import { create } from "zustand";
-import * as SecureStore from "expo-secure-store";
-import { persist, createJSONStorage } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 
+import type { AuthState, AuthTokens, User } from "@/libs/types";
 // Internal Dependencies
 import { reportWarning } from "@/libs/utils";
-import type { AuthState, User, AuthTokens } from "@/libs/types";
 
 interface AuthStore extends AuthState {
   // Actions

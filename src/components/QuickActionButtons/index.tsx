@@ -1,7 +1,18 @@
-import React from "react";
+import {
+  FontAwesome5,
+  Ionicons,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
-import { FontAwesome5, Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { Linking, Alert, ScrollView, TouchableOpacity, Text, StyleSheet } from "react-native";
+import React from "react";
+import {
+  Alert,
+  Linking,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+} from "react-native";
 
 import { reportError } from "@/libs/utils";
 
@@ -30,9 +41,7 @@ export function QuickActionButtons({
   const handlePhoneCall = async () => {
     try {
       // Format the phone number by removing spaces and special characters
-      const formattedNumber = phone
-        ?.replace(/\s+/g, "")
-        .replace(/[()-]/g, "");
+      const formattedNumber = phone?.replace(/\s+/g, "").replace(/[()-]/g, "");
       const phoneUrl = `tel:${formattedNumber}`;
 
       // Check if the device can handle the URL scheme first
@@ -89,7 +98,12 @@ export function QuickActionButtons({
           style={styles.quickActionButton}
           onPress={() => handleOpenLink(menuUrl as string)}
         >
-          <Ionicons size={16} name="restaurant-outline" color={ICON_COLOR} style={styles.quickActionButtonIcon} />
+          <Ionicons
+            size={16}
+            name="restaurant-outline"
+            color={ICON_COLOR}
+            style={styles.quickActionButtonIcon}
+          />
           <Text style={styles.quickActionButtonText}>Menu</Text>
         </TouchableOpacity>
       )}
@@ -99,7 +113,12 @@ export function QuickActionButtons({
           style={styles.quickActionButton}
           onPress={() => handleOpenLink(directionsUrl as string)}
         >
-          <FontAwesome5 name="directions" size={16} color={ICON_COLOR} style={styles.quickActionButtonIcon} />
+          <FontAwesome5
+            name="directions"
+            size={16}
+            color={ICON_COLOR}
+            style={styles.quickActionButtonIcon}
+          />
           <Text style={styles.quickActionButtonText}>Directions</Text>
         </TouchableOpacity>
       )}
@@ -109,7 +128,12 @@ export function QuickActionButtons({
           style={styles.quickActionButton}
           onPress={handlePhoneCall}
         >
-          <MaterialCommunityIcons name="phone" size={17} color={ICON_COLOR} style={styles.quickActionButtonIcon} />
+          <MaterialCommunityIcons
+            name="phone"
+            size={17}
+            color={ICON_COLOR}
+            style={styles.quickActionButtonIcon}
+          />
           <Text style={styles.quickActionButtonText}>Call</Text>
         </TouchableOpacity>
       )}
@@ -119,7 +143,12 @@ export function QuickActionButtons({
           style={styles.quickActionButton}
           onPress={() => handleOpenLink(instagramUrl as string)}
         >
-          <Ionicons size={16} color={ICON_COLOR} name="logo-instagram" style={styles.quickActionButtonIcon} />
+          <Ionicons
+            size={16}
+            color={ICON_COLOR}
+            name="logo-instagram"
+            style={styles.quickActionButtonIcon}
+          />
           <Text style={styles.quickActionButtonText}>Instagram</Text>
         </TouchableOpacity>
       )}
@@ -129,7 +158,12 @@ export function QuickActionButtons({
           style={styles.quickActionButton}
           onPress={() => handleOpenLink(websiteUrl as string)}
         >
-          <MaterialCommunityIcons name="web" size={16} color={ICON_COLOR} style={styles.quickActionButtonIcon} />
+          <MaterialCommunityIcons
+            name="web"
+            size={16}
+            color={ICON_COLOR}
+            style={styles.quickActionButtonIcon}
+          />
           <Text style={styles.quickActionButtonText}>Website</Text>
         </TouchableOpacity>
       )}
@@ -139,7 +173,12 @@ export function QuickActionButtons({
           style={styles.quickActionButton}
           onPress={() => handleOpenLink(facebookUrl as string)}
         >
-          <Ionicons size={16} color={ICON_COLOR} name="logo-facebook" style={styles.quickActionButtonIcon} />
+          <Ionicons
+            size={16}
+            color={ICON_COLOR}
+            name="logo-facebook"
+            style={styles.quickActionButtonIcon}
+          />
           <Text style={styles.quickActionButtonText}>Facebook</Text>
         </TouchableOpacity>
       )}
@@ -149,7 +188,12 @@ export function QuickActionButtons({
           style={styles.quickActionButton}
           onPress={onOpenHoursClick}
         >
-          <FontAwesome5 name="clock" size={16} color={ICON_COLOR} style={styles.quickActionButtonIcon} />
+          <FontAwesome5
+            name="clock"
+            size={16}
+            color={ICON_COLOR}
+            style={styles.quickActionButtonIcon}
+          />
           <Text style={styles.quickActionButtonText}>Opening Hours</Text>
         </TouchableOpacity>
       )}

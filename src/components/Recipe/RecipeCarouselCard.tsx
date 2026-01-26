@@ -6,8 +6,7 @@ import { Platform, StyleSheet, Text, View } from "react-native";
 // Internal Dependencies
 import type { Recipe } from "@/libs/types";
 import { RECIPE_CAROUSEL_CARD_WIDTH } from "./consts";
-import { ShimmerImage } from "@/components/ShimmerImage";
-import { ImagePlaceholder } from "@/components/ImagePlaceholder";
+import { ImagePlaceholder, ShimmerImage } from "@/components/Image";
 
 const IMAGE_SIZE = 64;
 const IMAGE_RADIUS = 12;
@@ -16,54 +15,58 @@ export interface RecipeCarouselCardProps {
   recipe: Recipe;
 }
 
-export const RecipeCarouselCard = memo<RecipeCarouselCardProps>(({ recipe }) => {
-  const { title, coverUri, cookTime, caloriesPerServing } = recipe;
+export const RecipeCarouselCard = memo<RecipeCarouselCardProps>(
+  ({ recipe }) => {
+    const { title, coverUri, cookTime, caloriesPerServing } = recipe;
 
-  return (
-    <View style={styles.card}>
-      {/* Thumbnail */}
-      <View style={styles.imageContainer}>
-        {coverUri ? (
-          <ShimmerImage
-            contentFit="cover"
-            style={styles.image}
-            source={{ uri: coverUri }}
-          />
-        ) : (
-          <ImagePlaceholder
-            iconSize={20}
-            height={IMAGE_SIZE}
-            style={styles.placeholder}
-          />
-        )}
-      </View>
+    return (
+      <View style={styles.card}>
+        {/* Thumbnail */}
+        <View style={styles.imageContainer}>
+          {coverUri ? (
+            <ShimmerImage
+              contentFit="cover"
+              style={styles.image}
+              source={{ uri: coverUri }}
+            />
+          ) : (
+            <ImagePlaceholder
+              iconSize={20}
+              height={IMAGE_SIZE}
+              style={styles.placeholder}
+            />
+          )}
+        </View>
 
-      {/* Content - to the right of image */}
-      <View style={styles.content}>
-        {/* Title */}
-        <Text style={styles.title} numberOfLines={2}>
-          {title}
-        </Text>
+        {/* Content - to the right of image */}
+        <View style={styles.content}>
+          {/* Title */}
+          <Text style={styles.title} numberOfLines={2}>
+            {title}
+          </Text>
 
-        {/* Metadata */}
-        <View style={styles.metadataContainer}>
-          {cookTime ? (
-            <View style={styles.metadataItem}>
-              <Ionicons name="time" size={14} color="#999" />
-              <Text style={styles.metadataText}>{cookTime} min</Text>
-            </View>
-          ) : null}
-          {caloriesPerServing ? (
-            <View style={styles.metadataItem}>
-              <Ionicons name="flame" size={14} color="#999" />
-              <Text style={styles.metadataText}>{caloriesPerServing} cal</Text>
-            </View>
-          ) : null}
+          {/* Metadata */}
+          <View style={styles.metadataContainer}>
+            {cookTime ? (
+              <View style={styles.metadataItem}>
+                <Ionicons name="time" size={14} color="#999" />
+                <Text style={styles.metadataText}>{cookTime} min</Text>
+              </View>
+            ) : null}
+            {caloriesPerServing ? (
+              <View style={styles.metadataItem}>
+                <Ionicons name="flame" size={14} color="#999" />
+                <Text style={styles.metadataText}>
+                  {caloriesPerServing} cal
+                </Text>
+              </View>
+            ) : null}
+          </View>
         </View>
       </View>
-    </View>
-  );
-});
+    );
+  },
+);
 
 RecipeCarouselCard.displayName = "RecipeCarouselCard";
 

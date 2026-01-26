@@ -1,14 +1,14 @@
 // External Dependencies
 import { Ionicons } from "@expo/vector-icons";
-import { SafeAreaView } from "react-native-safe-area-context";
 import React, { useState, useCallback, useEffect } from "react";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import {
-  View,
-  Text,
   StyleSheet,
+  Text,
   TextInput,
   TouchableOpacity,
+  View,
 } from "react-native";
 
 const MAX_NAME_LENGTH = 50;
@@ -124,7 +124,9 @@ export function WishlistForm({
               isSaveDisabled && styles.saveButtonTextDisabled,
             ]}
           >
-            {isLoading ? (savingButtonText ?? `${saveButtonText}...`) : saveButtonText}
+            {isLoading
+              ? (savingButtonText ?? `${saveButtonText}...`)
+              : saveButtonText}
           </Text>
         </TouchableOpacity>
       </View>

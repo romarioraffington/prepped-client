@@ -1,25 +1,23 @@
-import { useState } from "react";
 import { AntDesign } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
+import { useState } from "react";
 
 import {
-  View,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  StyleSheet,
   Text,
   TextInput,
-  Pressable,
-  Platform,
-  StyleSheet,
-  KeyboardAvoidingView,
+  View,
 } from "react-native";
 
 export default function Edit() {
-  const {
-    firstName: initialFirstName,
-    lastName: initialLastName
-  } = useLocalSearchParams<{
-    firstName: string;
-    lastName: string;
-  }>();
+  const { firstName: initialFirstName, lastName: initialLastName } =
+    useLocalSearchParams<{
+      firstName: string;
+      lastName: string;
+    }>();
 
   const [firstName, setFirstName] = useState(initialFirstName || "");
   const [lastName, setLastName] = useState(initialLastName || "");
@@ -31,7 +29,10 @@ export default function Edit() {
 
   const clearFirstName = () => setFirstName("");
   const clearLastName = () => setLastName("");
-  const isDisabled = !firstName || !lastName || (firstName === initialFirstName && lastName === initialLastName);
+  const isDisabled =
+    !firstName ||
+    !lastName ||
+    (firstName === initialFirstName && lastName === initialLastName);
 
   return (
     <KeyboardAvoidingView
@@ -42,7 +43,8 @@ export default function Edit() {
         <View style={styles.section}>
           <Text style={styles.title}>Name</Text>
           <Text style={styles.description}>
-            This is the name you would like other people to use when referring to you.
+            This is the name you would like other people to use when referring
+            to you.
           </Text>
 
           <View style={styles.inputContainer}>
@@ -82,7 +84,7 @@ export default function Edit() {
           <Pressable
             style={[
               styles.updateButton,
-              isDisabled && styles.updateButtonDisabled
+              isDisabled && styles.updateButtonDisabled,
             ]}
             onPress={handleUpdate}
             disabled={isDisabled}
@@ -91,7 +93,6 @@ export default function Edit() {
           </Pressable>
         </View>
       </View>
-
     </KeyboardAvoidingView>
   );
 }
@@ -99,7 +100,7 @@ export default function Edit() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
   },
   content: {
     flex: 1,
@@ -110,12 +111,12 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 35,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 16,
   },
   description: {
     fontSize: 16,
-    color: '#333',
+    color: "#333",
     marginBottom: 24,
   },
   inputContainer: {
@@ -123,13 +124,13 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: "500",
     marginBottom: 8,
   },
   inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f5f5f5',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f5f5f5",
     borderRadius: 8,
     paddingHorizontal: 12,
   },
@@ -142,15 +143,15 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 5,
     marginTop: 130,
-    alignItems: 'center',
-    backgroundColor: '#000',
+    alignItems: "center",
+    backgroundColor: "#000",
   },
   updateButtonDisabled: {
     opacity: 0.3,
   },
   updateButtonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });

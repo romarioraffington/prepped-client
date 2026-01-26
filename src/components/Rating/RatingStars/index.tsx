@@ -1,7 +1,7 @@
+import { Ionicons } from "@expo/vector-icons";
 // External Dependencies
 import type React from "react";
-import { View, StyleSheet } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { StyleSheet, View } from "react-native";
 
 // Internal Dependencies
 import { Colors } from "@/libs/constants";

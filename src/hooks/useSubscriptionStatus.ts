@@ -1,5 +1,5 @@
-import { ENTITLEMENTS } from "@/libs/types/Subscription";
 import { useSubscription } from "@/contexts/SubscriptionContext";
+import { ENTITLEMENTS } from "@/libs/types/Subscription";
 
 /**
  * Hook to check subscription status and provide utility functions

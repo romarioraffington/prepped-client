@@ -1,19 +1,23 @@
+import * as Haptics from "expo-haptics";
+import { router, useLocalSearchParams } from "expo-router";
 // External Dependencies
 import { useCallback } from "react";
 import { Alert } from "react-native";
-import * as Haptics from "expo-haptics";
-import { router, useLocalSearchParams } from "expo-router";
+
+import { useCreateCookbookMutation } from "@/api";
+import { SingleInputForm } from "@/components";
+import { useActionToast } from "@/contexts";
 
 // Internal Dependencies
-import { reportError } from "@/libs/utils";
-import { useActionToast } from "@/contexts";
-import { SingleInputForm } from "@/components";
-import { useCreateCookbookMutation } from "@/api";
+import { parseSlug, reportError } from "@/libs/utils";
 
 export default function CreateCookbook() {
   const { showToast } = useActionToast();
+  const { recipeSlug } = useLocalSearchParams<{ recipeSlug?: string }>();
   const { mutate: createCookbook, isPending } = useCreateCookbookMutation();
-  const { recipeSlug } = useLocalSearchParams<{ recipeSlug?: string; }>();
+
+  // Parse slug to extract recipe ID if recipeSlug exists
+  const recipeId = recipeSlug ? parseSlug(recipeSlug).id : undefined;
 
   // Common function to handle going back - reopens
   // manage-cookbooks modal if we came from there
@@ -40,16 +44,16 @@ export default function CreateCookbook() {
       // Build request body conditionally
       const requestBody = {
         name,
-        ...(recipeSlug && { recipe_id: recipeSlug }),
+        ...(recipeId && { recipe_id: recipeId }),
       };
 
       createCookbook(requestBody, {
         onSuccess: async (response) => {
-          // Show toast with API response data only if recipeSlug exists
+          // Show toast with API response data only if recipeId exists
           // Hide CTA button since this is a newly created cookbook (no change option)
-          if (recipeSlug) {
+          if (recipeId) {
             showToast({
-              text: `Saved to ${response?.data?.name ?? 'cookbook'}`,
+              text: `Saved to ${response?.data?.name ?? "cookbook"}`,
               thumbnailUri: response.data.imageUris?.[0] || null,
             });
           }
@@ -71,7 +75,7 @@ export default function CreateCookbook() {
         },
       });
     },
-    [isPending, recipeSlug, createCookbook, showToast],
+    [isPending, recipeId, createCookbook, showToast],
   );
 
   const handleCancel = useCallback(() => {

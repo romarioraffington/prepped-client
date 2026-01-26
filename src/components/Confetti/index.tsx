@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
-import Svg, { Circle } from 'react-native-svg';
-import { View, StyleSheet, Dimensions } from 'react-native';
+import React, { useEffect } from "react";
+import { Dimensions, StyleSheet, View } from "react-native";
+import Svg, { Circle } from "react-native-svg";
 
 import Animated, {
   runOnJS,
@@ -9,9 +9,9 @@ import Animated, {
   withSequence,
   useSharedValue,
   useAnimatedStyle,
-} from 'react-native-reanimated';
+} from "react-native-reanimated";
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 interface ConfettiPieceProps {
   delay: number;
@@ -20,7 +20,12 @@ interface ConfettiPieceProps {
   onComplete: () => void;
 }
 
-const ConfettiPiece: React.FC<ConfettiPieceProps> = ({ delay, color, startX, onComplete }) => {
+const ConfettiPiece: React.FC<ConfettiPieceProps> = ({
+  delay,
+  color,
+  startX,
+  onComplete,
+}) => {
   const translateY = useSharedValue(-50);
   const translateX = useSharedValue(startX);
   const rotate = useSharedValue(0);
@@ -36,23 +41,23 @@ const ConfettiPiece: React.FC<ConfettiPieceProps> = ({ delay, color, startX, onC
         withTiming(SCREEN_WIDTH + 100, { duration: randomDuration }),
         withTiming(SCREEN_WIDTH + 100, { duration: 0 }, () => {
           runOnJS(onComplete)();
-        })
-      )
+        }),
+      ),
     );
     translateX.value = withDelay(
       delay,
-      withTiming(startX + randomX, { duration: randomDuration })
+      withTiming(startX + randomX, { duration: randomDuration }),
     );
     rotate.value = withDelay(
       delay,
-      withTiming(360 * (2 + Math.random() * 2), { duration: randomDuration })
+      withTiming(360 * (2 + Math.random() * 2), { duration: randomDuration }),
     );
     opacity.value = withDelay(
       delay,
       withSequence(
         withTiming(1, { duration: randomDuration * 0.7 }),
-        withTiming(0, { duration: randomDuration * 0.3 })
-      )
+        withTiming(0, { duration: randomDuration * 0.3 }),
+      ),
     );
   }, []);
 
@@ -79,10 +84,12 @@ interface ConfettiProps {
 }
 
 export const Confetti: React.FC<ConfettiProps> = ({ onComplete }) => {
-  const [pieces, setPieces] = React.useState<Array<{ id: number; color: string; startX: number }>>([]);
+  const [pieces, setPieces] = React.useState<
+    Array<{ id: number; color: string; startX: number }>
+  >([]);
 
   useEffect(() => {
-    const colors = ['#9333EA', '#A855F7', '#C084FC', '#E9D5FF', '#F3E8FF'];
+    const colors = ["#9333EA", "#A855F7", "#C084FC", "#E9D5FF", "#F3E8FF"];
     const newPieces = Array.from({ length: 50 }, (_, i) => ({
       id: i,
       color: colors[Math.floor(Math.random() * colors.length)],
@@ -121,8 +128,7 @@ const styles = StyleSheet.create({
     zIndex: 9999,
   },
   confettiPiece: {
-    position: 'absolute',
+    position: "absolute",
     top: 0,
   },
 });
-

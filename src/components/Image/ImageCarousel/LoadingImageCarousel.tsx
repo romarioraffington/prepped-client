@@ -1,6 +1,6 @@
 // External dependencies
-import { useEffect } from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
+import { useEffect } from "react";
+import { Dimensions, StyleSheet, View } from "react-native";
 
 import Animated, {
   withTiming,
@@ -8,7 +8,7 @@ import Animated, {
   withSequence,
   useSharedValue,
   useAnimatedStyle,
-} from 'react-native-reanimated';
+} from "react-native-reanimated";
 
 // Internal dependencies
 const LOADING_IMAGE_COUNT = 3;
@@ -32,10 +32,10 @@ export const LoadingImageCarousel = ({
     opacity.value = withRepeat(
       withSequence(
         withTiming(0.7, { duration: 1000 }),
-        withTiming(0.3, { duration: 1000 })
+        withTiming(0.3, { duration: 1000 }),
       ),
       -1,
-      true
+      true,
     );
   }, []);
 
@@ -46,22 +46,24 @@ export const LoadingImageCarousel = ({
   return (
     <View style={{ height: imageHeight }}>
       <View style={styles.imageCarouselContent}>
-        {Array(LOADING_IMAGE_COUNT).fill(0).map((_, index) => (
-          <View
-            key={index}
-            style={[
-              {
-                width: imageWidth,
-                height: imageHeight,
-                marginRight: imageGap,
-              },
-              index === 0 && styles.firstImage,
-              index === 2 && styles.lastImage,
-            ]}
-          >
-            <Animated.View style={[styles.skeletonImage, animatedStyle]} />
-          </View>
-        ))}
+        {Array(LOADING_IMAGE_COUNT)
+          .fill(0)
+          .map((_, index) => (
+            <View
+              key={index}
+              style={[
+                {
+                  width: imageWidth,
+                  height: imageHeight,
+                  marginRight: imageGap,
+                },
+                index === 0 && styles.firstImage,
+                index === 2 && styles.lastImage,
+              ]}
+            >
+              <Animated.View style={[styles.skeletonImage, animatedStyle]} />
+            </View>
+          ))}
       </View>
     </View>
   );
@@ -69,8 +71,8 @@ export const LoadingImageCarousel = ({
 
 const styles = StyleSheet.create({
   imageCarouselContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
   },
   firstImage: {
     marginLeft: 16,
@@ -79,9 +81,9 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   skeletonImage: {
-    width: '100%',
-    height: '100%',
-    backgroundColor: '#e0e0e0',
+    width: "100%",
+    height: "100%",
+    backgroundColor: "#e0e0e0",
     borderRadius: 12,
   },
 });

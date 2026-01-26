@@ -1,8 +1,15 @@
 // External Dependencies
 import { Image, type ImageProps } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
-import { View, StyleSheet, type LayoutChangeEvent } from "react-native";
-import React, { forwardRef, useCallback, useEffect, useMemo, useState, type ComponentRef } from "react";
+import React, {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+  type ComponentRef,
+} from "react";
+import { type LayoutChangeEvent, StyleSheet, View } from "react-native";
 
 import Animated, {
   Easing,
@@ -26,13 +33,20 @@ export type ShimmerImageProps = ImageProps;
  */
 type ExpoImageComponentRef = ComponentRef<typeof Image>;
 
-export const ShimmerImage = forwardRef<ExpoImageComponentRef, ShimmerImageProps>((props, ref) => {
+export const ShimmerImage = forwardRef<
+  ExpoImageComponentRef,
+  ShimmerImageProps
+>((props, ref) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showShimmer, setShowShimmer] = useState(false);
   const [containerWidth, setContainerWidth] = useState(0);
-  const { style, placeholder, onLoadEnd, onLoadStart, onError, ...rest } = props;
+  const { style, placeholder, onLoadEnd, onLoadStart, onError, ...rest } =
+    props;
 
-  const shouldShowShimmer = useMemo(() => isLoading && showShimmer && !placeholder, [isLoading, showShimmer, placeholder]);
+  const shouldShowShimmer = useMemo(
+    () => isLoading && showShimmer && !placeholder,
+    [isLoading, showShimmer, placeholder],
+  );
 
   const translateX = useSharedValue(0);
 
@@ -60,12 +74,13 @@ export const ShimmerImage = forwardRef<ExpoImageComponentRef, ShimmerImageProps>
 
   const shimmerAnimatedStyle = useAnimatedStyle(() => {
     // Calculate opacity based on position for fade effect at edges
-    const progress = (translateX.value + containerWidth * 1.5) / (containerWidth * 3);
+    const progress =
+      (translateX.value + containerWidth * 1.5) / (containerWidth * 3);
     const opacity = interpolate(
       progress,
       [0, 0.1, 0.9, 1],
       [0, 1, 1, 0],
-      'clamp'
+      "clamp",
     );
 
     return {
@@ -74,13 +89,17 @@ export const ShimmerImage = forwardRef<ExpoImageComponentRef, ShimmerImageProps>
     };
   });
 
-  const handleLoadEnd = useCallback<NonNullable<ImageProps["onLoadEnd"]>>(() => {
+  const handleLoadEnd = useCallback<
+    NonNullable<ImageProps["onLoadEnd"]>
+  >(() => {
     setIsLoading(false);
     setShowShimmer(false);
     onLoadEnd?.();
   }, [onLoadEnd]);
 
-  const handleLoadStart = useCallback<NonNullable<ImageProps["onLoadStart"]>>(() => {
+  const handleLoadStart = useCallback<
+    NonNullable<ImageProps["onLoadStart"]>
+  >(() => {
     setIsLoading(true);
     onLoadStart?.();
   }, [onLoadStart]);
@@ -98,11 +117,14 @@ export const ShimmerImage = forwardRef<ExpoImageComponentRef, ShimmerImageProps>
   }, [isLoading, placeholder]);
 
   type OnErrorParams = Parameters<NonNullable<ImageProps["onError"]>>;
-  const handleError = useCallback<NonNullable<ImageProps["onError"]>>((...args: OnErrorParams) => {
-    setIsLoading(false);
-    setShowShimmer(false);
-    onError?.(...args);
-  }, [onError]);
+  const handleError = useCallback<NonNullable<ImageProps["onError"]>>(
+    (...args: OnErrorParams) => {
+      setIsLoading(false);
+      setShowShimmer(false);
+      onError?.(...args);
+    },
+    [onError],
+  );
 
   const onContainerLayout = useCallback((e: LayoutChangeEvent) => {
     setContainerWidth(e.nativeEvent.layout.width);
@@ -124,7 +146,10 @@ export const ShimmerImage = forwardRef<ExpoImageComponentRef, ShimmerImageProps>
       />
 
       {shouldShowShimmer ? (
-        <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.placeholderBase]}>
+        <View
+          pointerEvents="none"
+          style={[StyleSheet.absoluteFill, styles.placeholderBase]}
+        >
           <AnimatedLinearGradient
             colors={["#e5e7eb", "#f3f4f6", "#ffffff", "#f3f4f6", "#e5e7eb"]}
             start={{ x: 0, y: 0.5 }}
@@ -157,4 +182,3 @@ const styles = StyleSheet.create({
     bottom: 0,
   },
 });
-

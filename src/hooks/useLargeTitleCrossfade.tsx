@@ -1,17 +1,12 @@
 // External Dependencies
 import { StyleSheet } from "react-native";
 
-import {
-  useRef,
-  useMemo,
-  useEffect,
-  useCallback,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 
 import {
-  useHeaderHeight,
-  type HeaderTitleProps,
   HeaderTitle as HeaderTitleComponent,
+  type HeaderTitleProps,
+  useHeaderHeight,
 } from "@react-navigation/elements";
 
 import Animated, {
@@ -161,9 +156,15 @@ export function useLargeTitleCrossfade({
   // Returns 0-1 range, typed as number for compatibility
   const headerTitleOpacity = useDerivedValue(() => {
     // Fallback: if no measurement yet, still show title when clearly scrolled past header
-    if (measurementsValid.value === 0 || headerBaselineY.value <= 0 || titleHeight.value <= 0) {
+    if (
+      measurementsValid.value === 0 ||
+      headerBaselineY.value <= 0 ||
+      titleHeight.value <= 0
+    ) {
       const shouldShowFallback = offsetY.value > headerHeight + 8;
-      return withTiming(shouldShowFallback ? 1 : 0, { duration: shouldShowFallback ? 220 : 160 });
+      return withTiming(shouldShowFallback ? 1 : 0, {
+        duration: shouldShowFallback ? 220 : 160,
+      });
     }
 
     // Calculate when header title should appear (when large title is scrolled past)
@@ -179,9 +180,15 @@ export function useLargeTitleCrossfade({
   // Returns 0-1 range, typed as number for compatibility
   const largeTitleOpacity = useDerivedValue(() => {
     // Default to visible if measurements aren't ready, but hide once clearly past header height
-    if (headerBaselineY.value <= 0 || titleHeight.value <= 0 || measurementsValid.value === 0) {
+    if (
+      headerBaselineY.value <= 0 ||
+      titleHeight.value <= 0 ||
+      measurementsValid.value === 0
+    ) {
       const shouldHideFallback = offsetY.value > headerHeight + 8;
-      return withTiming(shouldHideFallback ? 0 : 1, { duration: shouldHideFallback ? 180 : 240 });
+      return withTiming(shouldHideFallback ? 0 : 1, {
+        duration: shouldHideFallback ? 180 : 240,
+      });
     }
 
     // Calculate when large title should disappear (when scrolled past)
@@ -222,7 +229,14 @@ export function useLargeTitleCrossfade({
       titleHeight.value = height;
       measurementsValid.value = 1;
     });
-  }, [currentTitle, previousTitle, headerBaselineY, offsetY, titleHeight, measurementsValid]);
+  }, [
+    currentTitle,
+    previousTitle,
+    headerBaselineY,
+    offsetY,
+    titleHeight,
+    measurementsValid,
+  ]);
 
   // Re-measure when header height changes (can shift threshold on iOS during nav transitions)
   useEffect(() => {
@@ -233,9 +247,13 @@ export function useLargeTitleCrossfade({
   }, [headerHeight, measureTitle]);
 
   // Determine wrapper alignment based on headerTitleStyle
-  const wrapperAlignment = useMemo((): { alignItems: "flex-start" | "center" } => {
+  const wrapperAlignment = useMemo((): {
+    alignItems: "flex-start" | "center";
+  } => {
     const textAlign = (headerTitleStyle as { textAlign?: string })?.textAlign;
-    return textAlign === "left" ? { alignItems: "flex-start" as const } : { alignItems: "center" as const };
+    return textAlign === "left"
+      ? { alignItems: "flex-start" as const }
+      : { alignItems: "center" as const };
   }, [headerTitleStyle]);
 
   // Memoized header title renderer
@@ -243,8 +261,17 @@ export function useLargeTitleCrossfade({
     () =>
       function HeaderTitle(props: HeaderTitleProps) {
         return (
-          <Animated.View style={[rTitleOpacityStyle, styles.headerTitleWrapper, wrapperAlignment]}>
-            <HeaderTitleComponent {...props} style={headerTitleStyle ?? { textAlign: "center" }}>
+          <Animated.View
+            style={[
+              rTitleOpacityStyle,
+              styles.headerTitleWrapper,
+              wrapperAlignment,
+            ]}
+          >
+            <HeaderTitleComponent
+              {...props}
+              style={headerTitleStyle ?? { textAlign: "center" }}
+            >
               {headerTitleText}
             </HeaderTitleComponent>
           </Animated.View>
@@ -263,17 +290,14 @@ export function useLargeTitleCrossfade({
   }, [headerTitleStyle]);
 
   // Function to get header options for setOptions
-  const getHeaderOptions = useCallback(
-    () => {
-      return {
-        headerTransparent: true as const,
-        headerBlurEffect: "light" as const,
-        headerTitle: HeaderTitleRenderer,
-        ...(headerTitleContainerStyle && { headerTitleContainerStyle }),
-      };
-    },
-    [HeaderTitleRenderer, headerTitleContainerStyle],
-  );
+  const getHeaderOptions = useCallback(() => {
+    return {
+      headerTransparent: true as const,
+      headerBlurEffect: "light" as const,
+      headerTitle: HeaderTitleRenderer,
+      ...(headerTitleContainerStyle && { headerTitleContainerStyle }),
+    };
+  }, [HeaderTitleRenderer, headerTitleContainerStyle]);
 
   return {
     titleRef,

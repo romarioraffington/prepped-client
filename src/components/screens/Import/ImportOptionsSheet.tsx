@@ -1,18 +1,21 @@
+import { Ionicons } from "@expo/vector-icons";
+import type BottomSheet from "@gorhom/bottom-sheet";
 // External Dependencies
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
-import { useMemo, useCallback } from "react";
-import { Ionicons } from "@expo/vector-icons";
+import { useCallback, useMemo } from "react";
 import { Alert, Linking } from "react-native";
-import type BottomSheet from "@gorhom/bottom-sheet";
 
+import { useDeleteRecipeMutation } from "@/api";
+import {
+  ActionBottomSheet,
+  type ActionBottomSheetMenuItem,
+} from "@/components/ActionBottomSheet";
+import { useActionToast } from "@/contexts";
 // Internal Dependencies
 import { Colors } from "@/libs/constants";
-import { useActionToast } from "@/contexts";
-import { useDeleteRecipeMutation } from "@/api";
 import type { ImportRecommendation } from "@/libs/types";
 import { createShortSlug, reportError } from "@/libs/utils";
-import { ActionBottomSheet, type ActionBottomSheetMenuItem } from "@/components/ActionBottomSheet";
 
 type ImportData = {
   id: string;
@@ -45,7 +48,8 @@ export function ImportOptionsSheet({
 }: ImportOptionsSheetProps) {
   const router = useRouter();
   const { showToast } = useActionToast();
-  const { mutateAsync: deleteImportAsync, isPending: isDeletePending } = useDeleteRecipeMutation();
+  const { mutateAsync: deleteImportAsync, isPending: isDeletePending } =
+    useDeleteRecipeMutation();
 
   const id = importData.id;
   const recommendations = importData.recommendations || [];
@@ -73,9 +77,14 @@ export function ImportOptionsSheet({
   }, [importData, router, bottomSheetRef]);
 
   const handleAssetPress = useCallback(async () => {
-    const uri = importData.sourceUri ||
-      (importData.asset && 'contentUri' in importData.asset ? importData.asset.contentUri : undefined) ||
-      (importData.asset && 'uri' in importData.asset ? importData.asset.uri : undefined);
+    const uri =
+      importData.sourceUri ||
+      (importData.asset && "contentUri" in importData.asset
+        ? importData.asset.contentUri
+        : undefined) ||
+      (importData.asset && "uri" in importData.asset
+        ? importData.asset.uri
+        : undefined);
 
     if (!uri) {
       reportError(new Error("No URI found for import"), {
@@ -148,7 +157,9 @@ export function ImportOptionsSheet({
             deleteImportAsync(id)
               .then(async () => {
                 // Haptic feedback
-                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                Haptics.notificationAsync(
+                  Haptics.NotificationFeedbackType.Success,
+                );
 
                 // Show success toast with green checkmark
                 showToast({
@@ -169,12 +180,15 @@ export function ImportOptionsSheet({
               })
               .catch((error) => {
                 // Haptic feedback for error
-                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+                Haptics.notificationAsync(
+                  Haptics.NotificationFeedbackType.Error,
+                );
 
                 // Show error alert
                 Alert.alert(
                   "Oops!",
-                  error?.message || "Failed to delete import. Please try again.",
+                  error?.message ||
+                    "Failed to delete import. Please try again.",
                   [{ text: "OK" }],
                 );
               });
@@ -197,51 +211,47 @@ export function ImportOptionsSheet({
     return [
       ...(hasRecommendations
         ? [
-          {
-            renderIcon: () => (
-              <Ionicons size={20} name="map-outline" color="#667" />
-            ),
-            label: "Map",
-            onPress: handleMapPress
-          }
-        ]
+            {
+              renderIcon: () => (
+                <Ionicons size={20} name="map-outline" color="#667" />
+              ),
+              label: "Map",
+              onPress: handleMapPress,
+            },
+          ]
         : []),
       isVideo
         ? {
-          renderIcon: () => (
-            <Ionicons size={20} name="play-outline" color="#667" />
-          ),
-          label: "Watch",
-          onPress: handleAssetPress
-        }
+            renderIcon: () => (
+              <Ionicons size={20} name="play-outline" color="#667" />
+            ),
+            label: "Watch",
+            onPress: handleAssetPress,
+          }
         : {
-          renderIcon: () => (
-            <Ionicons size={20} name="open-outline" color="#667" />
-          ),
-          label: "View",
-          onPress: handleAssetPress
-        },
+            renderIcon: () => (
+              <Ionicons size={20} name="open-outline" color="#667" />
+            ),
+            label: "View",
+            onPress: handleAssetPress,
+          },
       {
         renderIcon: () => (
           <Ionicons size={20} name="person-outline" color="#667" />
         ),
         label: "Creator Profile",
-        onPress: handleAuthorPress
+        onPress: handleAuthorPress,
       },
       {
         renderIcon: () => (
           <Ionicons size={20} name="megaphone-outline" color="#667" />
         ),
         label: "Report Issue",
-        onPress: handleReportPress
+        onPress: handleReportPress,
       },
       {
         renderIcon: () => (
-          <Ionicons
-            size={20}
-            name="trash-outline"
-            color={Colors.destructive}
-          />
+          <Ionicons size={20} name="trash-outline" color={Colors.destructive} />
         ),
         label: "Delete",
         onPress: handleDeletePress,
@@ -271,4 +281,3 @@ export function ImportOptionsSheet({
     />
   );
 }
-

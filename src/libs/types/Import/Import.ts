@@ -1,5 +1,5 @@
-import type { Platform } from "../Platform";
 import type { AssetType } from "../AssetType";
+import type { Platform } from "../Platform";
 
 export interface Import {
   id: string;

@@ -1,17 +1,20 @@
+import { Ionicons } from "@expo/vector-icons";
+import * as Haptics from "expo-haptics";
+import { Image } from "expo-image";
+import { router } from "expo-router";
 // External Dependencies
-import type React from 'react';
-import { Image } from 'expo-image';
-import { router } from 'expo-router';
-import * as Haptics from 'expo-haptics';
-import { Ionicons } from '@expo/vector-icons';
-import { useEffect, useRef, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import type React from "react";
+import { useEffect, useRef, useState } from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 // Internal Dependencies
-import { useImportContent } from '@/hooks';
-import { truncate, reportError } from '@/libs/utils';
-import { Colors, IMPORT_STATUS } from '@/libs/constants';
-import type { ImportProgressItem as ImportProgressItemType, Platform } from '@/libs/types';
+import { useImportContent } from "@/hooks";
+import { Colors, IMPORT_STATUS } from "@/libs/constants";
+import type {
+  ImportProgressItem as ImportProgressItemType,
+  Platform,
+} from "@/libs/types";
+import { reportError, truncate } from "@/libs/utils";
 
 // Consts
 const MAX_TITLE_LENGTH = 25;
@@ -133,7 +136,7 @@ export const ImportProgressItem: React.FC<ImportProgressItemProps> = ({
     try {
       await importContent(url, {
         onSuccess: () => {
-          console.log('Retry successful');
+          console.log("Retry successful");
         },
         onError: (error) => {
           reportError(error, {
@@ -170,61 +173,60 @@ export const ImportProgressItem: React.FC<ImportProgressItemProps> = ({
 
   const getPlatformIcon = (platform: Platform): string => {
     switch (platform) {
-      case 'tiktok':
-        return 'logo-tiktok';
-      case 'instagram':
-        return 'logo-instagram';
-      case 'youtube':
-        return 'logo-youtube';
+      case "tiktok":
+        return "logo-tiktok";
+      case "instagram":
+        return "logo-instagram";
+      case "youtube":
+        return "logo-youtube";
       default:
-        return 'globe-outline';
+        return "globe-outline";
     }
   };
 
   const getStatusText = (
-    status: ImportProgressItemType['status'],
-    progress?: number
+    status: ImportProgressItemType["status"],
+    progress?: number,
   ): string => {
     switch (status) {
       case IMPORT_STATUS.PROCESSING:
         if (progress !== undefined) {
           if (progress > 80) {
-            return 'Wrapping things up… 🎁'
+            return "Wrapping things up… 🎁";
           }
           if (progress === 80) {
             const messages = [
-              'Analyzing your content...🫡',
-              'Still working, bestie… 😗',
-              'Hang tight… 🤗',
-              'Making progress… 😗'
+              "Analyzing your content...🫡",
+              "Still working, bestie… 😗",
+              "Hang tight… 🤗",
+              "Making progress… 😗",
             ];
             return messages[Math.floor(Math.random() * messages.length)];
           }
         }
-        return 'Processing...';
+        return "Processing...";
       case IMPORT_STATUS.FAILED:
-        return 'Failed';
+        return "Failed";
       case IMPORT_STATUS.COMPLETED:
-        return hasRecommendations ? 'Completed' : 'No recommendations found';
+        return hasRecommendations ? "Completed" : "No recommendations found";
       default:
-        return 'Processing...';
+        return "Processing...";
     }
   };
 
-  const getStatusColor = (status: ImportProgressItemType['status']): string => {
+  const getStatusColor = (status: ImportProgressItemType["status"]): string => {
     switch (status) {
-      case 'failed':
+      case "failed":
         return Colors.destructive;
-      case 'completed':
-        return '#34C759';
+      case "completed":
+        return "#34C759";
       default:
-        return '#007AFF';
+        return "#007AFF";
     }
   };
 
   return (
     <View style={[styles.container, style]}>
-
       {/* Thumbnail or Platform Icon */}
       <View style={styles.iconContainer}>
         {thumbnailUri ? (
@@ -235,17 +237,26 @@ export const ImportProgressItem: React.FC<ImportProgressItemProps> = ({
           />
         ) : (
           <View style={styles.iconBackground}>
-            <Ionicons size={22} color="white" name={getPlatformIcon(platform) as any} />
+            <Ionicons
+              size={22}
+              color="white"
+              name={getPlatformIcon(platform) as any}
+            />
           </View>
         )}
       </View>
 
       {/* Content */}
-      <TouchableOpacity style={styles.content} activeOpacity={0.5} onPress={handleContentPress}>
-        <Text style={styles.title} numberOfLines={1}>{truncate(title, MAX_TITLE_LENGTH)}</Text>
+      <TouchableOpacity
+        style={styles.content}
+        activeOpacity={0.5}
+        onPress={handleContentPress}
+      >
+        <Text style={styles.title} numberOfLines={1}>
+          {truncate(title, MAX_TITLE_LENGTH)}
+        </Text>
 
         <View style={styles.statusRow}>
-
           <View style={styles.statusContainer}>
             {/* Completed Icon */}
             {isCompleted && hasRecommendations && (
@@ -258,25 +269,30 @@ export const ImportProgressItem: React.FC<ImportProgressItemProps> = ({
 
             {/* Failed Icon */}
             {isFailed && (
-              <Ionicons name="alert-circle" size={17} color={Colors.destructive} />
+              <Ionicons
+                name="alert-circle"
+                size={17}
+                color={Colors.destructive}
+              />
             )}
 
             {/* Status Text */}
-            <Text style={[styles.statusText, { color: isFailed ? Colors.destructive : '#007AFF' }]}>
+            <Text
+              style={[
+                styles.statusText,
+                { color: isFailed ? Colors.destructive : "#007AFF" },
+              ]}
+            >
               {error || getStatusText(status, displayProgress)}
             </Text>
 
             {/* Tap to view */}
             {isCompleted && hasRecommendations && (
-              <Text style={styles.tapToViewText}>
-                ⋅ Tap to view
-              </Text>
+              <Text style={styles.tapToViewText}>⋅ Tap to view</Text>
             )}
 
             {isFailed && (
-              <Text style={styles.tapToViewText}>
-                ⋅ Tap to retry
-              </Text>
+              <Text style={styles.tapToViewText}>⋅ Tap to retry</Text>
             )}
           </View>
 
@@ -296,8 +312,8 @@ export const ImportProgressItem: React.FC<ImportProgressItemProps> = ({
                 styles.progressBar,
                 {
                   width: `${displayProgress}%`,
-                  backgroundColor: getStatusColor(status)
-                }
+                  backgroundColor: getStatusColor(status),
+                },
               ]}
             />
           </View>
@@ -324,10 +340,10 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     marginVertical: 4,
     marginHorizontal: 40,
-    shadowColor: '#000',
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.90)',
+    shadowColor: "#000",
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(255, 255, 255, 0.90)",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -350,42 +366,42 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 8,
-    alignItems: 'center',
-    backgroundColor: '#330',
-    justifyContent: 'center',
+    alignItems: "center",
+    backgroundColor: "#330",
+    justifyContent: "center",
   },
   content: {
     flex: 1,
   },
   title: {
     fontSize: 15,
-    color: '#000',
+    color: "#000",
     marginBottom: 4,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   statusRow: {
     marginBottom: 6,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   status: {
     fontSize: 12,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   percentage: {
     fontSize: 12,
-    color: '#666',
-    fontWeight: '500',
+    color: "#666",
+    fontWeight: "500",
   },
   progressBarContainer: {
     height: 3,
     borderRadius: 2,
-    overflow: 'hidden',
-    backgroundColor: '#E5E5E7',
+    overflow: "hidden",
+    backgroundColor: "#E5E5E7",
   },
   progressBar: {
-    height: '100%',
+    height: "100%",
     borderRadius: 2,
   },
   closeButton: {
@@ -393,21 +409,21 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     top: 10,
     right: 12,
-    position: 'absolute',
+    position: "absolute",
   },
   statusContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 4,
   },
   tapToViewText: {
-    color: '#667',
+    color: "#667",
     fontSize: 12,
-    fontWeight: '400',
+    fontWeight: "400",
   },
   statusText: {
     fontSize: 12,
-    color: '#667',
-    fontWeight: '500',
+    color: "#667",
+    fontWeight: "500",
   },
 });

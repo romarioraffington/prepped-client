@@ -1,14 +1,20 @@
+import * as Haptics from "expo-haptics";
 // External Dependencies
 import React from "react";
-import * as Haptics from "expo-haptics";
-import { View, Text, TouchableOpacity, StyleSheet, Linking } from "react-native";
+import {
+  Linking,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 // Internal Dependencies
 import { Colors } from "@/libs/constants";
 
+import { RatingBars } from "@/components/Rating/RatingBars";
 // Imported directly to prevent circular dependencies warning
 import { RatingStars } from "@/components/Rating/RatingStars";
-import { RatingBars } from "@/components/Rating/RatingBars";
 
 interface ReviewSummaryChartProps {
   rating?: number;
@@ -20,11 +26,10 @@ interface ReviewSummaryChartProps {
 
 export function ReviewSummaryChart({
   rating = 0,
-  sourceUrl = '',
+  sourceUrl = "",
   reviewCount = 0,
   ratingDistribution = [0, 0, 0, 0, 0],
 }: ReviewSummaryChartProps) {
-
   const handleSourceUrlPress = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (sourceUrl) {
@@ -44,14 +49,21 @@ export function ReviewSummaryChart({
         <View style={styles.reviewSummaryColumnLeft}>
           <View style={styles.reviewSummaryRatingColumn}>
             <Text style={styles.reviewSummaryRating}>{rating}</Text>
-            <RatingStars rating={rating} size={15} color={Colors.pinkAccentColor} />
+            <RatingStars
+              rating={rating}
+              size={15}
+              color={Colors.pinkAccentColor}
+            />
             <Text style={styles.reviewSummaryCount}>({reviewCount})</Text>
           </View>
         </View>
 
         {/* Right: Rating bars */}
         <View style={styles.reviewsRatingColumnRight}>
-          <RatingBars ratings={ratingDistribution} barColor={Colors.pinkAccentColor} />
+          <RatingBars
+            ratings={ratingDistribution}
+            barColor={Colors.pinkAccentColor}
+          />
         </View>
       </TouchableOpacity>
     </View>

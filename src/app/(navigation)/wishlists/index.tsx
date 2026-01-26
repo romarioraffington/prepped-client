@@ -1,33 +1,48 @@
-// External Dependencies
-import * as Haptics from "expo-haptics";
-import { scheduleOnRN } from "react-native-worklets";
-import { useNavigation, useRouter } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
 import { isLiquidGlassAvailable } from "expo-glass-effect";
+// External Dependencies
+import * as Haptics from "expo-haptics";
+import { useNavigation, useRouter } from "expo-router";
+import React, {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useState,
+} from "react";
+import Animated, {
+  useAnimatedReaction,
+  useAnimatedScrollHandler,
+} from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from "react";
-import Animated, { useAnimatedReaction, useAnimatedScrollHandler } from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
 
 import {
   Alert,
-  Text,
-  View,
+  DeviceEventEmitter,
+  type FlatList,
   Platform,
   Pressable,
   StyleSheet,
-  type FlatList,
-  DeviceEventEmitter,
+  Text,
+  View,
 } from "react-native";
 
+import { useDeleteWishlistMutation, useWishlists } from "@/api/wishlist";
+import {
+  DotsLoader,
+  LargeTitle,
+  PinterestRefreshIndicator,
+  WishlistCard,
+  WithPullToRefresh,
+} from "@/components";
 // Internal Dependencies
 import { useActionToast } from "@/contexts";
-import type { WishlistCardData } from "@/libs/types";
-import { truncate, createFullSlug } from "@/libs/utils";
-import { useScrollDirection } from "@/hooks/useScrollDirection";
-import { DotsLoader, LargeTitle, PinterestRefreshIndicator, WishlistCard, WithPullToRefresh } from "@/components";
-import { useLargeTitleCrossfade } from "@/hooks/useLargeTitleCrossfade";
-import { useWishlists, useDeleteWishlistMutation } from "@/api/wishlist";
 import { BOTTOM_NAV_SCROLL_EVENT } from "@/hooks/useBottomNavigationAnimation";
+import { useLargeTitleCrossfade } from "@/hooks/useLargeTitleCrossfade";
+import { useScrollDirection } from "@/hooks/useScrollDirection";
+import type { WishlistCardData } from "@/libs/types";
+import { createFullSlug, truncate } from "@/libs/utils";
 
 type Wishlist = WishlistCardData;
 
@@ -40,8 +55,8 @@ export default function WishlistScreen() {
   const flatListRef = React.useRef<FlatList>(null);
   const [isHeaderScrolled, setIsHeaderScrolled] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const { mutateAsync: deleteWishlistAsync, isPending: isDeletePending } = useDeleteWishlistMutation();
-
+  const { mutateAsync: deleteWishlistAsync, isPending: isDeletePending } =
+    useDeleteWishlistMutation();
 
   const {
     data,
@@ -71,7 +86,7 @@ export default function WishlistScreen() {
       if (hasInitialDataRef.current) {
         refetch();
       }
-    }, [refetch])
+    }, [refetch]),
   );
 
   // Use the crossfade hook for title animation
@@ -94,7 +109,8 @@ export default function WishlistScreen() {
 
   // Track scroll direction for bottom nav visibility
   const [isTabBarHidden, setIsTabBarHidden] = useState(false);
-  const { scrollDirection, onScroll: handleScrollDirection } = useScrollDirection();
+  const { scrollDirection, onScroll: handleScrollDirection } =
+    useScrollDirection();
 
   // Emit bottom nav visibility events based on scroll direction
   const handleBottomNavVisibility = useCallback((shouldHideNav: boolean) => {
@@ -139,10 +155,14 @@ export default function WishlistScreen() {
           hitSlop={8}
           style={[
             styles.headerButton,
-            !isLiquidGlassAvailable() && !isHeaderScrolled && styles.headerButtonEditing,
+            !isLiquidGlassAvailable() &&
+              !isHeaderScrolled &&
+              styles.headerButtonEditing,
           ]}
         >
-          <Text style={styles.headerButtonText}>{isEditing ? "Done" : "Edit"}</Text>
+          <Text style={styles.headerButtonText}>
+            {isEditing ? "Done" : "Edit"}
+          </Text>
         </Pressable>
       ),
     });
@@ -182,7 +202,9 @@ export default function WishlistScreen() {
         // Show error alert
         Alert.alert(
           "Oops!",
-          error instanceof Error ? error.message : "Failed to delete wishlist. Please try again.",
+          error instanceof Error
+            ? error.message
+            : "Failed to delete wishlist. Please try again.",
           [{ text: "OK" }],
         );
       }
@@ -197,7 +219,11 @@ export default function WishlistScreen() {
         `"${item.name}" will be permanently deleted.`,
         [
           { text: "Cancel", style: "cancel" },
-          { text: "Delete", style: "destructive", onPress: () => handleDelete(item) },
+          {
+            text: "Delete",
+            style: "destructive",
+            onPress: () => handleDelete(item),
+          },
         ],
         { cancelable: true },
       );
@@ -247,7 +273,9 @@ export default function WishlistScreen() {
       {isError ? (
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyTitle}>Something went wrong</Text>
-          <Text style={styles.emptySubtitle}>Please try again in a moment.</Text>
+          <Text style={styles.emptySubtitle}>
+            Please try again in a moment.
+          </Text>
         </View>
       ) : (
         <WithPullToRefresh

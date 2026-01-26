@@ -1,25 +1,25 @@
 // External Dependencies
 import { Image } from "expo-image";
-import { Linking } from "react-native";
-import React, { useState, useEffect } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useLocalSearchParams, useNavigation } from "expo-router";
+import React, { useState, useEffect } from "react";
+import { Linking } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import {
-  View,
-  Text,
-  StyleSheet,
+  ActivityIndicator,
   Dimensions,
   ScrollView,
-  ActivityIndicator,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 
+import { useRecommendationPhotos } from "@/api";
+import { ProfileIcon } from "@/components";
 // Our Dependencies
 import { reportError } from "@/libs/utils";
-import { ProfileIcon } from "@/components";
-import { useRecommendationPhotos } from "@/api";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
 export default function RecommendationPhotosContent() {
   const navigation = useNavigation();
@@ -50,7 +50,6 @@ export default function RecommendationPhotosContent() {
       ),
     });
   }, [navigation, name, currentPhotoNumber, photos?.length]);
-
 
   if (isLoading) {
     return (
@@ -98,7 +97,11 @@ export default function RecommendationPhotosContent() {
       {photos.map((photo, index) => (
         <View key={`${photo.id}`}>
           <View style={styles.imageContainer}>
-            <Image contentFit="cover" style={styles.image} source={{ uri: photo.uri }} />
+            <Image
+              contentFit="cover"
+              style={styles.image}
+              source={{ uri: photo.uri }}
+            />
           </View>
 
           {/* Author Attribution for each photo */}
@@ -106,11 +109,17 @@ export default function RecommendationPhotosContent() {
             <ProfileIcon
               size={24}
               imageUrl={photo?.authorAttribution?.photoUri || undefined}
-              letter={photo?.authorAttribution?.displayName?.charAt(0).toUpperCase()}
-              onPress={() => handleAuthorPress(photo?.authorAttribution?.profileUri)}
+              letter={photo?.authorAttribution?.displayName
+                ?.charAt(0)
+                .toUpperCase()}
+              onPress={() =>
+                handleAuthorPress(photo?.authorAttribution?.profileUri)
+              }
             />
             {photo?.authorAttribution?.displayName && (
-              <Text style={styles.authorName}>{photo?.authorAttribution?.displayName}</Text>
+              <Text style={styles.authorName}>
+                {photo?.authorAttribution?.displayName}
+              </Text>
             )}
           </View>
         </View>
@@ -122,58 +131,57 @@ export default function RecommendationPhotosContent() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
+    backgroundColor: "#000",
   },
   scrollViewContentContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#000',
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#000",
   },
   headerTitle: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: '600',
-    textAlign: 'center',
+    fontWeight: "600",
+    textAlign: "center",
   },
   counterText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   imageContainer: {
     width,
   },
   image: {
-    width: '100%',
+    width: "100%",
     height: 300,
   },
   loadingContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   errorContainer: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   errorText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   authorContainer: {
     left: 10,
     bottom: "-28%",
-    position: 'absolute',
-    flexDirection: 'row',
-    alignItems: 'center',
+    position: "absolute",
+    flexDirection: "row",
+    alignItems: "center",
     gap: 8,
   },
   authorName: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
 });
-

@@ -1,15 +1,16 @@
-import { Stack } from 'expo-router';
+import { Stack } from "expo-router";
 
 export default function OnboardingLayout() {
   return (
     <Stack
       screenOptions={{
-        headerTitle: '',
-        headerTintColor: '#fff',
+        headerTitle: "",
+        headerTintColor: "#fff",
         headerShadowVisible: false,
         headerTransparent: true,
-        headerBackButtonDisplayMode: 'minimal',
-      }}>
+        headerBackButtonDisplayMode: "minimal",
+      }}
+    >
       <Stack.Screen
         name="get-started"
         options={{
@@ -20,7 +21,7 @@ export default function OnboardingLayout() {
         name="setup"
         options={{
           headerShown: true,
-          headerBackTitle: 'Get Started',
+          headerBackTitle: "Get Started",
         }}
       />
       <Stack.Screen

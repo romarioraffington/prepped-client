@@ -1,28 +1,40 @@
+import { AntDesign } from "@expo/vector-icons";
+import { useHeaderHeight } from "@react-navigation/elements";
+import { useQueryClient } from "@tanstack/react-query";
+import { router, useNavigation } from "expo-router";
+import React, { useEffect, useState, useLayoutEffect } from "react";
 // External Imports
 import Animated from "react-native-reanimated";
-import { AntDesign } from "@expo/vector-icons";
-import React, { useEffect, useState, useLayoutEffect, } from "react";
-import { useQueryClient } from "@tanstack/react-query";
-import { useHeaderHeight } from "@react-navigation/elements";
-import { router, useNavigation } from "expo-router";
 
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  RefreshControl,
-  Linking,
   Alert,
+  Linking,
+  RefreshControl,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
+import {
+  ChevronForward,
+  LargeTitle,
+  ListItem,
+  ProfileIcon,
+  SubscriptionStatus,
+} from "@/components";
+import { useAuth, useSubscription } from "@/contexts";
+import { useLargeTitleCrossfade } from "@/hooks";
 // Internal Imports
 import { Colors } from "@/libs/constants";
-import { useLargeTitleCrossfade } from "@/hooks";
-import { useAuth, useSubscription } from "@/contexts";
+import {
+  APP_BUILD_NUMBER,
+  APP_STORE_ID,
+  APP_VERSION,
+  LEGAL_ROUTES,
+  QUERY_KEYS,
+} from "@/libs/constants";
 import { reportError, reportWarning } from "@/libs/utils/errorReporting";
-import { ProfileIcon, ListItem, ChevronForward, SubscriptionStatus, LargeTitle } from "@/components";
-import { APP_VERSION, APP_BUILD_NUMBER, APP_STORE_ID, QUERY_KEYS, LEGAL_ROUTES } from "@/libs/constants";
 
 export default function Account() {
   const title = "Account";
@@ -68,7 +80,6 @@ export default function Account() {
     }
   }, [isAuthenticated, router]);
 
-
   const handleProfilePress = () => {
     router.push("/account/profile");
   };
@@ -83,7 +94,6 @@ export default function Account() {
 
   const handleReviewPress = async () => {
     try {
-
       const url = `itms-apps://itunes.apple.com/app/${APP_STORE_ID}?action=write-review`;
       const fallbackUrl = `https://apps.apple.com/app/${APP_STORE_ID}`;
 
@@ -95,14 +105,15 @@ export default function Account() {
         await Linking.openURL(fallbackUrl);
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       reportWarning(errorMessage, {
         component: "AccountScreen",
         action: "Open App Store for Review",
       });
       Alert.alert(
         "Oops!",
-        "Something went wrong. Please visit the App Store to leave a review!"
+        "Something went wrong. Please visit the App Store to leave a review!",
       );
     }
   };
@@ -127,7 +138,9 @@ export default function Account() {
       await refreshSubscriptionStatus();
 
       // Refresh quota status
-      await queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.RECIPE_QUOTA] });
+      await queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.RECIPE_QUOTA],
+      });
     } catch (error) {
       reportError(error, {
         component: "AccountScreen",
@@ -144,7 +157,10 @@ export default function Account() {
         onScroll={scrollHandler}
         scrollEventThrottle={16}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={[styles.contentContainer, { paddingTop: headerHeight + 16 }]}
+        contentContainerStyle={[
+          styles.contentContainer,
+          { paddingTop: headerHeight + 16 },
+        ]}
         refreshControl={
           <RefreshControl
             tintColor={Colors.primary}
@@ -182,7 +198,9 @@ export default function Account() {
               {displayName ? (
                 <Text style={styles.profileName}>{displayName}</Text>
               ) : (
-                <Text style={[styles.profileName, { fontSize: 15 }]}>{user?.email}</Text>
+                <Text style={[styles.profileName, { fontSize: 15 }]}>
+                  {user?.email}
+                </Text>
               )}
               <Text style={styles.profileAction}>Show profile</Text>
             </View>
@@ -216,7 +234,6 @@ export default function Account() {
             title="Send feedback"
             onPress={() => router.push("/feedback?returnTo=account")}
           />
-
         </View>
 
         {/* Legal Section */}
@@ -240,7 +257,9 @@ export default function Account() {
         </TouchableOpacity>
 
         {/* Version */}
-        <Text style={styles.versionText}>VERSION {APP_VERSION} ({APP_BUILD_NUMBER})</Text>
+        <Text style={styles.versionText}>
+          VERSION {APP_VERSION} ({APP_BUILD_NUMBER})
+        </Text>
       </Animated.ScrollView>
     </View>
   );
@@ -282,7 +301,6 @@ const styles = StyleSheet.create({
     color: "#717171",
     marginTop: 4,
   },
-
 
   // Other
   sectionTitle: {

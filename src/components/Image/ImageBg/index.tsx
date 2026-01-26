@@ -1,6 +1,6 @@
 import { Image } from "expo-image";
 import React, { type FC, memo } from "react";
-import { View, StyleSheet } from "react-native";
+import { StyleSheet, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 const AnimatedImage = Animated.createAnimatedComponent(Image);

@@ -1,10 +1,10 @@
 // External Dependencies
 import { useMutation } from "@tanstack/react-query";
 
+import { API_ENDPOINTS, getApiClient } from "@/libs/constants";
+import type { AuthProvider, AuthTokens, User } from "@/libs/types";
 // Internal Dependencies
 import { reportError } from "@/libs/utils";
-import { API_ENDPOINTS, getApiClient } from "@/libs/constants";
-import type { User, AuthTokens, AuthProvider } from "@/libs/types";
 
 interface SocialLoginRequest {
   provider: AuthProvider;

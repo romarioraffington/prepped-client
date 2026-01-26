@@ -1,9 +1,9 @@
 // External Dependencies
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+import { API_ENDPOINTS, QUERY_KEYS, getApiClient } from "@/libs/constants";
 // Internal Dependencies
 import { parseSlug, reportError } from "@/libs/utils";
-import { API_ENDPOINTS, getApiClient, QUERY_KEYS } from "@/libs/constants";
 
 export interface SaveRecipeToCookbookResponse {
   cookbookIds: string[];

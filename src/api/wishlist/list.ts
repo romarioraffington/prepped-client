@@ -1,14 +1,14 @@
 import { useAuthStore } from "@/stores/authStore";
 import { useInfiniteQuery } from "@tanstack/react-query";
 
+import { API_ENDPOINTS, QUERY_KEYS, getApiClient } from "@/libs/constants";
 import { reportError } from "@/libs/utils";
-import { API_ENDPOINTS, getApiClient, QUERY_KEYS } from "@/libs/constants";
 
 import type {
   WishlistCardData,
-  WishlistMember,
   WishlistListItem,
   WishlistListResponse,
+  WishlistMember,
   WishlistPageResult,
 } from "@/libs/types";
 

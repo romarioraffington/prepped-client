@@ -1,7 +1,7 @@
+import * as SecureStore from "expo-secure-store";
 // External Dependencies
 import { create } from "zustand";
-import * as SecureStore from "expo-secure-store";
-import { persist, createJSONStorage } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 import Purchases, {
   type CustomerInfo,
@@ -10,10 +10,10 @@ import Purchases, {
   type PurchasesEntitlementInfo,
 } from "react-native-purchases";
 
-// Internal Dependencies
-import { reportError, reportWarning } from "@/libs/utils";
 import { ENTITLEMENTS } from "@/libs/types/Subscription";
 import type { SubscriptionStore } from "@/libs/types/Subscription";
+// Internal Dependencies
+import { reportError, reportWarning } from "@/libs/utils";
 
 const secureStorage = {
   getItem: async (name: string): Promise<string | null> => {

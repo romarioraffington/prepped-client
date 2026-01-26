@@ -2,16 +2,16 @@
 import * as Haptics from "expo-haptics";
 
 import {
+  type InfiniteData,
   useMutation,
   useQueryClient,
-  type InfiniteData,
 } from "@tanstack/react-query";
 
+import type { WishlistDetailPageResult } from "@/api/wishlist/detail";
+import { API_ENDPOINTS, QUERY_KEYS, getApiClient } from "@/libs/constants";
+import type { WishlistPageResult } from "@/libs/types";
 // Internal Dependencies
 import { parseSlug, reportError } from "@/libs/utils";
-import type { WishlistPageResult } from "@/libs/types";
-import type { WishlistDetailPageResult } from "@/api/wishlist/detail";
-import { API_ENDPOINTS, getApiClient, QUERY_KEYS } from "@/libs/constants";
 
 export interface UpdateWishlistRequest {
   name: string;

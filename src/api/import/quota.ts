@@ -1,9 +1,9 @@
 //External Dependencies
 import { useQuery } from "@tanstack/react-query";
 
+import { QUERY_KEYS } from "@/libs/constants";
 //Internal Dependencies
 import type { ImportQuota } from "@/libs/types";
-import { QUERY_KEYS } from "@/libs/constants";
 
 const fetchImportQuota = async (): Promise<ImportQuota> => {
   // Return hardcoded values for now

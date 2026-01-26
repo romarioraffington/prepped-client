@@ -1,5 +1,5 @@
-import { useEffect, useState, useCallback, useMemo } from "react";
 import * as Updates from "expo-updates";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { reportError } from "@/libs/utils";
 

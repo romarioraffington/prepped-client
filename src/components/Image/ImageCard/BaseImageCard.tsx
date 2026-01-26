@@ -1,17 +1,17 @@
 // External Dependencies
 import type React from "react";
-import { useState, useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
+
 import {
   View,
   StyleSheet,
-  TouchableOpacity,
   type ImageStyle,
   type StyleProp,
+  TouchableOpacity,
 } from "react-native";
 
 // Internal Dependencies
-import { ShimmerImage } from "@/components/ShimmerImage";
-import { ImagePlaceholder } from "@/components/ImagePlaceholder";
+import { ImagePlaceholder, ShimmerImage } from "@/components/Image";
 
 // Height options for masonry variation (creates staggered effect)
 // Matches Pinterest-style dramatic height differences
@@ -50,8 +50,8 @@ export const BaseImageCard: React.FC<BaseImageCardProps> = ({
   // Pattern creates Pinterest-style stagger: tall, medium, short, tall...
   const getHeightFromIndex = (idx: number): number => {
     const pattern = [
-      CARD_HEIGHTS.tall,    // 0: first item tall
-      CARD_HEIGHTS.medium,  // 1: second medium
+      CARD_HEIGHTS.tall, // 0: first item tall
+      CARD_HEIGHTS.medium, // 1: second medium
     ];
     return pattern[idx % pattern.length];
   };

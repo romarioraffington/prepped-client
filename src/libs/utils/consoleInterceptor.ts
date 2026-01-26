@@ -7,7 +7,9 @@ const originalConsoleError = console.error;
  * Extract component/file name from stack trace
  * This provides automatic context without requiring explicit reportError calls
  */
-const extractContextFromStack = (error: Error): {
+const extractContextFromStack = (
+  error: Error,
+): {
   component?: string;
   file?: string;
   function?: string;
@@ -25,11 +27,18 @@ const extractContextFromStack = (error: Error): {
     const fileMatch = line.match(/\(([^)]+\.(tsx?|jsx?)):\d+:\d+\)/);
 
     if (functionMatch || fileMatch) {
-      const fileName = fileMatch?.[1]?.split("/").pop()?.replace(/\.(tsx?|jsx?)$/, "");
+      const fileName = fileMatch?.[1]
+        ?.split("/")
+        .pop()
+        ?.replace(/\.(tsx?|jsx?)$/, "");
       const functionName = functionMatch?.[1];
 
       // Prefer component-like names (PascalCase) or meaningful function names
-      if (functionName && (functionName[0] === functionName[0].toUpperCase() || functionName.length > 3)) {
+      if (
+        functionName &&
+        (functionName[0] === functionName[0].toUpperCase() ||
+          functionName.length > 3)
+      ) {
         return {
           component: functionName,
           file: fileName,

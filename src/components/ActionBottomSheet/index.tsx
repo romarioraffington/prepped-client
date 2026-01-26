@@ -1,11 +1,20 @@
+import { Ionicons } from "@expo/vector-icons";
+import BottomSheet, {
+  BottomSheetBackdrop,
+  BottomSheetView,
+} from "@gorhom/bottom-sheet";
 // External Dependencies
 import { Image } from "expo-image";
 import type { ReactNode } from "react";
-import { Ionicons } from "@expo/vector-icons";
-import { Portal } from "react-native-portalize";
 import { forwardRef, useMemo, useRef, useState } from "react";
-import { Animated, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet";
+import {
+  Animated,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import { Portal } from "react-native-portalize";
 
 // Internal Dependencies
 import { Colors } from "@/libs/constants";
@@ -38,7 +47,6 @@ export const ActionBottomSheet = forwardRef<
   BottomSheet,
   ActionBottomSheetProps
 >((props, ref) => {
-
   const {
     snapPoints,
     index = -1,
@@ -50,15 +58,20 @@ export const ActionBottomSheet = forwardRef<
   } = props;
 
   const closeAnimRef = useRef<Animated.CompositeAnimation | null>(null);
-  const imageTranslateY = useRef(new Animated.Value(PREVIEW_IMAGE_VISIBLE_TRANSLATE_Y)).current;
-  const [imageStatus, setImageStatus] = useState<"loading" | "loaded" | "error">("loading");
+  const imageTranslateY = useRef(
+    new Animated.Value(PREVIEW_IMAGE_VISIBLE_TRANSLATE_Y),
+  ).current;
+  const [imageStatus, setImageStatus] = useState<
+    "loading" | "loaded" | "error"
+  >("loading");
 
   // Determine if we should show the image (has URI, loaded successfully, no error)
   const showImage = headerImageUri && imageStatus === "loaded";
 
   // Show title when: explicitly provided AND (no image URI OR image errored OR still loading)
   // This prevents flash - title shows until image is confirmed loaded
-  const showTitle = headerTitle && (!headerImageUri || imageStatus !== "loaded");
+  const showTitle =
+    headerTitle && (!headerImageUri || imageStatus !== "loaded");
 
   const handleOnAnimate = (fromIndex: number, toIndex: number) => {
     if (toIndex === -1) {
@@ -93,7 +106,10 @@ export const ActionBottomSheet = forwardRef<
   };
 
   const itemsToRender = useMemo(
-    () => (menuItems ?? []).filter((m): m is ActionBottomSheetMenuItem => !!m && !m.hidden),
+    () =>
+      (menuItems ?? []).filter(
+        (m): m is ActionBottomSheetMenuItem => !!m && !m.hidden,
+      ),
     [menuItems],
   );
   const hasMenu = itemsToRender.length > 0;
@@ -107,20 +123,34 @@ export const ActionBottomSheet = forwardRef<
         enablePanDownToClose
         backgroundStyle={styles.bottomSheetBackground}
         handleIndicatorStyle={styles.handleIndicator}
-        handleComponent={headerImageUri && imageStatus !== "error" ? () => (
-          <View style={[styles.previewImageContainer, imageStatus === "loading" && { opacity: 0 }]}>
-            <Animated.View style={[styles.previewImage, { transform: [{ translateY: imageTranslateY }] }]}>
-              <Image
-                contentFit="cover"
-                transition={200}
-                source={{ uri: headerImageUri }}
-                style={StyleSheet.absoluteFill}
-                onLoad={() => setImageStatus("loaded")}
-                onError={() => setImageStatus("error")}
-              />
-            </Animated.View>
-          </View>
-        ) : undefined}
+        handleComponent={
+          headerImageUri && imageStatus !== "error"
+            ? () => (
+                <View
+                  style={[
+                    styles.previewImageContainer,
+                    imageStatus === "loading" && { opacity: 0 },
+                  ]}
+                >
+                  <Animated.View
+                    style={[
+                      styles.previewImage,
+                      { transform: [{ translateY: imageTranslateY }] },
+                    ]}
+                  >
+                    <Image
+                      contentFit="cover"
+                      transition={200}
+                      source={{ uri: headerImageUri }}
+                      style={StyleSheet.absoluteFill}
+                      onLoad={() => setImageStatus("loaded")}
+                      onError={() => setImageStatus("error")}
+                    />
+                  </Animated.View>
+                </View>
+              )
+            : undefined
+        }
         backdropComponent={(props) => (
           <BottomSheetBackdrop
             {...props}
@@ -143,17 +173,24 @@ export const ActionBottomSheet = forwardRef<
       >
         <BottomSheetView>
           <View style={styles.headerRow}>
-            {showTitle && (<Text style={styles.headerTitle}>{headerTitle}</Text>)}
-            <TouchableOpacity onPress={handleClose} style={[styles.closeButton, showImage && { top: 30 }]}>
+            {showTitle && <Text style={styles.headerTitle}>{headerTitle}</Text>}
+            <TouchableOpacity
+              onPress={handleClose}
+              style={[styles.closeButton, showImage && { top: 30 }]}
+            >
               <Ionicons name="close" size={22} color="#000" />
             </TouchableOpacity>
           </View>
 
           {hasMenu && (
-            <View style={[
-              styles.menuItemContainer,
-              showTitle ? { paddingTop: 30 } : showImage && { paddingTop: 90 },
-            ]}>
+            <View
+              style={[
+                styles.menuItemContainer,
+                showTitle
+                  ? { paddingTop: 30 }
+                  : showImage && { paddingTop: 90 },
+              ]}
+            >
               {itemsToRender.map((item, idx) => (
                 <TouchableOpacity
                   key={`${item.label}-${idx}`}
@@ -162,10 +199,12 @@ export const ActionBottomSheet = forwardRef<
                   disabled={item.disabled}
                 >
                   {item.renderIcon?.()}
-                  <Text style={[
-                    styles.menuItemText,
-                    item.destructive && styles.menuItemTextDestructive
-                  ]}>
+                  <Text
+                    style={[
+                      styles.menuItemText,
+                      item.destructive && styles.menuItemTextDestructive,
+                    ]}
+                  >
                     {item.label}
                   </Text>
                 </TouchableOpacity>
@@ -176,8 +215,7 @@ export const ActionBottomSheet = forwardRef<
       </BottomSheet>
     </Portal>
   );
-},
-);
+});
 
 export default ActionBottomSheet;
 
@@ -193,9 +231,11 @@ const styles = StyleSheet.create({
     top: 0,
     left: "50%",
     position: "absolute",
-    transform: [{
-      translateX: PREVIEW_IMAGE_TRANSLATE_X,
-    }],
+    transform: [
+      {
+        translateX: PREVIEW_IMAGE_TRANSLATE_X,
+      },
+    ],
   },
   previewImage: {
     height: 160,
@@ -241,5 +281,3 @@ const styles = StyleSheet.create({
     color: Colors.destructive,
   },
 });
-
-

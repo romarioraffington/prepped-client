@@ -1,6 +1,6 @@
 // External dependencies
-import { useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { useEffect } from "react";
+import { StyleSheet, View } from "react-native";
 
 import Animated, {
   withTiming,
@@ -8,10 +8,10 @@ import Animated, {
   withSequence,
   useSharedValue,
   useAnimatedStyle,
-} from 'react-native-reanimated';
+} from "react-native-reanimated";
 
 // Internal dependencies
-import { LoadingImageCarousel } from "@/components/ImageCarousel";
+import { LoadingImageCarousel } from "@/components/Image";
 
 export const LoadingEntityCard = () => {
   const opacity = useSharedValue(0.3);
@@ -20,10 +20,10 @@ export const LoadingEntityCard = () => {
     opacity.value = withRepeat(
       withSequence(
         withTiming(0.7, { duration: 1000 }),
-        withTiming(0.3, { duration: 1000 })
+        withTiming(0.3, { duration: 1000 }),
       ),
       -1,
-      true
+      true,
     );
   }, []);
 
@@ -33,7 +33,6 @@ export const LoadingEntityCard = () => {
 
   return (
     <View style={styles.card}>
-
       {/* Image Carousel Skeleton */}
       <LoadingImageCarousel />
 
@@ -55,8 +54,8 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: 12,
     marginBottom: 15,
-    overflow: 'hidden',
-    backgroundColor: '#fff',
+    overflow: "hidden",
+    backgroundColor: "#fff",
   },
   content: {
     padding: 12,
@@ -66,30 +65,30 @@ const styles = StyleSheet.create({
     width: 140,
     borderRadius: 4,
     marginBottom: 6,
-    backgroundColor: '#E1E1E1',
+    backgroundColor: "#E1E1E1",
   },
   ratingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 6,
   },
   skeletonStars: {
     height: 14,
     width: 100,
-    backgroundColor: '#E1E1E1',
+    backgroundColor: "#E1E1E1",
     borderRadius: 4,
     marginRight: 10,
   },
   skeletonReviewCount: {
     height: 14,
     width: 50,
-    backgroundColor: '#E1E1E1',
+    backgroundColor: "#E1E1E1",
     borderRadius: 4,
   },
   skeletonStatus: {
     height: 14,
     width: 160,
-    backgroundColor: '#E1E1E1',
+    backgroundColor: "#E1E1E1",
     borderRadius: 4,
     marginBottom: 12,
   },
@@ -97,6 +96,6 @@ const styles = StyleSheet.create({
     width: 250,
     height: 14,
     borderRadius: 4,
-    backgroundColor: '#E1E1E1',
+    backgroundColor: "#E1E1E1",
   },
 });

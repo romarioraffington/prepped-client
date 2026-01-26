@@ -1,20 +1,26 @@
+import { Ionicons } from "@expo/vector-icons";
+import type BottomSheet from "@gorhom/bottom-sheet";
+import * as Haptics from "expo-haptics";
 // External Dependencies
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import * as Haptics from "expo-haptics";
 import type { ComponentProps } from "react";
-import { useMemo, useCallback } from "react";
-import { Ionicons } from "@expo/vector-icons";
-import type BottomSheet from "@gorhom/bottom-sheet";
+import { useCallback, useMemo } from "react";
 import { Alert, Linking, StyleSheet, Text } from "react-native";
 
+import {
+  useDeleteRecipeMutation,
+  useRemoveRecipeFromCookbookMutation,
+} from "@/api";
+import {
+  ActionBottomSheet,
+  type ActionBottomSheetMenuItem,
+} from "@/components/ActionBottomSheet";
 // Internal Dependencies
 import { useActionToast } from "@/contexts";
 import { Colors } from "@/libs/constants";
-import { reportError, createFullSlug } from "@/libs/utils";
 import type { Recipe, RecipeOptionsVariant } from "@/libs/types";
-import { useDeleteRecipeMutation, useRemoveRecipeFromCookbookMutation } from "@/api";
-import { ActionBottomSheet, type ActionBottomSheetMenuItem } from "@/components/ActionBottomSheet";
+import { createFullSlug, reportError } from "@/libs/utils";
 
 type IoniconName = ComponentProps<typeof Ionicons>["name"];
 
@@ -37,8 +43,10 @@ export function RecipeOptionsSheet({
 }: RecipeOptionsSheetProps) {
   const router = useRouter();
   const { showToast } = useActionToast();
-  const { mutateAsync: deleteRecipeAsync, isPending: isDeletePending } = useDeleteRecipeMutation();
-  const { mutateAsync: removeFromCookbookAsync, isPending: isRemovePending } = useRemoveRecipeFromCookbookMutation();
+  const { mutateAsync: deleteRecipeAsync, isPending: isDeletePending } =
+    useDeleteRecipeMutation();
+  const { mutateAsync: removeFromCookbookAsync, isPending: isRemovePending } =
+    useRemoveRecipeFromCookbookMutation();
 
   const recipeId = recipeData.id;
 
@@ -56,9 +64,9 @@ export function RecipeOptionsSheet({
   }, [variant]);
 
   /**
- * Get the social platform icon based on platformId
- * Platform IDs: WEB = 1, TIKTOK = 2, YOUTUBE = 3, INSTAGRAM = 4, PINTEREST = 5
- */
+   * Get the social platform icon based on platformId
+   * Platform IDs: WEB = 1, TIKTOK = 2, YOUTUBE = 3, INSTAGRAM = 4, PINTEREST = 5
+   */
   function getSocialIcon(platformId?: number | null): IoniconName {
     switch (platformId) {
       case 2: // TIKTOK
@@ -173,28 +181,32 @@ export function RecipeOptionsSheet({
                 bottomSheetRef.current?.close();
 
                 // Haptic feedback
-                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                Haptics.notificationAsync(
+                  Haptics.NotificationFeedbackType.Success,
+                );
 
                 // Show success toast with recipe image
                 showToast({
                   text: (
                     <Text>
-                      Removed <Text style={{ fontWeight: 'bold' }}>{displayName}</Text>
+                      Removed{" "}
+                      <Text style={{ fontWeight: "bold" }}>{displayName}</Text>
                     </Text>
                   ),
                   thumbnailUri: recipeData.coverUri,
                 });
-
-
               })
               .catch((error) => {
                 // Haptic feedback for error
-                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+                Haptics.notificationAsync(
+                  Haptics.NotificationFeedbackType.Error,
+                );
 
                 // Show error alert
                 Alert.alert(
                   "Oops!",
-                  error?.message || "Failed to remove recipe from cookbook. Please try again.",
+                  error?.message ||
+                    "Failed to remove recipe from cookbook. Please try again.",
                   [{ text: "OK" }],
                 );
               });
@@ -253,16 +265,19 @@ export function RecipeOptionsSheet({
             deleteRecipeAsync(recipeId)
               .then(async () => {
                 // Haptic feedback
-                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+                Haptics.notificationAsync(
+                  Haptics.NotificationFeedbackType.Success,
+                );
 
                 // Show success toast
                 showToast({
                   text: (
                     <Text>
-                      Deleted <Text style={{ fontWeight: "600" }}>{displayName}</Text>
+                      Deleted{" "}
+                      <Text style={{ fontWeight: "600" }}>{displayName}</Text>
                     </Text>
                   ),
-                  thumbnailUri: recipeData.coverUri
+                  thumbnailUri: recipeData.coverUri,
                 });
 
                 // Close bottom sheet
@@ -275,12 +290,15 @@ export function RecipeOptionsSheet({
               })
               .catch((error) => {
                 // Haptic feedback for error
-                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+                Haptics.notificationAsync(
+                  Haptics.NotificationFeedbackType.Error,
+                );
 
                 // Show error alert
                 Alert.alert(
                   "Oops!",
-                  error?.message || "Failed to delete recipe. Please try again.",
+                  error?.message ||
+                    "Failed to delete recipe. Please try again.",
                   [{ text: "OK" }],
                 );
               });
@@ -309,19 +327,16 @@ export function RecipeOptionsSheet({
     const socialIcon = getSocialIcon(platformId);
     const socialLabel = getSocialLabel(platformId);
     const trimmedName = author?.name?.trim();
-    const firstName = trimmedName && trimmedName !== "" ? trimmedName.split(" ")[0] : null;
-    const creatorLabel = firstName ? `${firstName}'s Profile` : "Creator Profile";
+    const firstName =
+      trimmedName && trimmedName !== "" ? trimmedName.split(" ")[0] : null;
+    const creatorLabel = firstName
+      ? `${firstName}'s Profile`
+      : "Creator Profile";
 
     const items: ActionBottomSheetMenuItem[] = [
       // Watch on [Social Platform]
       {
-        renderIcon: () => (
-          <Ionicons
-            size={20}
-            name={socialIcon}
-            color="#667"
-          />
-        ),
+        renderIcon: () => <Ionicons size={20} name={socialIcon} color="#667" />,
         label: socialLabel,
         onPress: handleWatchContent,
       },
@@ -337,13 +352,7 @@ export function RecipeOptionsSheet({
               />
             );
           }
-          return (
-            <Ionicons
-              size={20}
-              name="person-outline"
-              color="#667"
-            />
-          );
+          return <Ionicons size={20} name="person-outline" color="#667" />;
         },
         label: creatorLabel,
         onPress: handleCreatorProfilePress,
@@ -365,7 +374,9 @@ export function RecipeOptionsSheet({
       items.push({
         label: "Remove from Cookbook",
         onPress: handleRemoveFromCookbookPress,
-        renderIcon: () => <Ionicons size={20} name="remove-circle-outline" color="#667" />,
+        renderIcon: () => (
+          <Ionicons size={20} name="remove-circle-outline" color="#667" />
+        ),
       });
     }
 
@@ -374,7 +385,9 @@ export function RecipeOptionsSheet({
       items.push({
         label: "Report Issue",
         onPress: handleReportIssuePress,
-        renderIcon: () => <Ionicons size={20} name="flag-outline" color="#667" />,
+        renderIcon: () => (
+          <Ionicons size={20} name="flag-outline" color="#667" />
+        ),
       });
     }
 
@@ -383,7 +396,9 @@ export function RecipeOptionsSheet({
       destructive: true,
       label: "Delete Recipe",
       onPress: handleDeletePress,
-      renderIcon: () => <Ionicons size={20} name="trash-outline" color={Colors.destructive} />,
+      renderIcon: () => (
+        <Ionicons size={20} name="trash-outline" color={Colors.destructive} />
+      ),
     });
 
     return items;

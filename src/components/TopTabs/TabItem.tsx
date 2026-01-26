@@ -14,13 +14,19 @@ export type TabItemProps = {
   onPress: () => void;
 };
 
-export const TabItem: FC<TabItemProps> = ({ label, isActive = false, onPress }) => {
+export const TabItem: FC<TabItemProps> = ({
+  label,
+  isActive = false,
+  onPress,
+}) => {
   return (
-    <Pressable
-      style={styles.tabItem}
-      onPress={onPress}
-    >
-      <Text style={[styles.tabText, { color: isActive ? TAB_COLOR_ACTIVE : TAB_COLOR_INACTIVE }]}>
+    <Pressable style={styles.tabItem} onPress={onPress}>
+      <Text
+        style={[
+          styles.tabText,
+          { color: isActive ? TAB_COLOR_ACTIVE : TAB_COLOR_INACTIVE },
+        ]}
+      >
         {label}
       </Text>
     </Pressable>

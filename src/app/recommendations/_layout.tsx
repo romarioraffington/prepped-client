@@ -1,7 +1,7 @@
+import type { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 // External Dependencies
 import { Stack } from "expo-router";
 import { StyleSheet } from "react-native";
-import type { NativeStackNavigationOptions } from "@react-navigation/native-stack";
 
 // Extended screen options type that includes headerTitleContainerStyle
 // This is supported by React Navigation at runtime but not fully typed
@@ -12,15 +12,18 @@ type ExtendedScreenOptions = NativeStackNavigationOptions & {
 export default function RecommendationsLayout() {
   return (
     <Stack
-      screenOptions={{
-        headerTitle: "",
-        headerTintColor: "#000",
-        headerTitleAlign: "center",
-        headerTransparent: true,
-        headerShadowVisible: false,
-        contentStyle: styles.contentStyle,
-        headerBackButtonDisplayMode: "minimal",
-      } as ExtendedScreenOptions}>
+      screenOptions={
+        {
+          headerTitle: "",
+          headerTintColor: "#000",
+          headerTitleAlign: "center",
+          headerTransparent: true,
+          headerShadowVisible: false,
+          contentStyle: styles.contentStyle,
+          headerBackButtonDisplayMode: "minimal",
+        } as ExtendedScreenOptions
+      }
+    >
       <Stack.Screen
         name="[slug]/index"
         options={{
@@ -55,4 +58,3 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
   },
 });
-

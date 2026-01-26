@@ -1,19 +1,21 @@
+import * as Haptics from "expo-haptics";
+import { router, useLocalSearchParams } from "expo-router";
 // External Dependencies
 import { useCallback } from "react";
 import { Alert } from "react-native";
-import * as Haptics from "expo-haptics";
-import { router, useLocalSearchParams } from "expo-router";
 
+import { cacheWishlistId, useCreateWishlistMutation } from "@/api";
+import { SingleInputForm } from "@/components";
+import { useActionToast } from "@/contexts";
 // Internal Dependencies
 import { reportError } from "@/libs/utils";
-import { useActionToast } from "@/contexts";
-import { SingleInputForm } from "@/components";
-import { useCreateWishlistMutation, cacheWishlistId } from "@/api";
 
 export default function CreateWishlist() {
   const { showToast } = useActionToast();
   const { mutate: createWishlist, isPending } = useCreateWishlistMutation();
-  const { recommendationSlug } = useLocalSearchParams<{ recommendationSlug?: string; }>();
+  const { recommendationSlug } = useLocalSearchParams<{
+    recommendationSlug?: string;
+  }>();
 
   // Common function to handle going back - reopens
   // save-to-wishlist modal if we came from there
@@ -54,7 +56,7 @@ export default function CreateWishlist() {
           // Hide CTA button since this is a newly created wishlist (no change option)
           if (recommendationSlug) {
             showToast({
-              text: `Saved to ${response?.data?.name ?? 'wishlist'}`,
+              text: `Saved to ${response?.data?.name ?? "wishlist"}`,
               thumbnailUri: response.data.coverImageUri || null,
             });
           }

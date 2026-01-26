@@ -1,5 +1,5 @@
-import type { Platform } from "./Platform";
 import type { IMPORT_STATUS } from "@/libs/constants";
+import type { Platform } from "./Platform";
 
 export type ImportStatus = (typeof IMPORT_STATUS)[keyof typeof IMPORT_STATUS];
 
