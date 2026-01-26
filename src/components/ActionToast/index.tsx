@@ -19,8 +19,8 @@ export const ActionToast: FC = () => {
   const [imageError, setImageError] = useState(false);
   const opacity = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(0)).current;
-  const { toast, hideToast, dismissToast, registerToastRef, onExitComplete } = useActionToast();
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { toast, hideToast, dismissToast, registerToastRef, onExitComplete } = useActionToast();
 
   // Determine if we should show the CTA button
   const shouldShowCTA = !!toast.cta?.text;
@@ -125,7 +125,16 @@ export const ActionToast: FC = () => {
         }
       };
     }
-  }, [toast.isVisible, toast.text, toast.thumbnailUri, toast.cta, opacity, translateY, hideToast]);
+  }, [
+    opacity,
+    toast.text,
+    toast.icon,
+    toast.cta,
+    hideToast,
+    translateY,
+    toast.isVisible,
+    toast.thumbnailUri,
+  ]);
 
   const handleImageError = () => {
     setImageError(true);
@@ -188,7 +197,11 @@ export const ActionToast: FC = () => {
       <View style={styles.toastBox}>
         <View style={styles.contentRow}>
           <View style={styles.thumbnailContainer}>
-            {toast.thumbnailUri && !imageError ? (
+            {toast.icon ? (
+              <View style={styles.defaultIconContainer}>
+                {toast.icon}
+              </View>
+            ) : toast.thumbnailUri && !imageError ? (
               <Image
                 contentFit="cover"
                 style={styles.thumbnail}

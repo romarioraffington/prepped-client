@@ -386,6 +386,18 @@ export default function CookbookDetails() {
                 // Show success toast
                 showToast({
                   text: `Removed ${recipeCount} ${recipeText}`,
+                  icon: (
+                    <View style={{
+                      width: 45,
+                      height: 45,
+                      borderRadius: 8,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      backgroundColor: "rgba(255, 59, 48, 0.12)",
+                    }}>
+                      <MaterialIcons name="bookmark-remove" size={22} color={Colors.destructive} />
+                    </View>
+                  ),
                 });
 
                 // Clear selections
@@ -444,6 +456,11 @@ export default function CookbookDetails() {
                 // Show success toast
                 showToast({
                   text: `Deleted ${recipeCount} ${recipeText}`,
+                  icon: (
+                    <View style={{ backgroundColor: "rgba(255, 59, 48, 0.12)", borderRadius: 8, width: 45, height: 45, alignItems: "center", justifyContent: "center" }}>
+                      <MaterialIcons name="bookmark-remove" size={22} color={Colors.destructive} />
+                    </View>
+                  ),
                 });
 
                 // Clear selections
@@ -692,11 +709,9 @@ const CookbookHeader = forwardRef<Animated.View, CookbookHeaderProps>(
           {hasRecipes && (
             <View style={styles.metadataContainer}>
               <View style={styles.cookbookBadge}>
-                <Ionicons size={11} name="book-outline" color="#667" />
-                <Text style={styles.cookbookBadgeText}>Cookbook</Text>
+                <Ionicons size={10} name="book-outline" color="#FFF4ED" />
+                <Text style={styles.cookbookBadgeText}>cookbook</Text>
               </View>
-              <Text style={styles.metadataSeparator}> • </Text>
-
               <Text style={styles.metadataText}>
                 {recipesCount} {recipesText}
               </Text>
@@ -758,27 +773,32 @@ const styles = StyleSheet.create({
   },
   metadataTextSelected: {
     fontFamily: Platform.select({
-      android: "Manrope_700Bold",
-      ios: "Manrope-Bold",
-    }),
-    color: "#999",
-    fontSize: 13,
-    fontWeight: "600",
-  },
-  cookbookBadge: {
-    gap: 4,
-    flexDirection: "row",
-    alignItems: "center",
-    borderRadius: 5,
-  },
-  cookbookBadgeText: {
-    fontFamily: Platform.select({
       android: "Manrope_400Regular",
       ios: "Manrope-Regular",
     }),
     color: "#999",
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: "400",
+  },
+  cookbookBadge: {
+    gap: 4,
+    borderRadius: 5,
+    paddingVertical: 2,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingHorizontal: 6,
+    marginRight: 6,
+    backgroundColor: 'rgba(234, 88, 12, 0.7)',
+  },
+  cookbookBadgeText: {
+    fontFamily: Platform.select({
+      android: "Manrope_500Medium",
+      ios: "Manrope-Medium",
+    }),
+    top: -1,
+    fontSize: 12,
+    color: "#FFF4ED",
+    fontWeight: "500",
   },
   headerOptionsButtonText: {
     fontSize: 15,

@@ -3,7 +3,7 @@ import { Animated } from "react-native";
 import { Tabs, useRouter } from "expo-router";
 import { DeviceEventEmitter } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 
 // Internal Dependencies
 import { Colors } from "@/libs/constants";
@@ -100,9 +100,9 @@ export default function BottomNavigation() {
         <Tabs.Screen
           name="(home)"
           options={{
-            title: "Kitchen",
+            title: "Pantry",
             tabBarIcon: ({ color }) => (
-              <MaterialCommunityIcons size={20} name="chef-hat" color={color} />
+              <Ionicons size={22} name="basket" color={color} />
             ),
           }}
           listeners={() => ({

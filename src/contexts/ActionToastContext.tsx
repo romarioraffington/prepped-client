@@ -11,6 +11,8 @@ export interface ActionToastParams {
   text: string | ReactNode;
   // Optional thumbnail image
   thumbnailUri?: string | null;
+  // Optional icon component (takes precedence over thumbnailUri)
+  icon?: ReactNode | null;
   // CTA button configuration - if provided, shows button
   cta?: { text: string; onPress: () => void };
   // Callback executed when toast auto-closes
@@ -19,6 +21,7 @@ export interface ActionToastParams {
 
 interface ActionToastState {
   isVisible: boolean;
+  icon: ReactNode | null;
   text: string | ReactNode;
   thumbnailUri: string | null;
   cta: { text: string; onPress: () => void } | null;
@@ -55,6 +58,7 @@ export const ActionToastProvider: React.FC<ActionToastProviderProps> = ({ childr
   const [toast, setToast] = useState<ActionToastState>({
     text: "",
     cta: null,
+    icon: null,
     isVisible: false,
     thumbnailUri: null,
   });
@@ -101,6 +105,7 @@ export const ActionToastProvider: React.FC<ActionToastProviderProps> = ({ childr
       isVisible: true,
       text: nextToast.text,
       cta: nextToast.cta ?? null,
+      icon: nextToast.icon ?? null,
       thumbnailUri: nextToast.thumbnailUri ?? null,
     });
 
@@ -132,6 +137,7 @@ export const ActionToastProvider: React.FC<ActionToastProviderProps> = ({ childr
           isVisible: true,
           text: nextToast.text,
           cta: nextToast.cta ?? null,
+          icon: nextToast.icon ?? null,
           thumbnailUri: nextToast.thumbnailUri ?? null,
         });
 
@@ -140,9 +146,10 @@ export const ActionToastProvider: React.FC<ActionToastProviderProps> = ({ childr
         // Queue was empty, clear state
         setToast({
           text: "",
+          icon: null,
+          cta: null,
           isVisible: false,
           thumbnailUri: null,
-          cta: null,
         });
         isAnimatingRef.current = false;
       }
@@ -150,9 +157,10 @@ export const ActionToastProvider: React.FC<ActionToastProviderProps> = ({ childr
       // No queued toast, clear state
       setToast({
         text: "",
+        cta: null,
+        icon: null,
         isVisible: false,
         thumbnailUri: null,
-        cta: null,
       });
       isAnimatingRef.current = false;
     }
@@ -179,6 +187,7 @@ export const ActionToastProvider: React.FC<ActionToastProviderProps> = ({ childr
       isVisible: true,
       text: params.text,
       cta: params.cta ?? null,
+      icon: params.icon ?? null,
       thumbnailUri: params.thumbnailUri ?? null,
     });
 
@@ -208,6 +217,7 @@ export const ActionToastProvider: React.FC<ActionToastProviderProps> = ({ childr
     setToast({
       text: "",
       cta: null,
+      icon: null,
       isVisible: false,
       thumbnailUri: null,
     });

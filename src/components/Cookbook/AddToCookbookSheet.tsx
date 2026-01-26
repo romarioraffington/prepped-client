@@ -422,7 +422,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   saveButtonText: {
-    fontSize: 17,
+    top: -2,
+    fontSize: 18,
     fontWeight: "600",
     color: Colors.primary,
     fontFamily: Platform.select({
