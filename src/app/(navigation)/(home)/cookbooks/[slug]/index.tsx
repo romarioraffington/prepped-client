@@ -788,7 +788,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingHorizontal: 6,
     marginRight: 6,
-    backgroundColor: 'rgba(234, 88, 12, 0.7)',
+    backgroundColor: 'rgba(234, 88, 12, 0.8)',
   },
   cookbookBadgeText: {
     fontFamily: Platform.select({

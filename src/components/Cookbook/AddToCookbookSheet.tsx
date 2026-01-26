@@ -155,11 +155,43 @@ export function AddToCookbookSheet({
         const cookbook = cookbooks.find((cb) => cb.id === cookbookIds[0]);
         const cookbookName = cookbook?.name ?? "cookbook";
         showToast({
-          text: `Added ${recipeCount} ${recipeText} to ${cookbookName}`,
+          icon: (
+            <View style={{
+              width: 45,
+              height: 45,
+              borderRadius: 8,
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "rgba(234, 88, 12, 0.12)",
+            }}>
+              <Ionicons name="checkmark-done-circle" size={22} color={Colors.primary} />
+            </View>
+          ),
+          text: (
+            <Text style={{ fontWeight: "600" }}>
+              {`Added ${recipeText} to ${cookbookName}`}
+            </Text>
+          ),
         });
       } else {
         showToast({
-          text: `Added ${recipeCount} ${recipeText} to ${cookbookCount} cookbooks`,
+          icon: (
+            <View style={{
+              width: 45,
+              height: 45,
+              borderRadius: 8,
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: "rgba(234, 88, 12, 0.12)",
+            }}>
+              <Ionicons name="checkmark-done-circle" size={22} color={Colors.primary} />
+            </View>
+          ),
+          text: (
+            <Text style={{ fontWeight: "600" }}>
+              {`Added ${recipeText} to ${cookbookCount} cookbooks`}
+            </Text>
+          ),
         });
       }
 
@@ -350,7 +382,7 @@ export function AddToCookbookSheet({
           >
             <Ionicons
               name="add"
-              size={17}
+              size={18}
               style={styles.createButtonIcon}
               color={isPending ? Colors.matureForeground : Colors.primary}
             />
@@ -470,10 +502,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   createButtonIcon: {
-    marginRight: 4,
+    marginRight: 0,
   },
   createButtonText: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: "600",
     color: Colors.primary,
     fontFamily: Platform.select({

@@ -2,7 +2,17 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 // Internal Dependencies
-import { QUERY_KEYS } from "@/libs/constants";
+import { reportError } from "@/libs/utils";
+import { API_ENDPOINTS, QUERY_KEYS, getApiClient } from "@/libs/constants";
+
+/**
+ * Maximum number of items (recipes or cookbooks) that can be processed
+ * in a single bulk operation request.
+ *
+ * This limit is enforced client-side for consistency with bulk remove operations
+ * and to prevent overly large requests that could impact performance.
+ */
+const MAX_BULK_OPERATION_SIZE = 20;
 
 /**
  * Request body for bulk adding recipes to cookbooks
@@ -28,17 +38,44 @@ export const bulkAddRecipesToCookbooks = async (
   recipeIds: string[],
   cookbookIds: string[],
 ): Promise<void> => {
-  // TODO: Implement POST /api/v1/cookbooks/recipes/bulk
-  // Request body: { recipe_ids: string[], cookbook_ids: string[] }
-  // Response: 204 No Content (success, idempotent)
-  // Error responses:
-  //   - 401 Unauthorized
-  //   - 403 User doesn't own recipes/cookbooks
-  //   - 422 Validation error (invalid UUIDs, too many items, etc.)
-  //   - 429 Rate limit exceeded (>10 requests/minute)
+  // Client-side validation: max recipes per request
+  if (recipeIds.length > MAX_BULK_OPERATION_SIZE) {
+    throw new Error(
+      `You can only add up to ${MAX_BULK_OPERATION_SIZE} recipes at a time.`,
+    );
+  }
 
-  // Stubbed implementation - returns resolved promise
-  return Promise.resolve();
+  // Client-side validation: max cookbooks per request
+  if (cookbookIds.length > MAX_BULK_OPERATION_SIZE) {
+    throw new Error(
+      `You can only add to up to ${MAX_BULK_OPERATION_SIZE} cookbooks at a time.`,
+    );
+  }
+
+  try {
+    const client = getApiClient();
+    const endpoint = `${API_ENDPOINTS.COOKBOOKS_V1}/recipes/bulk`;
+    await client.post(endpoint, {
+      recipe_ids: recipeIds,
+      cookbook_ids: cookbookIds,
+    });
+  } catch (error) {
+    reportError(error, {
+      component: "CookbookBulkAddRecipes",
+      action: "Bulk Add Recipes To Cookbooks",
+      extra: {
+        recipeCount: recipeIds.length,
+        cookbookCount: cookbookIds.length,
+      },
+    });
+
+    let errorMessage = "Failed to add recipes to cookbooks";
+    if (error instanceof Error && error.message) {
+      errorMessage = error.message;
+    }
+
+    throw new Error(errorMessage);
+  }
 };
 
 /**
@@ -48,27 +85,13 @@ export const bulkAddRecipesToCookbooks = async (
  *   - For single cookbook: pass `cookbookIds: [cookbookId]`
  *   - For multiple cookbooks: pass `cookbookIds: [id1, id2, ...]`
  *
- * Enforces client-side 20 recipe limit for consistency with bulk remove
+ * Validation is enforced in bulkAddRecipesToCookbooks function
  */
 export const useBulkAddRecipesToCookbookMutation = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({ recipeIds, cookbookIds }: BulkAddRecipesRequest) => {
-      // Client-side validation: max 20 recipes per request
-      if (recipeIds.length > 20) {
-        return Promise.reject(
-          new Error("You can only add up to 20 recipes at a time."),
-        );
-      }
-
-      // Client-side validation: max 20 cookbooks per request
-      if (cookbookIds.length > 20) {
-        return Promise.reject(
-          new Error("You can only add to up to 20 cookbooks at a time."),
-        );
-      }
-
       return bulkAddRecipesToCookbooks(recipeIds, cookbookIds);
     },
 
