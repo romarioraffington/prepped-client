@@ -1,8 +1,10 @@
+// External Dependencies
 import { AntDesign } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
-// External Dependencies
 import * as Haptics from "expo-haptics";
 import { router, useLocalSearchParams } from "expo-router";
+import { SafeAreaView } from "react-native-safe-area-context";
+
 import React, {
   useCallback,
   useEffect,
@@ -10,15 +12,14 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 import {
   Alert,
+  Text,
+  View,
   FlatList,
   StyleSheet,
-  Text,
   TouchableOpacity,
-  View,
 } from "react-native";
 
 import { CookbookCard, DotsLoader, EmptyImageState } from "@/components";
@@ -43,15 +44,23 @@ export default function ManageCookbooks() {
   // Parse slug to extract ID and name
   const { id: recipeId, name: recipeName } = parseSlug(recipeSlug);
 
-  const { mutate: saveToCookbook, isPending: isSaving } =
-    useSaveRecipeToCookbookMutation();
-  const { mutate: removeFromCookbook, isPending: isDeleting } =
-    useRemoveRecipeFromCookbookMutation();
+  const {
+    mutate: saveToCookbook,
+    isPending: isSaving
+  } = useSaveRecipeToCookbookMutation();
+
+  const {
+    mutate: removeFromCookbook,
+    isPending: isDeleting,
+  } = useRemoveRecipeFromCookbookMutation();
 
   const isPending = isSaving || isDeleting;
 
   // Track selected cookbook (for removal flow)
-  const [selectedCookbookId, setSelectedCookbookId] = useState<string | null>(
+  const [
+    selectedCookbookId,
+    setSelectedCookbookId,
+  ] = useState<string | null>(
     null,
   );
 
@@ -287,7 +296,7 @@ export default function ManageCookbooks() {
             showRecentlyViewed={false}
             isSelectedForRemoval={isSelectedForRemoval}
             isSelectedForAddition={isSelectedForAddition}
-            onPress={isPending ? () => {} : () => handleCookbookSelect(item)}
+            onPress={isPending ? () => { } : () => handleCookbookSelect(item)}
           />
         </View>
       );
