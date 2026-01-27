@@ -1,4 +1,4 @@
-import { Feather } from "@expo/vector-icons";
+import { Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import type BottomSheet from "@gorhom/bottom-sheet";
 import { useQueryClient } from "@tanstack/react-query";
@@ -44,8 +44,10 @@ export function CookbookOptionsSheet({
   const queryClient = useQueryClient();
   const { showToast } = useActionToast();
 
-  const { mutateAsync: deleteCookbookAsync, isPending: isDeletePending } =
-    useDeleteCookbookMutation();
+  const {
+    isPending: isDeletePending,
+    mutateAsync: deleteCookbookAsync
+  } = useDeleteCookbookMutation();
 
   // Calculate snap points (2 items if no recipes, 3 items if has recipes)
   const snapPoints = useMemo(() => [hasRecipes ? "32%" : "28%"], [hasRecipes]);
@@ -149,7 +151,7 @@ export function CookbookOptionsSheet({
                 Alert.alert(
                   "Oops!",
                   error?.message ||
-                    "Failed to delete cookbook. Please try again.",
+                  "Failed to delete cookbook. Please try again.",
                   [{ text: "OK" }],
                 );
               });
@@ -177,24 +179,21 @@ export function CookbookOptionsSheet({
       {
         label: "Edit Title",
         onPress: handleEditTitlePress,
-        renderIcon: () => <Feather name="edit-2" size={20} color="#000" />,
+        renderIcon: () => (
+          <MaterialCommunityIcons name="format-title" size={24} color="#000" />
+        ),
       },
       // Bulk Edit Recipes (only if there are recipes)
       ...(hasRecipes
         ? [
-            {
-              label: "Bulk Edit Recipes",
-              onPress: handleBulkEditPress,
-              renderIcon: () => (
-                <Feather
-                  name="mouse-pointer"
-                  size={21}
-                  color="#000"
-                  opacity={0.7}
-                />
-              ),
-            },
-          ]
+          {
+            label: "Bulk Edit Recipes",
+            onPress: handleBulkEditPress,
+            renderIcon: () => (
+              <MaterialCommunityIcons name="view-dashboard-edit-outline" size={24} color="#000" />
+            ),
+          },
+        ]
         : []),
       // Delete Cookbook (destructive, always last)
       {
