@@ -27,10 +27,18 @@ export default function CreateCookbook() {
   // Parse slug to extract recipe ID if recipeSlug exists
   const recipeId = recipeSlug ? parseSlug(recipeSlug).id : undefined;
 
-  // Common function to handle going back - reopens
-  // manage-cookbooks modal if we came from there
+  // Common function to handle going back - returns to the correct place
+  // based on where the user came from:
+  // 1. From manage-cookbooks (has recipeSlug) → reopen manage-cookbooks modal
+  // 2. From AddToCookbookSheet (has returnTo) → emit event to reopen sheet
+  // 3. From cookbooks list (no params) → go back normally
   const handleGoBack = useCallback(() => {
-    if (recipeSlug) {
+    // If we came from AddToCookbookSheet, emit event to reopen the sheet
+    if (returnTo === RETURN_TO_ADD_TO_COOKBOOK_SHEET) {
+      DeviceEventEmitter.emit(COOKBOOK_CREATED_EVENT, {});
+      router.back();
+    } else if (recipeSlug) {
+      // If we came from manage-cookbooks modal, reopen it
       router.back();
       setTimeout(() => {
         router.push({
@@ -41,9 +49,10 @@ export default function CreateCookbook() {
         });
       }, 100);
     } else {
+      // Default: just go back
       router.back();
     }
-  }, [recipeSlug]);
+  }, [recipeSlug, returnTo]);
 
   const handleSave = useCallback(
     (name: string) => {
