@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
     paddingVertical: 18,
     paddingHorizontal: 16,
     borderColor: "#C0C0C0",
-    backgroundColor: "#fff",
+    backgroundColor: Colors.background,
     minHeight: 100,
   },
   characterCount: {
