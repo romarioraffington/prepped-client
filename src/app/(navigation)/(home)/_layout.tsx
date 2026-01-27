@@ -47,13 +47,6 @@ export default function HomeLayout() {
           headerBackTitle: "Cookbooks",
         }}
       />
-      <Stack.Screen
-        name="cookbooks/[slug]/edit"
-        options={{
-          headerShown: true,
-          headerTransparent: true,
-        }}
-      />
     </Stack>
   );
 }

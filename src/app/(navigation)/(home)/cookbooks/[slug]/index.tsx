@@ -25,13 +25,8 @@ import {
   TouchableOpacity,
 } from "react-native";
 
-import Animated, {
-  Easing,
-  withTiming,
-  useSharedValue,
-  useAnimatedStyle,
-  type SharedValue,
-} from "react-native-reanimated";
+import type Animated from "react-native-reanimated";
+import type { SharedValue } from "react-native-reanimated";
 
 // Internal Dependencies
 import type { Recipe } from "@/libs/types";
@@ -44,6 +39,7 @@ import {
   RecipeCard,
   LargeTitle,
   StaggeredGrid,
+  BulkEditFooter,
   WithPullToRefresh,
   RecipeOptionsSheet,
   CookbookOptionsSheet,
@@ -100,22 +96,6 @@ export default function CookbookDetails() {
     mutateAsync: bulkDeleteRecipesAsync,
   } = useBulkDeleteRecipesMutation();
 
-  // Footer animation - starts off-screen (100 = hidden below screen)
-  const footerTranslateY = useSharedValue(100);
-
-  // Animate footer when bulk edit mode changes
-  useEffect(() => {
-    footerTranslateY.value = withTiming(isBulkEditMode ? 0 : 100, {
-      duration: 300,
-      easing: Easing.out(Easing.ease),
-    });
-  }, [isBulkEditMode, footerTranslateY]);
-
-  // Animated style for footer slide animation
-  const footerAnimatedStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: footerTranslateY.value }],
-  }));
-
   // Extract the needed data
   const collectionType = data?.type;
   const recipes = data?.recipes ?? [];
@@ -149,15 +129,11 @@ export default function CookbookDetails() {
     }
   }, [isOptionsSheetOpen]);
 
-  // Handle edit press - navigate to edit recipes screen (only for unorganized collections)
-  const handleEditPress = useCallback(() => {
-    router.push({
-      pathname: "/cookbooks/[slug]/edit" as any,
-      params: {
-        slug,
-      },
-    });
-  }, [slug]);
+  // Handle organize press - trigger bulk edit mode for unorganized collections
+  const handleOrganizePress = useCallback(() => {
+    setIsBulkEditMode(true);
+    setSelectedRecipeIds(new Set());
+  }, []);
 
   // Handle bulk edit press - triggered from options sheet
   const handleBulkEditPress = useCallback(() => {
@@ -169,6 +145,15 @@ export default function CookbookDetails() {
   const handleDonePress = useCallback(() => {
     setIsBulkEditMode(false);
     setSelectedRecipeIds(new Set());
+  }, []);
+
+  // Handle move press - show placeholder alert for now
+  const handleMovePress = useCallback(() => {
+    Alert.alert(
+      "Move Recipes",
+      "Move functionality coming soon.",
+      [{ text: "OK" }],
+    );
   }, []);
 
   // Handle recipe selection toggle
@@ -272,15 +257,15 @@ export default function CookbookDetails() {
       );
     }
 
-    // Show edit button for UNORGANIZED collections
+    // Show organize button for UNORGANIZED collections
     if (collectionType === COLLECTION_TYPE.UNORGANIZED) {
       return (
         <View style={styles.headerRightContainer}>
           <TouchableOpacity
+            onPress={handleOrganizePress}
             style={styles.headerOptionsButton}
-            onPress={handleEditPress}
           >
-            <Text style={styles.headerOptionsButtonText}>Edit</Text>
+            <Text style={styles.headerOptionsButtonText}>Organize</Text>
           </TouchableOpacity>
         </View>
       );
@@ -299,7 +284,7 @@ export default function CookbookDetails() {
     );
   }, [
     handleOptionsPress,
-    handleEditPress,
+    handleOrganizePress,
     handleDonePress,
     collectionType,
     isBulkEditMode,
@@ -578,7 +563,6 @@ export default function CookbookDetails() {
   }
 
   // Calculate bottom padding for bulk edit mode (footer height + safe area)
-  const hasSelections = selectedRecipeIds.size > 0;
   const isMutationPending = isRemovePending || isDeletePending;
   const bulkEditBottomPadding = isBulkEditMode ? 60 + insets.bottom : 0;
 
@@ -607,96 +591,16 @@ export default function CookbookDetails() {
       </WithPullToRefresh>
 
       {/* Bulk Edit Footer */}
-      <Animated.View
-        style={[
-          styles.bulkEditFooter,
-          { paddingBottom: insets.bottom },
-          footerAnimatedStyle,
-        ]}
-        pointerEvents={isBulkEditMode ? "auto" : "none"}
-      >
-        <View style={styles.bulkEditButtonRow}>
-          <TouchableOpacity
-            style={[
-              styles.bulkEditButton,
-              (!hasSelections || isMutationPending) &&
-              styles.bulkEditButtonDisabled,
-            ]}
-            onPress={handleBulkAdd}
-            disabled={!hasSelections || isMutationPending}
-          >
-            <MaterialIcons
-              name="bookmark-add"
-              size={25}
-              color={hasSelections && !isMutationPending ? "#667" : "#999"}
-            />
-            <Text
-              style={[
-                styles.bulkEditButtonText,
-                (!hasSelections || isMutationPending) &&
-                styles.bulkEditButtonTextDisabled,
-              ]}
-            >
-              Add
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.bulkEditButton,
-              (!hasSelections || isMutationPending) &&
-              styles.bulkEditButtonDisabled,
-            ]}
-            onPress={handleBulkRemove}
-            disabled={!hasSelections || isMutationPending}
-          >
-            <MaterialIcons
-              name="bookmark-remove"
-              size={24}
-              color={hasSelections && !isMutationPending ? "#667" : "#999"}
-            />
-            <Text
-              style={[
-                styles.bulkEditButtonText,
-                (!hasSelections || isMutationPending) &&
-                styles.bulkEditButtonTextDisabled,
-              ]}
-            >
-              Remove
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.bulkEditButton,
-              (!hasSelections || isMutationPending) &&
-              styles.bulkEditButtonDisabled,
-            ]}
-            onPress={handleBulkDelete}
-            disabled={!hasSelections || isMutationPending}
-          >
-            <Ionicons
-              name="trash-outline"
-              size={20}
-              color={
-                hasSelections && !isMutationPending
-                  ? Colors.destructive
-                  : "#999"
-              }
-            />
-            <Text
-              style={[
-                styles.bulkEditButtonText,
-                styles.bulkEditButtonTextDestructive,
-                (!hasSelections || isMutationPending) &&
-                styles.bulkEditButtonTextDisabled,
-              ]}
-            >
-              Delete
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </Animated.View>
+      <BulkEditFooter
+        isVisible={isBulkEditMode}
+        selectedCount={selectedRecipeIds.size}
+        isPending={isMutationPending}
+        variant={collectionType === COLLECTION_TYPE.UNORGANIZED ? "organize" : "default"}
+        onMove={handleMovePress}
+        onDelete={handleBulkDelete}
+        onAdd={handleBulkAdd}
+        onRemove={handleBulkRemove}
+      />
 
       {/* Recipe Options Bottom Sheet */}
       {selectedRecipe && (
@@ -878,41 +782,5 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     paddingHorizontal: 4,
     color: "#000",
-  },
-  bulkEditFooter: {
-    left: 0,
-    right: 0,
-    bottom: 0,
-    paddingTop: 10,
-    overflow: "hidden",
-    position: "absolute",
-    backgroundColor: "rgba(245, 245, 240, 0.95)",
-  },
-  bulkEditButtonRow: {
-    gap: 80,
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 20,
-    justifyContent: "center",
-  },
-  bulkEditButton: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 5,
-  },
-  bulkEditButtonDisabled: {
-    opacity: 0.5,
-  },
-  bulkEditButtonText: {
-    marginTop: 4,
-    fontSize: 13,
-    color: "#667",
-    fontWeight: "500",
-  },
-  bulkEditButtonTextDestructive: {
-    color: Colors.destructive,
-  },
-  bulkEditButtonTextDisabled: {
-    color: "#999",
   },
 });

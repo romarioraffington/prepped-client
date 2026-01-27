@@ -43,10 +43,16 @@ export function RecipeOptionsSheet({
 }: RecipeOptionsSheetProps) {
   const router = useRouter();
   const { showToast } = useActionToast();
-  const { mutateAsync: deleteRecipeAsync, isPending: isDeletePending } =
-    useDeleteRecipeMutation();
-  const { mutateAsync: removeFromCookbookAsync, isPending: isRemovePending } =
-    useRemoveRecipeFromCookbookMutation();
+
+  const {
+    mutateAsync: deleteRecipeAsync,
+    isPending: isDeletePending
+  } = useDeleteRecipeMutation();
+
+  const {
+    mutateAsync: removeFromCookbookAsync,
+    isPending: isRemovePending
+  } = useRemoveRecipeFromCookbookMutation();
 
   const recipeId = recipeData.id;
 
@@ -206,7 +212,7 @@ export function RecipeOptionsSheet({
                 Alert.alert(
                   "Oops!",
                   error?.message ||
-                    "Failed to remove recipe from cookbook. Please try again.",
+                  "Failed to remove recipe from cookbook. Please try again.",
                   [{ text: "OK" }],
                 );
               });
@@ -298,7 +304,7 @@ export function RecipeOptionsSheet({
                 Alert.alert(
                   "Oops!",
                   error?.message ||
-                    "Failed to delete recipe. Please try again.",
+                  "Failed to delete recipe. Please try again.",
                   [{ text: "OK" }],
                 );
               });

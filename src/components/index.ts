@@ -10,6 +10,7 @@ export * from "./screens";
 export * from "./Marquee";
 export * from "./Review";
 export * from "./Cookbook";
+export * from "./BulkEditFooter";
 export * from "./Wishlist";
 export * from "./ProBadge";
 export * from "./Offering";
