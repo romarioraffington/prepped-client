@@ -1,3 +1,9 @@
+// External Dependencies
+import { scheduleOnRN } from "react-native-worklets";
+import {
+  type SharedValue,
+  useAnimatedReaction,
+} from "react-native-reanimated";
 import React, { type FC, type RefObject, useState, useCallback } from "react";
 import {
   Dimensions,
@@ -6,16 +12,10 @@ import {
   StyleSheet,
   View,
 } from "react-native";
-// External Imports
-import {
-  type SharedValue,
-  runOnJS,
-  useAnimatedReaction,
-} from "react-native-reanimated";
 
-import { TabIndicator } from "./TabIndicator";
-// Internal Imports
+// Internal Dependencies
 import { TabItem } from "./TabItem";
+import { TabIndicator } from "./TabIndicator";
 
 export type TabData = { label: string; value: number };
 export type TabsData = TabData[];
@@ -44,16 +44,18 @@ export const TopTabs: FC<Props> = ({
   >(new Array(tabs.length).fill({ width: 0, x: 0 }));
 
   // Track active tab index in React state for re-renders
-  const [currentActiveIndex, setCurrentActiveIndex] = useState(
-    activeTabIndex.value,
-  );
+  // Initialize to 0 instead of accessing shared value during render
+  const [currentActiveIndex, setCurrentActiveIndex] = useState(0);
 
   // Sync shared value changes to React state
+  // This will sync on first change and all subsequent changes
+  // The initial value will be synced when the shared value first changes
   useAnimatedReaction(
     () => activeTabIndex.value,
     (current, previous) => {
-      if (current !== previous) {
-        runOnJS(setCurrentActiveIndex)(current);
+      // Sync on initial mount (when previous is undefined) or when value changes
+      if (previous === undefined || current !== previous) {
+        scheduleOnRN(setCurrentActiveIndex, current);
       }
     },
     [activeTabIndex],

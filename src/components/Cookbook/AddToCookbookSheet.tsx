@@ -123,7 +123,8 @@ export function AddToCookbookSheet({
   useEffect(() => {
     const listener = DeviceEventEmitter.addListener(
       COOKBOOK_CREATED_EVENT,
-      ({ cookbookId }: { cookbookId: string }) => {
+      (eventData?: { cookbookId?: string }) => {
+        const cookbookId = eventData?.cookbookId;
         if (isPending || !cookbookId) return;
         // Pre-select the cookbook immediately - will be selected when sheet opens
         setSelectedCookbookIds(new Set([cookbookId]));
