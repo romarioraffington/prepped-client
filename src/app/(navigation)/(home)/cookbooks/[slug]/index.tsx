@@ -388,8 +388,8 @@ export default function CookbookDetails() {
                       }}
                     >
                       <MaterialIcons
-                        name="bookmark-remove"
                         size={22}
+                        name="bookmark-remove"
                         color={Colors.destructive}
                       />
                     </View>
@@ -469,8 +469,8 @@ export default function CookbookDetails() {
                       }}
                     >
                       <MaterialIcons
-                        name="bookmark-remove"
                         size={22}
+                        name="bookmark-remove"
                         color={Colors.destructive}
                       />
                     </View>
@@ -606,9 +606,9 @@ export default function CookbookDetails() {
         selectedCount={selectedRecipeIds.size}
         isPending={isMutationPending}
         variant={collectionType === COLLECTION_TYPE.UNORGANIZED ? "organize" : "default"}
+        onAdd={handleBulkAdd}
         onMove={handleMovePress}
         onDelete={handleBulkDelete}
-        onAdd={handleBulkAdd}
         onRemove={handleBulkRemove}
       />
 

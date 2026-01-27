@@ -153,8 +153,8 @@ export function BulkEditFooter({
               disabled={isDisabled}
             >
               <MaterialIcons
-                name="bookmark-add"
                 size={25}
+                name="bookmark-add"
                 color={!isDisabled ? "#667" : "#999"}
               />
               <Text
@@ -165,13 +165,13 @@ export function BulkEditFooter({
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={[styles.button, isDisabled && styles.buttonDisabled]}
               onPress={onRemove}
               disabled={isDisabled}
+              style={[styles.button, isDisabled && styles.buttonDisabled]}
             >
               <MaterialIcons
-                name="bookmark-remove"
                 size={24}
+                name="bookmark-remove"
                 color={!isDisabled ? "#667" : "#999"}
               />
               <Text

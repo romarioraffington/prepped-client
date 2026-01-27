@@ -1,6 +1,6 @@
 // External Dependencies
 import * as Haptics from "expo-haptics";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useCallback, useEffect, useMemo } from "react";
 import { router, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -222,9 +222,9 @@ export default function AddToCookbook() {
                   backgroundColor: "rgba(234, 88, 12, 0.12)",
                 }}
               >
-                <Ionicons
-                  name="checkmark-done-circle"
+                <MaterialIcons
                   size={22}
+                  name="drive-file-move-outline"
                   color={Colors.primary}
                 />
               </View>
@@ -248,10 +248,10 @@ export default function AddToCookbook() {
                   backgroundColor: "rgba(234, 88, 12, 0.12)",
                 }}
               >
-                <Ionicons
-                  name="checkmark-done-circle"
+                <MaterialIcons
                   size={22}
                   color={Colors.primary}
+                  name="drive-file-move-outline"
                 />
               </View>
             ),
@@ -292,9 +292,9 @@ export default function AddToCookbook() {
                   backgroundColor: "rgba(234, 88, 12, 0.12)",
                 }}
               >
-                <Ionicons
-                  name="checkmark-done-circle"
+                <MaterialIcons
                   size={22}
+                  name="bookmark-add"
                   color={Colors.primary}
                 />
               </View>
@@ -330,9 +330,9 @@ export default function AddToCookbook() {
                   backgroundColor: "rgba(234, 88, 12, 0.12)",
                 }}
               >
-                <Ionicons
-                  name="checkmark-done-circle"
+                <MaterialIcons
                   size={22}
+                  name="bookmark-add"
                   color={Colors.primary}
                 />
               </View>
