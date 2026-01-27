@@ -147,14 +147,24 @@ export default function CookbookDetails() {
     setSelectedRecipeIds(new Set());
   }, []);
 
-  // Handle move press - show placeholder alert for now
+  // Handle move press - navigate to add-to-cookbook modal in move mode
   const handleMovePress = useCallback(() => {
-    Alert.alert(
-      "Move Recipes",
-      "Move functionality coming soon.",
-      [{ text: "OK" }],
-    );
-  }, []);
+    if (selectedRecipeIds.size === 0) return;
+
+    // Exit bulk edit mode immediately
+    setIsBulkEditMode(false);
+
+    // Navigate to add-to-cookbook modal with move mode
+    router.push({
+      pathname: "/(modal)/add-to-cookbook",
+      params: {
+        mode: "move",
+        selectedRecipeIds: Array.from(selectedRecipeIds).join(","),
+        currentCookbookId: cookbookId,
+        selectedCookbookIds: "",
+      },
+    });
+  }, [selectedRecipeIds, cookbookId]);
 
   // Handle recipe selection toggle
   const handleRecipeSelect = useCallback((recipeId: string) => {

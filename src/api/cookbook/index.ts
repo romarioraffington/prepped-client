@@ -5,4 +5,5 @@ export * from "./detail";
 export * from "./saveRecipe";
 export * from "./removeRecipe";
 export * from "./bulkAddRecipes";
+export * from "./bulkMoveRecipes";
 export * from "./bulkRemoveRecipes";

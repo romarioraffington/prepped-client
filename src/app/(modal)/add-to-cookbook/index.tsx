@@ -14,6 +14,7 @@ import {
   Pressable,
   StyleSheet,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 
 // Internal Dependencies
@@ -26,7 +27,12 @@ import { ImagePlaceholder, ShimmerImage } from "@/components/Image";
 import { RecipeCarousel } from "@/components/Recipe/RecipeCarousel";
 import { COLLECTION_TYPE, Colors, QUERY_KEYS } from "@/libs/constants";
 import type { ImageGridItem, PaginationMeta, Recipe } from "@/libs/types";
-import { useBulkAddRecipesToCookbookMutation, useCookbooks } from "@/api";
+
+import {
+  useCookbooks,
+  useBulkMoveRecipesMutation,
+  useBulkAddRecipesToCookbookMutation,
+} from "@/api";
 
 // Type for cookbook details cache data
 interface CookbookDetailsCache {
@@ -41,6 +47,7 @@ const IMAGE_SIZE = 56;
 const IMAGE_RADIUS = 10;
 
 type RouteParams = {
+  mode?: "add" | "move";
   newCookbookId?: string;
   selectedRecipeIds: string;
   currentCookbookId: string;
@@ -53,11 +60,15 @@ export default function AddToCookbook() {
 
   // Read route params
   const {
+    mode = "add",
     newCookbookId,
     selectedRecipeIds,
     currentCookbookId,
     selectedCookbookIds: selectedIdsParam,
   } = useLocalSearchParams<RouteParams>();
+
+  // Determine if we're in move mode
+  const isMoveMode = mode === "move";
 
   // Validate required params
   const recipeIdList = useMemo(() => {
@@ -96,9 +107,20 @@ export default function AddToCookbook() {
   // Check if cookbooks are still loading
   const isLoadingCookbooks = isCookbooksLoading || isFetchingNextPage;
 
+  // Bulk move mutation
+  const {
+    isPending: isMovePending,
+    mutateAsync: bulkMoveAsync
+  } = useBulkMoveRecipesMutation();
+
   // Bulk add mutation
-  const { isPending, mutateAsync: bulkAddAsync } =
-    useBulkAddRecipesToCookbookMutation();
+  const {
+    isPending: isAddPending,
+    mutateAsync: bulkAddAsync
+  } = useBulkAddRecipesToCookbookMutation();
+
+  // Combined pending state
+  const isPending = isAddPending || isMovePending;
 
   // Load more cookbooks when user scrolls to the end
   const handleEndReached = useCallback(() => {
@@ -146,6 +168,7 @@ export default function AddToCookbook() {
       if (isPending) return;
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
+      // Allow multiple selections in both add and move modes
       const next = new Set(selectedCookbookIds);
       if (next.has(cookbookId)) {
         next.delete(cookbookId);
@@ -161,105 +184,180 @@ export default function AddToCookbook() {
     [isPending, selectedCookbookIds],
   );
 
-  // Handle save (add to cookbooks)
+  // Handle save (add or move to cookbooks)
   const handleSave = useCallback(async () => {
     if (selectedCookbookIds.size === 0 || isPending) return;
 
     const recipeCount = recipes.length;
-    const recipeIdsToAdd = recipes.map((r) => r.id);
+    const recipeIds = recipes.map((r) => r.id);
     const cookbookIds = Array.from(selectedCookbookIds);
     const cookbookCount = cookbookIds.length;
     const recipeText = recipeCount === 1 ? "recipe" : "recipes";
 
     try {
-      await bulkAddAsync({
-        recipeIds: recipeIdsToAdd,
-        cookbookIds,
-      });
-
-      // Success
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-
-      // Show toast message
-      if (cookbookCount === 1) {
-        const cookbook = cookbooks.find((cb) => cb.id === cookbookIds[0]);
-        const cookbookName = cookbook?.name ?? "cookbook";
-        const cookbookIdForNav = cookbook?.id;
-        showToast({
-          icon: (
-            <View
-              style={{
-                width: 45,
-                height: 45,
-                borderRadius: 8,
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "rgba(234, 88, 12, 0.12)",
-              }}
-            >
-              <Ionicons
-                name="checkmark-done-circle"
-                size={22}
-                color={Colors.primary}
-              />
-            </View>
-          ),
-          text: (
-            <Text style={{ fontWeight: "600" }}>
-              {`Added ${recipeText} to ${cookbookName}`}
-            </Text>
-          ),
-          cta: cookbookIdForNav
-            ? {
-              text: "View",
-              onPress: () => {
-                const slug = createFullSlug(cookbookName, cookbookIdForNav);
-                router.push({
-                  pathname: "/cookbooks/[slug]",
-                  params: { slug },
-                });
-              },
-            }
-            : undefined,
+      if (isMoveMode) {
+        // Move mode - call bulk move mutation with all destination cookbooks
+        await bulkMoveAsync({
+          recipeIds,
+          sourceCookbookId: currentCookbookId,
+          destinationCookbookIds: cookbookIds,
         });
+
+        // Success
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+        // Show toast message
+        if (cookbookCount === 1) {
+          const cookbook = cookbooks.find((cb) => cb.id === cookbookIds[0]);
+          const cookbookName = cookbook?.name ?? "cookbook";
+          showToast({
+            icon: (
+              <View
+                style={{
+                  width: 45,
+                  height: 45,
+                  borderRadius: 8,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "rgba(234, 88, 12, 0.12)",
+                }}
+              >
+                <Ionicons
+                  name="checkmark-done-circle"
+                  size={22}
+                  color={Colors.primary}
+                />
+              </View>
+            ),
+            text: (
+              <Text style={{ fontWeight: "600" }}>
+                {`Moved ${recipeText} to ${cookbookName}`}
+              </Text>
+            ),
+          });
+        } else {
+          showToast({
+            icon: (
+              <View
+                style={{
+                  width: 45,
+                  height: 45,
+                  borderRadius: 8,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "rgba(234, 88, 12, 0.12)",
+                }}
+              >
+                <Ionicons
+                  name="checkmark-done-circle"
+                  size={22}
+                  color={Colors.primary}
+                />
+              </View>
+            ),
+            text: (
+              <Text style={{ fontWeight: "600" }}>
+                {`Moved ${recipeText} to ${cookbookCount} cookbooks`}
+              </Text>
+            ),
+          });
+        }
+
+        // Navigate back to the source cookbook
+        router.back();
       } else {
-        showToast({
-          icon: (
-            <View
-              style={{
-                width: 45,
-                height: 45,
-                borderRadius: 8,
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "rgba(234, 88, 12, 0.12)",
-              }}
-            >
-              <Ionicons
-                name="checkmark-done-circle"
-                size={22}
-                color={Colors.primary}
-              />
-            </View>
-          ),
-          text: (
-            <Text style={{ fontWeight: "600" }}>
-              {`Added ${recipeText} to ${cookbookCount} cookbooks`}
-            </Text>
-          ),
+        // Add mode - call bulk add mutation
+        await bulkAddAsync({
+          recipeIds,
+          cookbookIds,
         });
-      }
 
-      // Navigate back with success indicator
-      router.back();
+        // Success
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+        // Show toast message
+        if (cookbookCount === 1) {
+          const cookbook = cookbooks.find((cb) => cb.id === cookbookIds[0]);
+          const cookbookName = cookbook?.name ?? "cookbook";
+          const cookbookIdForNav = cookbook?.id;
+          showToast({
+            icon: (
+              <View
+                style={{
+                  width: 45,
+                  height: 45,
+                  borderRadius: 8,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "rgba(234, 88, 12, 0.12)",
+                }}
+              >
+                <Ionicons
+                  name="checkmark-done-circle"
+                  size={22}
+                  color={Colors.primary}
+                />
+              </View>
+            ),
+            text: (
+              <Text style={{ fontWeight: "600" }}>
+                {`Added ${recipeText} to ${cookbookName}`}
+              </Text>
+            ),
+            cta: cookbookIdForNav
+              ? {
+                text: "View",
+                onPress: () => {
+                  const slug = createFullSlug(cookbookName, cookbookIdForNav);
+                  router.push({
+                    pathname: "/cookbooks/[slug]",
+                    params: { slug },
+                  });
+                },
+              }
+              : undefined,
+          });
+        } else {
+          showToast({
+            icon: (
+              <View
+                style={{
+                  width: 45,
+                  height: 45,
+                  borderRadius: 8,
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "rgba(234, 88, 12, 0.12)",
+                }}
+              >
+                <Ionicons
+                  name="checkmark-done-circle"
+                  size={22}
+                  color={Colors.primary}
+                />
+              </View>
+            ),
+            text: (
+              <Text style={{ fontWeight: "600" }}>
+                {`Added ${recipeText} to ${cookbookCount} cookbooks`}
+              </Text>
+            ),
+          });
+        }
+
+        // Navigate back with success indicator
+        router.back();
+      }
     } catch (error) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
 
+      const errorMessage = isMoveMode
+        ? "Failed to move recipes. Please try again."
+        : "Failed to add recipes. Please try again.";
+
       Alert.alert(
         "Oops!",
-        error instanceof Error
-          ? error.message
-          : "Failed to add recipes. Please try again.",
+        error instanceof Error ? error.message : errorMessage,
         [{ text: "OK" }],
       );
     }
@@ -268,7 +366,10 @@ export default function AddToCookbook() {
     cookbooks,
     showToast,
     isPending,
+    isMoveMode,
     bulkAddAsync,
+    bulkMoveAsync,
+    currentCookbookId,
     selectedCookbookIds,
   ]);
 
@@ -373,6 +474,9 @@ export default function AddToCookbook() {
     [selectedCookbookIds, handleSelectCookbook, isPending],
   );
 
+  // Header title based on mode
+  const headerTitle = isMoveMode ? "Move to Cookbook" : "Add to Cookbook";
+
   // Show error if required params are missing
   if (!selectedRecipeIds || !currentCookbookId) {
     return (
@@ -380,7 +484,7 @@ export default function AddToCookbook() {
         <View style={styles.headerContainer}>
           <View style={styles.header}>
             <BlurBackButton onPress={handleClose} />
-            <Text style={styles.headerTitle}>Add to Cookbook</Text>
+            <Text style={styles.headerTitle}>{headerTitle}</Text>
             <View style={{ width: 50 }} />
           </View>
           <View style={styles.divider} />
@@ -399,7 +503,7 @@ export default function AddToCookbook() {
         <View style={styles.headerContainer}>
           <View style={styles.header}>
             <BlurBackButton onPress={handleClose} />
-            <Text style={styles.headerTitle}>Add to Cookbook</Text>
+            <Text style={styles.headerTitle}>{headerTitle}</Text>
             <View style={{ width: 50 }} />
           </View>
           <View style={styles.divider} />
@@ -411,29 +515,40 @@ export default function AddToCookbook() {
     );
   }
 
+  // Button disabled state - both modes require at least one cookbook selected
   const isSaveButtonDisabled = selectedCookbookIds.size === 0 || isPending;
+
+  // Button text based on mode
+  const saveButtonText = isMoveMode
+    ? isPending ? "Moving" : "Move"
+    : isPending ? "Saving" : "Save";
+
+  // Section label based on mode
+  const recipeSectionLabel = isMoveMode
+    ? `Moving ${recipes.length === 1 ? "1 RECIPE" : `${recipes.length} RECIPES`}`
+    : `Adding ${recipes.length === 1 ? "1 RECIPE" : `${recipes.length} RECIPES`}`;
 
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.headerContainer}>
         <View style={styles.header}>
-          <BlurBackButton onPress={handleClose} disabled={isPending} />
-          <Text style={styles.headerTitle}>Add to Cookbook</Text>
+          <BlurBackButton onPress={handleClose} disabled={isPending} style={{ top: 2 }} />
+          <Text style={styles.headerTitle}>{headerTitle}</Text>
           <TouchableOpacity
             onPress={handleSave}
             style={styles.saveButton}
             disabled={isSaveButtonDisabled}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
-            {isPending && <DotsLoader />}
+            {isPending && <ActivityIndicator size="small" color={Colors.primary} />}
             <Text
               style={[
                 styles.saveButtonText,
                 isSaveButtonDisabled && styles.saveButtonTextDisabled,
               ]}
             >
-              {isPending ? "Saving" : "Save"}
+              {saveButtonText}
             </Text>
           </TouchableOpacity>
         </View>
@@ -443,8 +558,7 @@ export default function AddToCookbook() {
       {/* Recipe preview section */}
       <View style={styles.recipeSection}>
         <Text style={styles.sectionLabel}>
-          Adding{" "}
-          {recipes.length === 1 ? "1 RECIPE" : `${recipes.length} RECIPES`}
+          {recipeSectionLabel}
         </Text>
         <View style={styles.carouselContainer}>
           <RecipeCarousel recipes={recipes} />
@@ -515,10 +629,11 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
   },
   headerContainer: {
-    paddingHorizontal: 25,
+    paddingLeft: 18,
+    paddingRight: 25,
   },
   header: {
-    paddingTop: 20,
+    paddingTop: 18,
     paddingBottom: 15,
     flexDirection: "row",
     alignItems: "center",
