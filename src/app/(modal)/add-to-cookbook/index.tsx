@@ -460,9 +460,9 @@ export default function AddToCookbook() {
               <View style={styles.checkboxInner}>
                 {isSelected && (
                   <Ionicons
-                    name="checkmark-done-sharp"
                     size={14}
                     color={Colors.primary}
+                    name="checkmark-done-sharp"
                   />
                 )}
               </View>

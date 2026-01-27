@@ -141,6 +141,15 @@ export default function CookbookDetails() {
     setSelectedRecipeIds(new Set());
   }, []);
 
+  // Handle add recipes press - navigate to add-recipes screen
+  const handleAddRecipesPress = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    router.push({
+      pathname: "/cookbooks/[slug]/add-recipes",
+      params: { slug },
+    });
+  }, [slug]);
+
   // Handle done press - exit bulk edit mode
   const handleDonePress = useCallback(() => {
     setIsBulkEditMode(false);
@@ -281,9 +290,16 @@ export default function CookbookDetails() {
       );
     }
 
-    // Show options button for organized collections
+    // Show plus button and options button for organized collections
     return (
       <View style={styles.headerRightContainer}>
+        <TouchableOpacity
+          style={styles.headerButton}
+          onPress={handleAddRecipesPress}
+          hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+        >
+          <Ionicons name="add" size={22} color="#667" />
+        </TouchableOpacity>
         <TouchableOpacity
           style={styles.headerOptionsButton}
           onPress={handleOptionsPress}
@@ -293,11 +309,12 @@ export default function CookbookDetails() {
       </View>
     );
   }, [
-    handleOptionsPress,
-    handleOrganizePress,
-    handleDonePress,
     collectionType,
     isBulkEditMode,
+    handleDonePress,
+    handleOptionsPress,
+    handleOrganizePress,
+    handleAddRecipesPress,
   ]);
 
   // Single setOptions call using hook-provided options
@@ -734,6 +751,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     position: "relative",
+  },
+  headerButton: {
+    padding: 4,
   },
   headerOptionsButton: {},
   metadataContainer: {

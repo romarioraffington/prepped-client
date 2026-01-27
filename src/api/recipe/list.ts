@@ -1,21 +1,39 @@
 // External Dependencies
 import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
 
-import { API_ENDPOINTS, QUERY_KEYS, getApiClient } from "@/libs/constants";
-import type { PaginationLinks, PaginationMeta, Recipe } from "@/libs/types";
 // Internal Dependencies
 import { reportError } from "@/libs/utils";
+import { API_ENDPOINTS, QUERY_KEYS, getApiClient } from "@/libs/constants";
+import type { PaginationLinks, PaginationMeta, Recipe } from "@/libs/types";
 
 interface RecipePageResult {
   data: Recipe[];
   meta: PaginationMeta;
 }
 
-const fetchRecipes = async (cursor?: string): Promise<RecipePageResult> => {
+interface FetchRecipesOptions {
+  excludeCookbookId?: string;
+}
+
+const fetchRecipes = async (
+  cursor?: string,
+  options?: FetchRecipesOptions,
+): Promise<RecipePageResult> => {
   try {
     const client = getApiClient();
-    const url = cursor
-      ? `${API_ENDPOINTS.RECIPES_LIST_V1}?cursor=${encodeURIComponent(cursor)}`
+
+    // Build query parameters
+    const params = new URLSearchParams();
+    if (cursor) {
+      params.append("cursor", cursor);
+    }
+    if (options?.excludeCookbookId) {
+      params.append("exclude_cookbook_id", options.excludeCookbookId);
+    }
+
+    const queryString = params.toString();
+    const url = queryString
+      ? `${API_ENDPOINTS.RECIPES_LIST_V1}?${queryString}`
       : API_ENDPOINTS.RECIPES_LIST_V1;
 
     const response = (await client.get(url)) as
@@ -57,10 +75,31 @@ const fetchRecipes = async (cursor?: string): Promise<RecipePageResult> => {
   }
 };
 
-export const useRecipes = () => {
+/**
+ * Options for the useRecipes hook
+ */
+interface UseRecipesOptions {
+  excludeCookbookId?: string;
+}
+
+/**
+ * React Query hook for fetching recipes with optional filtering
+ *
+ * @param options - Optional filtering options
+ * @param options.excludeCookbookId - Exclude recipes that are already in this cookbook
+ */
+export const useRecipes = (options?: UseRecipesOptions) => {
+  // Build query key with optional filters
+  const queryKey = [
+    QUERY_KEYS.RECIPES,
+    ...(options?.excludeCookbookId
+      ? [{ excludeCookbookId: options.excludeCookbookId }]
+      : []),
+  ];
+
   return useInfiniteQuery({
-    queryKey: [QUERY_KEYS.RECIPES],
-    queryFn: ({ pageParam }) => fetchRecipes(pageParam),
+    queryKey,
+    queryFn: ({ pageParam }) => fetchRecipes(pageParam, options),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => lastPage.meta.next_cursor ?? undefined,
 

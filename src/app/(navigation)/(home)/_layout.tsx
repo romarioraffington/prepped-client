@@ -56,6 +56,15 @@ export default function HomeLayout() {
           sheetAllowedDetents: [0.34],
         }}
       />
+      <Stack.Screen
+        name="cookbooks/[slug]/add-recipes"
+        options={{
+          headerShown: false,
+          sheetCornerRadius: 30,
+          presentation: "formSheet",
+          sheetAllowedDetents: [1.0],
+        }}
+      />
     </Stack>
   );
 }
