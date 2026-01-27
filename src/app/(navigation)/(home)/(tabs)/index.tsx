@@ -1,12 +1,14 @@
 // External Components
+import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
-import React, { useCallback, useEffect, useState, useMemo } from "react";
-import { Alert, FlatList, StyleSheet, View } from "react-native";
-import type { useAnimatedScrollHandler } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import React, { useCallback, useEffect, useState, useMemo } from "react";
+import type { useAnimatedScrollHandler } from "react-native-reanimated";
+import { Alert, FlatList, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 
-import type { ImageGridItem } from "@/libs/types";
 // Internal Components
+import { Colors } from "@/libs/constants";
+import type { ImageGridItem } from "@/libs/types";
 import { createFullSlug } from "@/libs/utils";
 
 import {
@@ -55,17 +57,23 @@ export default function Cookbooks({
     return data?.pages.flatMap((page) => page.data) ?? [];
   }, [data?.pages]);
 
-  // Auto-open create modal for users with no cookbooks
+  // Auto-open create cookbook modal for users with no cookbooks
   useEffect(() => {
     if (!isLoading && !cookbooks.length) {
       // Add a delay to allow the screen to render first
       const timer = setTimeout(() => {
-        router.push("/(modal)/create");
+        router.push("/(modal)/create-cookbook");
       }, 500);
 
       return () => clearTimeout(timer);
     }
   }, [isLoading, cookbooks.length, router]);
+
+  // Handle create cookbook button press
+  const handleCreateCookbook = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    router.push("/(modal)/create-cookbook");
+  }, [router]);
 
   useEffect(() => {
     if (error) {
@@ -142,6 +150,12 @@ export default function Cookbooks({
                   title="Create a cookbook ✨"
                   description={`Share recipes from other apps to start building your cookbook.`}
                 />
+                <Pressable
+                  onPress={handleCreateCookbook}
+                  style={styles.createButton}
+                >
+                  <Text style={styles.createButtonText}>Create Cookbook</Text>
+                </Pressable>
               </View>
             }
             scrollEventThrottle={16}
@@ -194,5 +208,21 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  createButton: {
+    marginTop: 24,
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    borderRadius: 12,
+    backgroundColor: Colors.primary,
+  },
+  createButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#fff",
+    fontFamily: Platform.select({
+      android: "Manrope_600SemiBold",
+      ios: "Manrope-SemiBold",
+    }),
   },
 });

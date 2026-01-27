@@ -1,4 +1,5 @@
 // External Dependencies
+import { router } from "expo-router";
 import type { RefObject } from "react";
 import * as Haptics from "expo-haptics";
 import { Ionicons } from "@expo/vector-icons";
@@ -21,9 +22,8 @@ import {
   StyleSheet,
   ActivityIndicator,
   TouchableOpacity,
+  DeviceEventEmitter,
 } from "react-native";
-
-import { useBulkAddRecipesToCookbookMutation, useCookbooks } from "@/api";
 
 // Internal Dependencies
 import { useActionToast } from "@/contexts";
@@ -33,6 +33,12 @@ import { COLLECTION_TYPE, Colors } from "@/libs/constants";
 import { BlurBackButton } from "@/components/BlurBackButton";
 import { RecipeCarousel } from "@/components/Recipe/RecipeCarousel";
 import { ImagePlaceholder, ShimmerImage } from "@/components/Image";
+import { useBulkAddRecipesToCookbookMutation, useCookbooks } from "@/api";
+
+import {
+  COOKBOOK_CREATED_EVENT,
+  RETURN_TO_ADD_TO_COOKBOOK_SHEET,
+} from "@/app/(modal)/create-cookbook";
 
 const IMAGE_SIZE = 56;
 const IMAGE_RADIUS = 10;
@@ -112,6 +118,19 @@ export function AddToCookbookSheet({
       bottomSheetRef.current.close();
     }
   }, [isOpen, bottomSheetRef]);
+
+  // Listen for cookbook created event to pre-select the new cookbook
+  useEffect(() => {
+    const listener = DeviceEventEmitter.addListener(
+      COOKBOOK_CREATED_EVENT,
+      ({ cookbookId }: { cookbookId: string }) => {
+        if (isPending || !cookbookId) return;
+        // Pre-select the cookbook immediately - will be selected when sheet opens
+        setSelectedCookbookIds(new Set([cookbookId]));
+      },
+    );
+    return () => listener.remove();
+  }, [isPending]);
 
   // Handle close
   const handleClose = useCallback(() => {
@@ -256,14 +275,20 @@ export function AddToCookbookSheet({
   const handleCreateCookbook = useCallback(() => {
     if (isPending) return;
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    // TODO: Navigate to create cookbook route with recipe IDs
-    // After creation, automatically add recipes to new cookbook
-    Alert.alert(
-      "Create Cookbook",
-      "Create cookbook functionality coming soon",
-      [{ text: "OK" }],
-    );
-  }, [isPending]);
+
+    // Close the bottom sheet
+    bottomSheetRef.current?.close();
+
+    // Small delay to ensure sheet closes before navigation
+    setTimeout(() => {
+      router.push({
+        pathname: "/(modal)/create-cookbook",
+        params: {
+          returnTo: RETURN_TO_ADD_TO_COOKBOOK_SHEET,
+        },
+      });
+    }, 100);
+  }, [isPending, bottomSheetRef]);
 
   // Render backdrop
   const renderBackdrop = (props: BottomSheetBackdropProps) => (

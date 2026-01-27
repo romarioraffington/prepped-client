@@ -1,65 +1,68 @@
-import { Feather, Ionicons, MaterialIcons } from "@expo/vector-icons";
-import type { default as BottomSheet } from "@gorhom/bottom-sheet";
-import { useHeaderHeight } from "@react-navigation/elements";
 // External Dependencies
 import * as Haptics from "expo-haptics";
+import { useHeaderHeight } from "@react-navigation/elements";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import type { default as BottomSheet } from "@gorhom/bottom-sheet";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router, useLocalSearchParams, useNavigation } from "expo-router";
+
 import React, {
   useRef,
   useState,
   useMemo,
-  forwardRef,
-  useLayoutEffect,
-  useCallback,
   useEffect,
+  forwardRef,
+  useCallback,
+  useLayoutEffect,
 } from "react";
+
 import {
   Alert,
+  View,
+  Text,
   Platform,
   StyleSheet,
-  Text,
   TouchableOpacity,
-  View,
+  DeviceEventEmitter,
 } from "react-native";
+
 import Animated, {
+  Easing,
+  withTiming,
   useSharedValue,
   useAnimatedStyle,
-  withTiming,
-  Easing,
   type SharedValue,
 } from "react-native-reanimated";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { useLargeTitleCrossfade } from "@/hooks";
-import { COLLECTION_TYPE, Colors } from "@/libs/constants";
 // Internal Dependencies
 import type { Recipe } from "@/libs/types";
+import { useActionToast } from "@/contexts";
+import { useLargeTitleCrossfade } from "@/hooks";
 import { createShortSlug, parseSlug } from "@/libs/utils";
+import { COLLECTION_TYPE, Colors } from "@/libs/constants";
+import { COOKBOOK_CREATED_EVENT } from "@/app/(modal)/create-cookbook";
 
 import {
-  AddToCookbookSheet,
-  CookbookOptionsSheet,
   LargeTitle,
-  LoadingStaggeredGrid,
-  PinterestRefreshIndicator,
   RecipeCard,
-  RecipeOptionsSheet,
   StaggeredGrid,
   WithPullToRefresh,
+  RecipeOptionsSheet,
+  AddToCookbookSheet,
+  CookbookOptionsSheet,
+  LoadingStaggeredGrid,
+  PinterestRefreshIndicator,
 } from "@/components";
 
 // API
 import {
+  useCookbookDetails,
   useBulkDeleteRecipesMutation,
   useBulkRemoveRecipesFromCookbookMutation,
-  useCookbookDetails,
 } from "@/api";
 
-// Contexts
-import { useActionToast } from "@/contexts";
-
 // Stable noop function for fallback (prevents creating new functions on every render)
-const noop = () => {};
+const noop = () => { };
 
 export default function CookbookDetails() {
   const navigation = useNavigation();
@@ -242,10 +245,24 @@ export default function CookbookDetails() {
 
   // Handle add to cookbook sheet close
   const handleAddToCookbookClose = useCallback(() => {
-    // Exit bulk edit mode and clear state when sheet closes
     setIsAddSheetOpen(false);
     setIsBulkEditMode(false);
-    setSelectedRecipeIds(new Set());
+  }, []);
+
+  // Listen for cookbook created event to reopen sheet
+  // AddToCookbookSheet will handle pre-selection internally
+  useEffect(() => {
+    const listener = DeviceEventEmitter.addListener(
+      COOKBOOK_CREATED_EVENT,
+      () => {
+        // Just reopen the sheet - AddToCookbookSheet will handle pre-selection
+        setIsAddSheetOpen(true);
+      },
+    );
+
+    return () => {
+      listener.remove();
+    };
   }, []);
 
   // Filter out stale selections when recipes change
@@ -430,7 +447,7 @@ export default function CookbookDetails() {
                 Alert.alert(
                   "Oops!",
                   error?.message ||
-                    "Failed to remove recipes from cookbook. Please try again.",
+                  "Failed to remove recipes from cookbook. Please try again.",
                   [{ text: "OK" }],
                 );
               });
@@ -511,7 +528,7 @@ export default function CookbookDetails() {
                 Alert.alert(
                   "Oops!",
                   error?.message ||
-                    "Failed to delete recipes. Please try again.",
+                  "Failed to delete recipes. Please try again.",
                   [{ text: "OK" }],
                 );
               });
@@ -632,7 +649,7 @@ export default function CookbookDetails() {
             style={[
               styles.bulkEditButton,
               (!hasSelections || isMutationPending) &&
-                styles.bulkEditButtonDisabled,
+              styles.bulkEditButtonDisabled,
             ]}
             onPress={handleBulkAdd}
             disabled={!hasSelections || isMutationPending}
@@ -646,7 +663,7 @@ export default function CookbookDetails() {
               style={[
                 styles.bulkEditButtonText,
                 (!hasSelections || isMutationPending) &&
-                  styles.bulkEditButtonTextDisabled,
+                styles.bulkEditButtonTextDisabled,
               ]}
             >
               Add
@@ -657,7 +674,7 @@ export default function CookbookDetails() {
             style={[
               styles.bulkEditButton,
               (!hasSelections || isMutationPending) &&
-                styles.bulkEditButtonDisabled,
+              styles.bulkEditButtonDisabled,
             ]}
             onPress={handleBulkRemove}
             disabled={!hasSelections || isMutationPending}
@@ -671,7 +688,7 @@ export default function CookbookDetails() {
               style={[
                 styles.bulkEditButtonText,
                 (!hasSelections || isMutationPending) &&
-                  styles.bulkEditButtonTextDisabled,
+                styles.bulkEditButtonTextDisabled,
               ]}
             >
               Remove
@@ -682,7 +699,7 @@ export default function CookbookDetails() {
             style={[
               styles.bulkEditButton,
               (!hasSelections || isMutationPending) &&
-                styles.bulkEditButtonDisabled,
+              styles.bulkEditButtonDisabled,
             ]}
             onPress={handleBulkDelete}
             disabled={!hasSelections || isMutationPending}
@@ -701,7 +718,7 @@ export default function CookbookDetails() {
                 styles.bulkEditButtonText,
                 styles.bulkEditButtonTextDestructive,
                 (!hasSelections || isMutationPending) &&
-                  styles.bulkEditButtonTextDisabled,
+                styles.bulkEditButtonTextDisabled,
               ]}
             >
               Delete
@@ -744,9 +761,9 @@ export default function CookbookDetails() {
         isOpen={isAddSheetOpen}
         recipes={selectedRecipes}
         currentCookbookId={cookbookId}
+        onClose={handleAddToCookbookClose}
         bottomSheetRef={addToCookbookSheetRef}
         onSuccess={handleAddToCookbookSuccess}
-        onClose={handleAddToCookbookClose}
       />
     </View>
   );

@@ -1,19 +1,27 @@
-import * as Haptics from "expo-haptics";
-import { router, useLocalSearchParams } from "expo-router";
 // External Dependencies
 import { useCallback } from "react";
-import { Alert } from "react-native";
-
-import { useCreateCookbookMutation } from "@/api";
-import { SingleInputForm } from "@/components";
-import { useActionToast } from "@/contexts";
+import * as Haptics from "expo-haptics";
+import { Alert, DeviceEventEmitter } from "react-native";
+import { router, useLocalSearchParams } from "expo-router";
 
 // Internal Dependencies
+import { useActionToast } from "@/contexts";
+import { SingleInputForm } from "@/components";
+import { useCreateCookbookMutation } from "@/api";
 import { parseSlug, reportError } from "@/libs/utils";
+
+// Event name for cookbook creation - used to notify AddToCookbookSheet
+export const COOKBOOK_CREATED_EVENT = "cookbookCreated";
+
+// Return context identifier for AddToCookbookSheet
+export const RETURN_TO_ADD_TO_COOKBOOK_SHEET = "add-to-cookbook-sheet";
 
 export default function CreateCookbook() {
   const { showToast } = useActionToast();
-  const { recipeSlug } = useLocalSearchParams<{ recipeSlug?: string }>();
+  const { recipeSlug, returnTo } = useLocalSearchParams<{
+    recipeSlug?: string;
+    returnTo?: string;
+  }>();
   const { mutate: createCookbook, isPending } = useCreateCookbookMutation();
 
   // Parse slug to extract recipe ID if recipeSlug exists
@@ -49,15 +57,26 @@ export default function CreateCookbook() {
 
       createCookbook(requestBody, {
         onSuccess: async (response) => {
+          const newCookbookId = response?.data?.id;
+          const cookbookName = response?.data?.name ?? "cookbook";
+
           // Show toast with API response data only if recipeId exists
-          // Hide CTA button since this is a newly created cookbook (no change option)
           if (recipeId) {
             showToast({
-              text: `Saved to ${response?.data?.name ?? "cookbook"}`,
+              text: `Saved to ${cookbookName}`,
               thumbnailUri: response.data.imageUris?.[0] || null,
             });
           }
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+          // If we came from AddToCookbookSheet, emit event with new cookbook ID
+          // so the parent can reopen the sheet with the new cookbook pre-selected
+          if (returnTo === RETURN_TO_ADD_TO_COOKBOOK_SHEET && newCookbookId) {
+            DeviceEventEmitter.emit(COOKBOOK_CREATED_EVENT, {
+              cookbookId: newCookbookId,
+              cookbookName,
+            });
+          }
 
           // Navigate back
           router.back();
@@ -75,7 +94,7 @@ export default function CreateCookbook() {
         },
       });
     },
-    [isPending, recipeId, createCookbook, showToast],
+    [isPending, recipeId, returnTo, createCookbook, showToast],
   );
 
   const handleCancel = useCallback(() => {

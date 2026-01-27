@@ -1,19 +1,22 @@
-import { Ionicons } from "@expo/vector-icons";
 // External Dependencies
 import { router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import React, { useState, useCallback, useEffect } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import {
-  StyleSheet,
   Text,
-  TextInput,
-  TouchableOpacity,
   View,
+  Platform,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
 } from "react-native";
 
 // Internal Dependencies
+import { Colors } from "@/libs/constants";
 import { DotsLoader } from "@/components";
+import { BlurBackButton } from "@/components/BlurBackButton";
 
 export interface SingleInputFormProps {
   // The title displayed in the header (e.g., "Create wishlist" or "Add note")
@@ -121,16 +124,18 @@ export function SingleInputForm({
             style={styles.closeButton}
             disabled={isLoading}
           >
-            <Ionicons name="close" size={24} color="#000" />
+            <Ionicons
+              name="close"
+              size={24}
+              color={isLoading ? "#999" : "#000"}
+            />
           </TouchableOpacity>
         ) : (
-          <TouchableOpacity
+          <BlurBackButton
             onPress={handleBack}
-            style={styles.backButton}
             disabled={isLoading}
-          >
-            <Ionicons name="arrow-back" size={24} color="#000" />
-          </TouchableOpacity>
+            style={styles.backButton}
+          />
         )}
         <Text style={styles.headerTitle}>{title}</Text>
       </View>
@@ -205,11 +210,11 @@ export function SingleInputForm({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: Colors.background,
   },
   header: {
-    paddingTop: 18,
-    paddingBottom: 16,
+    paddingTop: 28,
+    paddingVertical: 20,
     paddingHorizontal: 16,
     alignItems: "center",
     justifyContent: "center",
@@ -229,13 +234,17 @@ const styles = StyleSheet.create({
     position: "absolute",
   },
   headerTitle: {
-    fontSize: 18,
+    fontSize: 20,
     color: "#000",
-    fontWeight: "500",
+    fontWeight: "700",
+    fontFamily: Platform.select({
+      android: "BricolageGrotesque_700Bold",
+      ios: "BricolageGrotesque-Bold",
+    }),
   },
   content: {
     flex: 1,
-    paddingTop: 24,
+    paddingTop: 10,
     paddingBottom: 30,
     paddingHorizontal: 20,
   },
@@ -255,9 +264,13 @@ const styles = StyleSheet.create({
   },
   characterCount: {
     fontSize: 13,
-    color: "#667",
+    color: Colors.matureForeground,
     marginLeft: 4,
-    fontWeight: "700",
+    fontWeight: "400",
+    fontFamily: Platform.select({
+      android: "Manrope_400Regular",
+      ios: "Manrope-Regular",
+    }),
   },
   footer: {
     gap: 12,
@@ -266,7 +279,7 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     borderTopWidth: 1,
     paddingHorizontal: 20,
-    borderTopColor: "#E5E5E5",
+    borderTopColor: "#E5E5E0",
     justifyContent: "space-between",
   },
   leftButton: {
@@ -277,6 +290,10 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#000",
     textDecorationLine: "underline",
+    fontFamily: Platform.select({
+      android: "Manrope_600SemiBold",
+      ios: "Manrope-SemiBold",
+    }),
   },
   leftButtonTextDisabled: {
     opacity: 0.5,
@@ -286,7 +303,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 22,
     alignItems: "center",
-    backgroundColor: "#222",
+    backgroundColor: Colors.primary,
     justifyContent: "center",
     minHeight: 44,
   },
@@ -294,9 +311,13 @@ const styles = StyleSheet.create({
     backgroundColor: "#E5E5E5",
   },
   saveButtonText: {
-    fontSize: 17,
+    fontSize: 18,
     color: "#fff",
-    fontWeight: "500",
+    fontWeight: "600",
+    fontFamily: Platform.select({
+      android: "Manrope_600SemiBold",
+      ios: "Manrope-SemiBold",
+    }),
   },
   saveButtonTextDisabled: {
     color: "#999",

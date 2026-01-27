@@ -315,6 +315,15 @@ function RootLayoutNavigator() {
         }}
       />
       <Stack.Screen
+        name="(modal)/create-cookbook/index"
+        options={{
+          headerShown: false,
+          sheetCornerRadius: 30,
+          presentation: "formSheet",
+          sheetAllowedDetents: [0.34],
+        }}
+      />
+      <Stack.Screen
         name="(modal)/manage-cookbooks/index"
         options={{
           headerShown: false,

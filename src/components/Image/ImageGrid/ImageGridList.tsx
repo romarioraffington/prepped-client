@@ -3,22 +3,22 @@ import { type ReactElement, forwardRef, useCallback, useMemo } from "react";
 import Animated from "react-native-reanimated";
 
 import {
-  FlatList,
-  type NativeScrollEvent,
-  type NativeSyntheticEvent,
-  Platform,
-  type RefreshControlProps,
-  StyleSheet,
   Text,
   View,
+  FlatList,
+  Platform,
+  StyleSheet,
   type ViewStyle,
+  type NativeScrollEvent,
+  type NativeSyntheticEvent,
+  type RefreshControlProps,
 } from "react-native";
 
-import type { ImageGridItem as ImageGridItemType } from "@/libs/types";
-import { formatRelativeTime } from "@/libs/utils/date";
 // Internal Imports
 import { ImageGridItem } from "./ImageGridItem";
+import { formatRelativeTime } from "@/libs/utils/date";
 import { LoadingImageGridList } from "./LoadingImageGridList";
+import type { ImageGridItem as ImageGridItemType } from "@/libs/types";
 
 interface ImageGridListProps {
   isLoading?: boolean;
@@ -72,12 +72,13 @@ export const ImageGridList = forwardRef<
     const renderItem = useCallback(
       ({ item }: { item: ImageGridItemType }) => {
         // Generate metadata showing recipe count and last updated timestamp
-        const recipeCount =
-          item.count > 0 ? (
-            <Text style={styles.recipeCountText}>
-              {item.count} {item.count === 1 ? "Recipe" : "Recipes"}
-            </Text>
-          ) : null;
+        const recipeCount = (
+          <Text style={styles.recipeCountText}>
+            {item.count === 0
+              ? "No Recipes"
+              : `${item.count} ${item.count === 1 ? "Recipe" : "Recipes"}`}
+          </Text>
+        );
 
         const timestamp = item.lastUpdatedTimestamp
           ? formatRelativeTime(item.lastUpdatedTimestamp)
@@ -87,16 +88,15 @@ export const ImageGridList = forwardRef<
           <Text style={styles.timestampText}>{timestamp}</Text>
         ) : null;
 
-        const metadata =
-          recipeCount || timestampText ? (
-            <View style={styles.metadataRow}>
-              {recipeCount}
-              {recipeCount && timestampText && (
-                <Text style={styles.metadataSeparator}> </Text>
-              )}
-              {timestampText}
-            </View>
-          ) : null;
+        const metadata = (
+          <View style={styles.metadataRow}>
+            {recipeCount}
+            {timestampText && (
+              <Text style={styles.metadataSeparator}> </Text>
+            )}
+            {timestampText}
+          </View>
+        );
 
         return (
           <ImageGridItem
