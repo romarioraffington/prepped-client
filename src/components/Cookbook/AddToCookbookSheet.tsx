@@ -26,6 +26,7 @@ import {
 } from "react-native";
 
 // Internal Dependencies
+import { createFullSlug } from "@/libs/utils";
 import { useActionToast } from "@/contexts";
 import { DotsLoader } from "@/components/DotsLoader";
 import type { ImageGridItem, Recipe } from "@/libs/types";
@@ -192,6 +193,7 @@ export function AddToCookbookSheet({
       if (cookbookCount === 1) {
         const cookbook = cookbooks.find((cb) => cb.id === cookbookIds[0]);
         const cookbookName = cookbook?.name ?? "cookbook";
+        const cookbookId = cookbook?.id;
         showToast({
           icon: (
             <View
@@ -216,6 +218,18 @@ export function AddToCookbookSheet({
               {`Added ${recipeText} to ${cookbookName}`}
             </Text>
           ),
+          cta: cookbookId
+            ? {
+                text: "View",
+                onPress: () => {
+                  const slug = createFullSlug(cookbookName, cookbookId);
+                  router.push({
+                    pathname: "/cookbooks/[slug]",
+                    params: { slug },
+                  });
+                },
+              }
+            : undefined,
         });
       } else {
         showToast({
