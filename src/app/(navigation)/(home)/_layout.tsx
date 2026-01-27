@@ -47,6 +47,15 @@ export default function HomeLayout() {
           headerBackTitle: "Cookbooks",
         }}
       />
+      <Stack.Screen
+        name="cookbooks/[slug]/edit"
+        options={{
+          headerShown: false,
+          sheetCornerRadius: 30,
+          presentation: "formSheet",
+          sheetAllowedDetents: [0.34],
+        }}
+      />
     </Stack>
   );
 }

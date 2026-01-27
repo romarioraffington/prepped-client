@@ -76,12 +76,13 @@ export function CookbookOptionsSheet({
   // Handle Edit Title press
   const handleEditTitlePress = useCallback(() => {
     bottomSheetRef.current?.close();
-    if (onEditTitlePress) {
-      setTimeout(() => {
-        onEditTitlePress();
-      }, 100);
-    }
-  }, [bottomSheetRef, onEditTitlePress]);
+    setTimeout(() => {
+      router.push({
+        pathname: "/cookbooks/[slug]/edit",
+        params: { slug: cookbookSlug },
+      });
+    }, 100);
+  }, [bottomSheetRef, router, cookbookSlug]);
 
   // Handle Bulk Edit Recipes press
   const handleBulkEditPress = useCallback(() => {
