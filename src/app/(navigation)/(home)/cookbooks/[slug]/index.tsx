@@ -1,7 +1,7 @@
 // External Dependencies
 import * as Haptics from "expo-haptics";
-import { useHeaderHeight } from "@react-navigation/elements";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { useHeaderHeight } from "@react-navigation/elements";
 import type { default as BottomSheet } from "@gorhom/bottom-sheet";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { router, useLocalSearchParams, useNavigation } from "expo-router";
@@ -18,12 +18,11 @@ import React, {
 
 import {
   Alert,
-  View,
   Text,
+  View,
   Platform,
   StyleSheet,
   TouchableOpacity,
-  DeviceEventEmitter,
 } from "react-native";
 
 import Animated, {
@@ -40,15 +39,13 @@ import { useActionToast } from "@/contexts";
 import { useLargeTitleCrossfade } from "@/hooks";
 import { createShortSlug, parseSlug } from "@/libs/utils";
 import { COLLECTION_TYPE, Colors } from "@/libs/constants";
-import { COOKBOOK_CREATED_EVENT } from "@/app/(modal)/create-cookbook";
 
 import {
-  LargeTitle,
   RecipeCard,
+  LargeTitle,
   StaggeredGrid,
   WithPullToRefresh,
   RecipeOptionsSheet,
-  AddToCookbookSheet,
   CookbookOptionsSheet,
   LoadingStaggeredGrid,
   PinterestRefreshIndicator,
@@ -67,41 +64,41 @@ const noop = () => { };
 export default function CookbookDetails() {
   const navigation = useNavigation();
   const insets = useSafeAreaInsets();
+  const { showToast } = useActionToast();
   const headerHeight = useHeaderHeight();
   const [refreshing, setRefreshing] = useState(false);
   const { slug } = useLocalSearchParams<{ slug: string }>();
   const bottomSheetRef = useRef<BottomSheet | null>(null);
+  const cookbookOptionsSheetRef = useRef<BottomSheet | null>(null);
+  const [isOptionsSheetOpen, setIsOptionsSheetOpen] = useState(false);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+
+  // Parse slug to extract ID and name for API call
+  const { id: cookbookId, name: cookbookName } = parseSlug(slug);
 
   // Bulk edit mode state
   const [isBulkEditMode, setIsBulkEditMode] = useState(false);
   const [selectedRecipeIds, setSelectedRecipeIds] = useState<Set<string>>(
     new Set(),
   );
-  const cookbookOptionsSheetRef = useRef<BottomSheet | null>(null);
-  const [isOptionsSheetOpen, setIsOptionsSheetOpen] = useState(false);
 
-  // Add to cookbook sheet state
-  const addToCookbookSheetRef = useRef<BottomSheet | null>(null);
-  const [isAddSheetOpen, setIsAddSheetOpen] = useState(false);
-
-  // Parse slug to extract ID and name for API call
-  const { id: cookbookId, name: cookbookName } = parseSlug(slug);
-
-  // Toast context for showing success messages
-  const { showToast } = useActionToast();
+  // Fetch cookbook details
+  const {
+    data,
+    refetch,
+    isLoading,
+  } = useCookbookDetails(cookbookId);
 
   // Bulk operation mutations
-  const { mutateAsync: bulkRemoveRecipesAsync, isPending: isRemovePending } =
-    useBulkRemoveRecipesFromCookbookMutation();
+  const {
+    isPending: isRemovePending,
+    mutateAsync: bulkRemoveRecipesAsync,
+  } = useBulkRemoveRecipesFromCookbookMutation();
 
-  const { mutateAsync: bulkDeleteRecipesAsync, isPending: isDeletePending } =
-    useBulkDeleteRecipesMutation();
-
-  // Calculate bottom padding: safe area bottom + extra space for comfortable scrolling
-  const contentBottomPadding = insets.bottom + 20;
-
-  const { data, refetch, isLoading } = useCookbookDetails(cookbookId);
+  const {
+    isPending: isDeletePending,
+    mutateAsync: bulkDeleteRecipesAsync,
+  } = useBulkDeleteRecipesMutation();
 
   // Footer animation - starts off-screen (100 = hidden below screen)
   const footerTranslateY = useSharedValue(100);
@@ -120,8 +117,8 @@ export default function CookbookDetails() {
   }));
 
   // Extract the needed data
-  const recipes = data?.recipes ?? [];
   const collectionType = data?.type;
+  const recipes = data?.recipes ?? [];
   const collectionName = data?.name ?? "";
   const recipesCount = data?.recipesCount ?? 0;
 
@@ -207,12 +204,7 @@ export default function CookbookDetails() {
 
   const selectCallbacks = selectCallbacksRef.current;
 
-  // Get selected recipes for add to cookbook sheet
-  const selectedRecipes = useMemo(() => {
-    return recipes.filter((recipe) => selectedRecipeIds.has(recipe.id));
-  }, [recipes, selectedRecipeIds]);
-
-  // Handle bulk add - open add to cookbook sheet
+  // Handle bulk add - navigate to add to cookbook route
   const handleBulkAdd = useCallback(() => {
     if (selectedRecipeIds.size === 0) return;
 
@@ -229,41 +221,16 @@ export default function CookbookDetails() {
     // Exit bulk edit mode immediately when Add is pressed
     setIsBulkEditMode(false);
 
-    // Open add to cookbook sheet
-    setIsAddSheetOpen(true);
-  }, [selectedRecipeIds.size]);
-
-  // Sheet opening is now handled by the AddToCookbookSheet component via isOpen prop
-
-  // Handle successful add to cookbook
-  const handleAddToCookbookSuccess = useCallback(() => {
-    // Clear selections and exit bulk edit mode after successful bulk add
-    setSelectedRecipeIds(new Set());
-    setIsBulkEditMode(false);
-    setIsAddSheetOpen(false);
-  }, []);
-
-  // Handle add to cookbook sheet close
-  const handleAddToCookbookClose = useCallback(() => {
-    setIsAddSheetOpen(false);
-    setIsBulkEditMode(false);
-  }, []);
-
-  // Listen for cookbook created event to reopen sheet
-  // AddToCookbookSheet will handle pre-selection internally
-  useEffect(() => {
-    const listener = DeviceEventEmitter.addListener(
-      COOKBOOK_CREATED_EVENT,
-      () => {
-        // Just reopen the sheet - AddToCookbookSheet will handle pre-selection
-        setIsAddSheetOpen(true);
+    // Navigate to add to cookbook route
+    router.push({
+      pathname: "/(modal)/add-to-cookbook",
+      params: {
+        selectedRecipeIds: Array.from(selectedRecipeIds).join(","),
+        currentCookbookId: cookbookId,
+        selectedCookbookIds: "",
       },
-    );
-
-    return () => {
-      listener.remove();
-    };
-  }, []);
+    });
+  }, [selectedRecipeIds, cookbookId]);
 
   // Filter out stale selections when recipes change
   useEffect(() => {
@@ -611,9 +578,13 @@ export default function CookbookDetails() {
   }
 
   // Calculate bottom padding for bulk edit mode (footer height + safe area)
-  const bulkEditBottomPadding = isBulkEditMode ? 60 + insets.bottom : 0;
   const hasSelections = selectedRecipeIds.size > 0;
   const isMutationPending = isRemovePending || isDeletePending;
+  const bulkEditBottomPadding = isBulkEditMode ? 60 + insets.bottom : 0;
+
+  // Calculate bottom padding: safe area
+  // bottom + extra space for comfortable scrolling
+  const contentBottomPadding = insets.bottom + 20;
 
   return (
     <View style={styles.container}>
@@ -755,16 +726,6 @@ export default function CookbookDetails() {
           }}
         />
       )}
-
-      {/* Add to Cookbook Bottom Sheet */}
-      <AddToCookbookSheet
-        isOpen={isAddSheetOpen}
-        recipes={selectedRecipes}
-        currentCookbookId={cookbookId}
-        onClose={handleAddToCookbookClose}
-        bottomSheetRef={addToCookbookSheetRef}
-        onSuccess={handleAddToCookbookSuccess}
-      />
     </View>
   );
 }

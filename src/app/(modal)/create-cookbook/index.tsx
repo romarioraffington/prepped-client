@@ -1,7 +1,7 @@
 // External Dependencies
 import { useCallback } from "react";
+import { Alert } from "react-native";
 import * as Haptics from "expo-haptics";
-import { Alert, DeviceEventEmitter } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 
 // Internal Dependencies
@@ -10,49 +10,43 @@ import { SingleInputForm } from "@/components";
 import { useCreateCookbookMutation } from "@/api";
 import { parseSlug, reportError } from "@/libs/utils";
 
-// Event name for cookbook creation - used to notify AddToCookbookSheet
-export const COOKBOOK_CREATED_EVENT = "cookbookCreated";
-
-// Return context identifier for AddToCookbookSheet
-export const RETURN_TO_ADD_TO_COOKBOOK_SHEET = "add-to-cookbook-sheet";
+type RouteParams = {
+  recipeSlug?: string;
+  selectedRecipeIds?: string;
+  currentCookbookId?: string;
+  selectedCookbookIds?: string;
+};
 
 export default function CreateCookbook() {
   const { showToast } = useActionToast();
-  const { recipeSlug, returnTo } = useLocalSearchParams<{
-    recipeSlug?: string;
-    returnTo?: string;
-  }>();
   const { mutate: createCookbook, isPending } = useCreateCookbookMutation();
 
-  // Parse slug to extract recipe ID if recipeSlug exists
+  const {
+    recipeSlug,
+    currentCookbookId,
+    selectedRecipeIds,
+    selectedCookbookIds,
+  } = useLocalSearchParams<RouteParams>();
+
+  // Parse slug to extract recipe ID if recipeSlug exists.
+  // When this is provided, the cookbook will be created with the recipe.
   const recipeId = recipeSlug ? parseSlug(recipeSlug).id : undefined;
 
-  // Common function to handle going back - returns to the correct place
-  // based on where the user came from:
-  // 1. From manage-cookbooks (has recipeSlug) → reopen manage-cookbooks modal
-  // 2. From AddToCookbookSheet (has returnTo) → emit event to reopen sheet
-  // 3. From cookbooks list (no params) → go back normally
-  const handleGoBack = useCallback(() => {
-    // If we came from AddToCookbookSheet, emit event to reopen the sheet
-    if (returnTo === RETURN_TO_ADD_TO_COOKBOOK_SHEET) {
-      DeviceEventEmitter.emit(COOKBOOK_CREATED_EVENT, {});
-      router.back();
-    } else if (recipeSlug) {
-      // If we came from manage-cookbooks modal, reopen it
-      router.back();
-      setTimeout(() => {
-        router.push({
-          pathname: "/(modal)/manage-cookbooks",
-          params: {
-            recipeSlug,
-          },
-        });
-      }, 100);
+  const handleGoBack = () => {
+    // If we came from add-to-cookbook, navigate back to it
+    if (selectedRecipeIds && currentCookbookId) {
+      router.replace({
+        pathname: "/(modal)/add-to-cookbook",
+        params: {
+          selectedRecipeIds,
+          currentCookbookId,
+          selectedCookbookIds: selectedCookbookIds || "",
+        },
+      });
     } else {
-      // Default: just go back
       router.back();
     }
-  }, [recipeSlug, returnTo]);
+  };
 
   const handleSave = useCallback(
     (name: string) => {
@@ -78,17 +72,25 @@ export default function CreateCookbook() {
           }
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
-          // If we came from AddToCookbookSheet, emit event with new cookbook ID
-          // so the parent can reopen the sheet with the new cookbook pre-selected
-          if (returnTo === RETURN_TO_ADD_TO_COOKBOOK_SHEET && newCookbookId) {
-            DeviceEventEmitter.emit(COOKBOOK_CREATED_EVENT, {
-              cookbookId: newCookbookId,
-              cookbookName,
+          // If we came from add-to-cookbook route, navigate back with newCookbookId
+          // so the add-to-cookbook route can pre-select the new cookbook
+          if (
+            newCookbookId &&
+            selectedRecipeIds &&
+            currentCookbookId
+          ) {
+            router.replace({
+              pathname: "/(modal)/add-to-cookbook",
+              params: {
+                newCookbookId,
+                selectedRecipeIds,
+                currentCookbookId,
+                selectedCookbookIds: selectedCookbookIds || "",
+              },
             });
+          } else {
+            router.back();
           }
-
-          // Navigate back
-          router.back();
         },
         onError: (error) => {
           Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
@@ -103,12 +105,17 @@ export default function CreateCookbook() {
         },
       });
     },
-    [isPending, recipeId, returnTo, createCookbook, showToast],
+    [
+      isPending,
+      recipeId,
+      showToast,
+      recipeSlug,
+      createCookbook,
+      selectedRecipeIds,
+      currentCookbookId,
+      selectedCookbookIds,
+    ],
   );
-
-  const handleCancel = useCallback(() => {
-    handleGoBack();
-  }, [handleGoBack]);
 
   return (
     <SingleInputForm
@@ -117,7 +124,7 @@ export default function CreateCookbook() {
       onSave={handleSave}
       isLoading={isPending}
       onBack={handleGoBack}
-      onCancel={handleCancel}
+      onCancel={handleGoBack}
     />
   );
 }

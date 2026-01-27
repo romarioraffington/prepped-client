@@ -1,40 +1,43 @@
-import * as Sentry from "@sentry/react-native";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 // External Dependencies
+import { useImportQuota } from "@/api";
 import { isRunningInExpoGo } from "expo";
 import Constants from "expo-constants";
+import { StyleSheet } from "react-native";
+import { useEffect, useState } from "react";
+import { Host } from "react-native-portalize";
+import * as Sentry from "@sentry/react-native";
+import * as SplashScreen from "expo-splash-screen";
+import { ShareIntentProvider } from "expo-share-intent";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+
 import {
   Stack,
-  useNavigationContainerRef,
   useRouter,
   useSegments,
-} from "expo-router";
-import { ShareIntentProvider } from "expo-share-intent";
-import * as SplashScreen from "expo-splash-screen";
-import { useEffect, useState } from "react";
-import { ActivityIndicator, StyleSheet, View } from "react-native";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { Host } from "react-native-portalize";
+  useNavigationContainerRef,
+} from "expo-router"
 
 // Internal Dependencies
-import { useImportQuota } from "@/api";
 import {
   ActionToast,
   ErrorFallback,
   ImportProgressManager,
   ShareIntentHandler,
 } from "@/components";
+
 import {
-  ActionToastProvider,
+  useAuth,
   AuthProvider,
+  ActionToastProvider,
   ImportProgressProvider,
   SubscriptionProvider,
-  useAuth,
 } from "@/contexts";
+
 import { useAppUpdates } from "@/hooks";
 import { reportWarning } from "@/libs/utils";
-import { setupConsoleErrorInterceptor } from "@/libs/utils/consoleInterceptor";
 import { hasHomeButton, isIPad } from "@/libs/utils/platform";
+import { setupConsoleErrorInterceptor } from "@/libs/utils/consoleInterceptor";
 
 // Get environment configuration
 const isDev = __DEV__;
@@ -99,8 +102,8 @@ const queryClient = new QueryClient({
 
 const navigationIntegration = !isDev
   ? Sentry.reactNavigationIntegration({
-      enableTimeToInitialDisplay: !isRunningInExpoGo(),
-    })
+    enableTimeToInitialDisplay: !isRunningInExpoGo(),
+  })
   : null;
 
 export default function HomeLayout() {
@@ -325,6 +328,13 @@ function RootLayoutNavigator() {
       />
       <Stack.Screen
         name="(modal)/manage-cookbooks/index"
+        options={{
+          headerShown: false,
+          presentation: "modal",
+        }}
+      />
+      <Stack.Screen
+        name="(modal)/add-to-cookbook/index"
         options={{
           headerShown: false,
           presentation: "modal",
