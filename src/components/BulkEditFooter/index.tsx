@@ -1,8 +1,8 @@
 // External Dependencies
 import { useEffect } from "react";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
 // Internal Dependencies
@@ -15,7 +15,7 @@ export interface BulkEditFooterProps {
   selectedCount: number;
   onMove?: () => void;
   onDelete?: () => void;
-  onAdd?: () => void;
+  onCopy?: () => void;
   onRemove?: () => void;
   isPending?: boolean;
   variant?: BulkEditFooterVariant;
@@ -26,7 +26,7 @@ export function BulkEditFooter({
   selectedCount,
   onMove,
   onDelete,
-  onAdd,
+  onCopy,
   onRemove,
   isPending = false,
   variant = "default",
@@ -100,23 +100,23 @@ export function BulkEditFooter({
         );
 
       case "recipes":
-        // Add and Delete only
+        // Copy and Delete only
         return (
           <>
             <TouchableOpacity
               style={[styles.button, isDisabled && styles.buttonDisabled]}
-              onPress={onAdd}
+              onPress={onCopy}
               disabled={isDisabled}
             >
               <MaterialIcons
-                name="bookmark-add"
                 size={25}
+                name="content-copy"
                 color={!isDisabled ? "#667" : "#999"}
               />
               <Text
                 style={[styles.buttonText, isDisabled && styles.buttonTextDisabled]}
               >
-                Add
+                Copy
               </Text>
             </TouchableOpacity>
 
@@ -144,23 +144,23 @@ export function BulkEditFooter({
         );
 
       default:
-        // Add, Remove, Delete (default variant)
+        // Copy, Remove, Delete (default variant)
         return (
           <>
             <TouchableOpacity
-              style={[styles.button, isDisabled && styles.buttonDisabled]}
-              onPress={onAdd}
+              onPress={onCopy}
               disabled={isDisabled}
+              style={[styles.button, isDisabled && styles.buttonDisabled]}
             >
               <MaterialIcons
-                size={25}
-                name="bookmark-add"
+                size={23}
+                name="content-copy"
                 color={!isDisabled ? "#667" : "#999"}
               />
               <Text
                 style={[styles.buttonText, isDisabled && styles.buttonTextDisabled]}
               >
-                Add
+                Copy
               </Text>
             </TouchableOpacity>
 
@@ -169,9 +169,9 @@ export function BulkEditFooter({
               disabled={isDisabled}
               style={[styles.button, isDisabled && styles.buttonDisabled]}
             >
-              <MaterialIcons
+              <MaterialCommunityIcons
                 size={24}
-                name="bookmark-remove"
+                name="book-remove-multiple-outline"
                 color={!isDisabled ? "#667" : "#999"}
               />
               <Text

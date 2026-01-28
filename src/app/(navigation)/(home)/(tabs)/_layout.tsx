@@ -1,39 +1,43 @@
 // External Imports
 import { BlurView } from "expo-blur";
 import { StatusBar } from "expo-status-bar";
-import React, { useCallback, useEffect, useRef, useState } from "react";
 import type { FlatList } from "react-native";
-import {
-  DeviceEventEmitter,
-  Animated as RNAnimated,
-  StyleSheet,
-  View,
-} from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { scheduleOnRN } from "react-native-worklets";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+
+import {
+  View,
+  StyleSheet,
+  DeviceEventEmitter,
+} from "react-native";
 
 import Animated, {
   useSharedValue,
   useAnimatedReaction,
   useAnimatedScrollHandler,
+  withSpring,
+  type SharedValue,
 } from "react-native-reanimated";
 
+
+// Internal Imports
+import { Colors } from "@/libs/constants";
+import { useHeaderAnimation } from "@/hooks";
+import type { ImageGridItem } from "@/libs/types";
+import { TabScrollProvider, useTabScroll } from "@/contexts";
+import { BOTTOM_NAV_SCROLL_EVENT } from "@/hooks/useBottomNavigationAnimation";
+
 import {
-  CONTENT_WIDTH,
-  FloatingAddButton,
+  TopTabs,
   type TabData,
   type TabsData,
-  TopTabs,
+  CONTENT_WIDTH,
+  FloatingAddButton,
 } from "@/components";
-import { TabScrollProvider, useTabScroll } from "@/contexts";
-// Internal Imports
-import { useHeaderAnimation } from "@/hooks";
-import { BOTTOM_NAV_SCROLL_EVENT } from "@/hooks/useBottomNavigationAnimation";
-import { Colors } from "@/libs/constants";
-import type { ImageGridItem } from "@/libs/types";
 
-import Cookbooks from "./index";
 // Content Components
+import Cookbooks from "./index";
 import Recipes from "./recipes";
 
 enum Tab {
@@ -55,14 +59,18 @@ type ScrollableRef = {
 function TabsContent() {
   const insets = useSafeAreaInsets();
   const [headerHeight, setHeaderHeight] = useState(0);
-  const fabOpacity = useRef(new RNAnimated.Value(1)).current;
+  const fabOpacity = useSharedValue(1); // Use Reanimated instead of RNAnimated
+  const [currentTabIndex, setCurrentTabIndex] = useState(0);
   const [statusBarHidden, setStatusBarHidden] = useState(false);
   const blurHeight = headerHeight || insets.top + 50;
   const blurOpacity = headerHeight > 0 ? 1 : 0;
 
   // From context
-  const { scrollDirection, handleTabScroll, resetScrollDirection } =
-    useTabScroll();
+  const {
+    scrollDirection,
+    handleTabScroll,
+    resetScrollDirection
+  } = useTabScroll();
 
   // Horizontal tabs state
   const activeTabIndex = useSharedValue(0);
@@ -95,25 +103,31 @@ function TabsContent() {
     },
   );
 
-  const handleBottomNavVisibility = useCallback(
-    (shouldHideNav: boolean) => {
-      DeviceEventEmitter.emit(BOTTOM_NAV_SCROLL_EVENT, shouldHideNav);
-      RNAnimated.spring(fabOpacity, {
-        toValue: shouldHideNav ? 0 : 1,
-        useNativeDriver: true,
-        damping: 30,
-        stiffness: 100,
-      }).start();
-    },
-    [fabOpacity],
-  );
+  // Callback to emit bottom nav scroll event
+  const emitBottomNavEvent = useCallback((shouldHide: boolean) => {
+    DeviceEventEmitter.emit(BOTTOM_NAV_SCROLL_EVENT, shouldHide);
+  }, []);
 
+  // Animate FAB opacity directly with Reanimated - no serialization issues
   useAnimatedReaction(
     () => scrollDirection.value,
     (currentDirection, previousDirection) => {
       if (currentDirection === previousDirection) return;
-      const shouldHideNav = currentDirection === "to-bottom";
-      scheduleOnRN(handleBottomNavVisibility, shouldHideNav);
+      const shouldHide = currentDirection === "to-bottom";
+      fabOpacity.value = withSpring(shouldHide ? 0 : 1, {
+        damping: 30,
+        stiffness: 100,
+      });
+      scheduleOnRN(emitBottomNavEvent, shouldHide);
+    },
+  );
+
+  // Sync active tab index to React state for FloatingAddButton
+  useAnimatedReaction(
+    () => activeTabIndex.value,
+    (current, previous) => {
+      if (previous !== undefined && current === previous) return;
+      scheduleOnRN(setCurrentTabIndex, current);
     },
   );
 
@@ -170,6 +184,7 @@ function TabsContent() {
   const switchToTab = useCallback(
     (index: number) => {
       activeTabIndex.value = index;
+      setCurrentTabIndex(index);
       horizontalListRef.current?.scrollToIndex({
         index,
         viewPosition: 0.5,
@@ -279,6 +294,7 @@ function TabsContent() {
         bottomOffset={70}
         disableTranslate
         animationValue={fabOpacity}
+        activeTabIndex={currentTabIndex}
       />
     </View>
   );

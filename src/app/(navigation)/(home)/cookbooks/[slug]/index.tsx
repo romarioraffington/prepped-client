@@ -1,10 +1,10 @@
 // External Dependencies
 import * as Haptics from "expo-haptics";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useHeaderHeight } from "@react-navigation/elements";
-import type { default as BottomSheet } from "@gorhom/bottom-sheet";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import type { default as BottomSheet } from "@gorhom/bottom-sheet";
 import { router, useLocalSearchParams, useNavigation } from "expo-router";
+import { Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
 
 import React, {
   useRef,
@@ -208,24 +208,24 @@ export default function CookbookDetails() {
 
   const selectCallbacks = selectCallbacksRef.current;
 
-  // Handle bulk add - navigate to add to cookbook route
-  const handleBulkAdd = useCallback(() => {
+  // Handle bulk copy - navigate to copy to cookbook route
+  const handleBulkCopy = useCallback(() => {
     if (selectedRecipeIds.size === 0) return;
 
     // Client-side validation: max 20 recipes per request
     if (selectedRecipeIds.size > 20) {
       Alert.alert(
         "Too Many Recipes",
-        "You can only add up to 20 recipes at a time. Please deselect some recipes and try again.",
+        "You can only copy up to 20 recipes at a time. Please deselect some recipes and try again.",
         [{ text: "OK" }],
       );
       return;
     }
 
-    // Exit bulk edit mode immediately when Add is pressed
+    // Exit bulk edit mode immediately when Copy is pressed
     setIsBulkEditMode(false);
 
-    // Navigate to add to cookbook route
+    // Navigate to copy to cookbook route
     router.push({
       pathname: "/(modal)/add-to-cookbook",
       params: {
@@ -404,10 +404,10 @@ export default function CookbookDetails() {
                         backgroundColor: "rgba(255, 59, 48, 0.12)",
                       }}
                     >
-                      <MaterialIcons
+                      <MaterialCommunityIcons
                         size={22}
-                        name="bookmark-remove"
                         color={Colors.destructive}
+                        name="book-remove-multiple-outline"
                       />
                     </View>
                   ),
@@ -622,11 +622,15 @@ export default function CookbookDetails() {
         isVisible={isBulkEditMode}
         selectedCount={selectedRecipeIds.size}
         isPending={isMutationPending}
-        variant={collectionType === COLLECTION_TYPE.UNORGANIZED ? "organize" : "default"}
-        onAdd={handleBulkAdd}
+        onCopy={handleBulkCopy}
         onMove={handleMovePress}
         onDelete={handleBulkDelete}
         onRemove={handleBulkRemove}
+        variant={
+          collectionType === COLLECTION_TYPE.UNORGANIZED
+            ? "organize"
+            : "default"
+        }
       />
 
       {/* Recipe Options Bottom Sheet */}

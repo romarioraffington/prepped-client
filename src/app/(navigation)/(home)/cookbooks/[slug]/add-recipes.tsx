@@ -145,12 +145,12 @@ export default function AddRecipes() {
               backgroundColor: "rgba(234, 88, 12, 0.12)",
             }}
           >
-            <MaterialIcons size={22} name="bookmark-add" color={Colors.primary} />
+            <MaterialIcons size={22} name="content-copy" color={Colors.primary} />
           </View>
         ),
         text: (
           <Text style={{ fontWeight: "600" }}>
-            {`Added ${recipeCount} ${recipeText} to ${cookbookName}`}
+            {`Copied ${recipeCount} ${recipeText} to ${cookbookName}`}
           </Text>
         ),
       });

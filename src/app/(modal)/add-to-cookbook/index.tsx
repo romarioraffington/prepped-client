@@ -266,7 +266,7 @@ export default function AddToCookbook() {
         // Navigate back to the source cookbook
         router.back();
       } else {
-        // Add mode - call bulk add mutation
+        // Copy mode - call bulk add mutation
         await bulkAddAsync({
           recipeIds,
           cookbookIds,
@@ -294,14 +294,14 @@ export default function AddToCookbook() {
               >
                 <MaterialIcons
                   size={22}
-                  name="bookmark-add"
+                  name="content-copy"
                   color={Colors.primary}
                 />
               </View>
             ),
             text: (
-              <Text style={{ fontWeight: "600" }}>
-                {`Added ${recipeText} to ${cookbookName}`}
+              <Text>
+                {`Copied ${recipeText} to ${cookbookName}`}
               </Text>
             ),
             cta: cookbookIdForNav
@@ -332,14 +332,14 @@ export default function AddToCookbook() {
               >
                 <MaterialIcons
                   size={22}
-                  name="bookmark-add"
+                  name="content-copy"
                   color={Colors.primary}
                 />
               </View>
             ),
             text: (
               <Text style={{ fontWeight: "600" }}>
-                {`Added ${recipeText} to ${cookbookCount} cookbooks`}
+                {`Copied ${recipeText} to ${cookbookCount} cookbooks`}
               </Text>
             ),
           });
@@ -353,7 +353,7 @@ export default function AddToCookbook() {
 
       const errorMessage = isMoveMode
         ? "Failed to move recipes. Please try again."
-        : "Failed to add recipes. Please try again.";
+        : "Failed to copy recipes. Please try again.";
 
       Alert.alert(
         "Oops!",
@@ -475,7 +475,7 @@ export default function AddToCookbook() {
   );
 
   // Header title based on mode
-  const headerTitle = isMoveMode ? "Move to Cookbook" : "Add to Cookbook";
+  const headerTitle = isMoveMode ? "Move to Cookbook" : "Copy to Cookbook";
 
   // Show error if required params are missing
   if (!selectedRecipeIds || !currentCookbookId) {
@@ -526,7 +526,7 @@ export default function AddToCookbook() {
   // Section label based on mode
   const recipeSectionLabel = isMoveMode
     ? `Moving ${recipes.length === 1 ? "1 RECIPE" : `${recipes.length} RECIPES`}`
-    : `Adding ${recipes.length === 1 ? "1 RECIPE" : `${recipes.length} RECIPES`}`;
+    : `Copying ${recipes.length === 1 ? "1 RECIPE" : `${recipes.length} RECIPES`}`;
 
   return (
     <SafeAreaView style={styles.container}>
