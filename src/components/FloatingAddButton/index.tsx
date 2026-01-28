@@ -85,10 +85,10 @@ export const FloatingAddButton: React.FC<FloatingAddButtonProps> = ({
         transform: disableTranslate
           ? []
           : [
-              {
-                translateY: (1 - animationValue.value) * 100,
-              },
-            ],
+            {
+              translateY: (1 - animationValue.value) * 100,
+            },
+          ],
       };
     }
     return {
@@ -135,15 +135,15 @@ export const FloatingAddButton: React.FC<FloatingAddButtonProps> = ({
       ]}
     >
       <Animated.View
-        pointerEvents={visible ? "auto" : "none"}
         style={rVisibilityStyle}
+        pointerEvents={visible ? "auto" : "none"}
       >
         <AnimatedPressable
-          accessibilityRole="button"
-          accessibilityLabel={accessibilityLabel}
           onPress={handlePress}
           onPressIn={handlePressIn}
+          accessibilityRole="button"
           onPressOut={handlePressOut}
+          accessibilityLabel={accessibilityLabel}
           style={[styles.buttonContainer, rButtonScaleStyle]}
         >
           <View style={styles.button}>
@@ -156,8 +156,8 @@ export const FloatingAddButton: React.FC<FloatingAddButtonProps> = ({
             <Animated.View style={[styles.iconContainer, rBulkEditIconStyle]}>
               <MaterialCommunityIcons
                 size={24}
-                name="view-dashboard-edit-outline"
                 color="#fff"
+                name="view-dashboard-edit-outline"
               />
             </Animated.View>
           </View>
