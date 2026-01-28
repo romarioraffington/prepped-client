@@ -477,12 +477,12 @@ export default function CookbookDetails() {
                   icon: (
                     <View
                       style={{
-                        backgroundColor: "rgba(255, 59, 48, 0.12)",
                         borderRadius: 8,
                         width: 45,
                         height: 45,
                         alignItems: "center",
                         justifyContent: "center",
+                        backgroundColor: "rgba(255, 59, 48, 0.12)",
                       }}
                     >
                       <MaterialIcons

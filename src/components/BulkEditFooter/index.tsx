@@ -192,8 +192,8 @@ export function BulkEditFooter({
               disabled={isDisabled}
             >
               <Ionicons
-                name="trash-outline"
                 size={20}
+                name="trash-outline"
                 color={!isDisabled ? Colors.destructive : "#999"}
               />
               <Text

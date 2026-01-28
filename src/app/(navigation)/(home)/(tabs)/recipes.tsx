@@ -1,6 +1,7 @@
 // External Dependencies
 import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 import type { default as BottomSheet } from "@gorhom/bottom-sheet";
 import { Alert, FlatList, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -23,6 +24,7 @@ import {
   StaggeredGrid,
   WithPullToRefresh,
 } from "@/components";
+import { Colors } from "~/src/libs/constants";
 
 type ScrollableRef = {
   scrollToOffset?: (params: { offset: number; animated?: boolean }) => void;
@@ -179,9 +181,12 @@ export default function Recipes({
 
     Alert.alert(
       "Delete Recipes",
-      `Are you sure you want to delete ${recipeCount} ${recipeText}? This action cannot be undone.`,
+      `Permanently delete ${recipeCount} ${recipeText}? This will remove them from all cookbooks.`,
       [
-        { text: "Cancel", style: "cancel" },
+        {
+          text: "Cancel",
+          style: "cancel"
+        },
         {
           text: "Delete",
           style: "destructive",
@@ -195,6 +200,24 @@ export default function Recipes({
               // Show success toast
               showToast({
                 text: `Deleted ${recipeCount} ${recipeText}`,
+                icon: (
+                  <View
+                    style={{
+                      borderRadius: 8,
+                      width: 45,
+                      height: 45,
+                      alignItems: "center",
+                      justifyContent: "center",
+                      backgroundColor: "rgba(255, 59, 48, 0.12)",
+                    }}
+                  >
+                    <Ionicons
+                      size={20}
+                      name="trash-outline"
+                      color={Colors.destructive}
+                    />
+                  </View>
+                ),
               });
 
               // Exit bulk edit mode
