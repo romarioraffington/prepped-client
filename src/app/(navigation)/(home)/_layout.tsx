@@ -61,8 +61,7 @@ export default function HomeLayout() {
         options={{
           headerShown: false,
           sheetCornerRadius: 30,
-          presentation: "formSheet",
-          sheetAllowedDetents: [1.0],
+          presentation: "fullScreenModal",
         }}
       />
     </Stack>

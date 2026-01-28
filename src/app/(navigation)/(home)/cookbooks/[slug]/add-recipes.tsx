@@ -1,10 +1,9 @@
 // External Dependencies
 import * as Haptics from "expo-haptics";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { useCallback, useMemo } from "react";
 import { router, useLocalSearchParams } from "expo-router";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import {
   Alert,
@@ -37,12 +36,13 @@ type RouteParams = {
 };
 
 export default function AddRecipes() {
-  const insets = useSafeAreaInsets();
   const { showToast } = useActionToast();
 
   // Read route params
-  const { slug, selectedRecipeIds: selectedIdsParam } =
-    useLocalSearchParams<RouteParams>();
+  const {
+    slug,
+    selectedRecipeIds: selectedIdsParam
+  } = useLocalSearchParams<RouteParams>();
 
   // Parse slug to extract cookbook ID
   const { id: cookbookId, name: cookbookName } = parseSlug(slug ?? "");
@@ -55,9 +55,9 @@ export default function AddRecipes() {
 
   // Fetch recipes excluding those already in the cookbook
   const {
-    data: recipesData,
     hasNextPage,
     fetchNextPage,
+    data: recipesData,
     isFetchingNextPage,
     isLoading: isRecipesLoading,
   } = useRecipes({ excludeCookbookId: cookbookId });
@@ -66,8 +66,10 @@ export default function AddRecipes() {
   const isLoadingRecipes = isRecipesLoading;
 
   // Bulk add mutation
-  const { isPending: isAddPending, mutateAsync: bulkAddAsync } =
-    useBulkAddRecipesToCookbookMutation();
+  const {
+    isPending: isAddPending,
+    mutateAsync: bulkAddAsync
+  } = useBulkAddRecipesToCookbookMutation();
 
   const isPending = isAddPending;
 
@@ -116,16 +118,6 @@ export default function AddRecipes() {
   // Handle add recipes
   const handleAddRecipes = useCallback(async () => {
     if (selectedRecipeIds.size === 0 || isPending) return;
-
-    // Client-side validation: max 20 recipes per request
-    if (selectedRecipeIds.size > 20) {
-      Alert.alert(
-        "Too Many Recipes",
-        "You can only add up to 20 recipes at a time. Please deselect some recipes and try again.",
-        [{ text: "OK" }],
-      );
-      return;
-    }
 
     const recipeCount = selectedRecipeIds.size;
     const recipeIds = Array.from(selectedRecipeIds);
@@ -177,11 +169,11 @@ export default function AddRecipes() {
       );
     }
   }, [
-    cookbookId,
-    cookbookName,
     showToast,
     isPending,
+    cookbookId,
     bulkAddAsync,
+    cookbookName,
     selectedRecipeIds,
   ]);
 
@@ -260,9 +252,9 @@ export default function AddRecipes() {
               <View style={styles.checkboxInner}>
                 {isSelected && (
                   <Ionicons
-                    name="checkmark-done-sharp"
                     size={14}
                     color={Colors.primary}
+                    name="checkmark-done-sharp"
                   />
                 )}
               </View>
@@ -278,14 +270,7 @@ export default function AddRecipes() {
   if (!slug) {
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.headerContainer}>
-          <View style={styles.header}>
-            <BlurBackButton onPress={handleClose} />
-            <Text style={styles.headerTitle}>Add Recipes</Text>
-            <View style={{ width: 50 }} />
-          </View>
-          <View style={styles.divider} />
-        </View>
+        <AddRecipesHeader onClose={handleClose} />
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyText}>Unable to load cookbook</Text>
         </View>
@@ -297,14 +282,7 @@ export default function AddRecipes() {
   if (isLoadingRecipes) {
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.headerContainer}>
-          <View style={styles.header}>
-            <BlurBackButton onPress={handleClose} />
-            <Text style={styles.headerTitle}>Add Recipes</Text>
-            <View style={{ width: 50 }} />
-          </View>
-          <View style={styles.divider} />
-        </View>
+        <AddRecipesHeader onClose={handleClose} />
         <View style={styles.loadingContainer}>
           <DotsLoader />
         </View>
@@ -322,20 +300,12 @@ export default function AddRecipes() {
       : `Add ${selectedRecipeIds.size} ${selectedRecipeIds.size === 1 ? "Recipe" : "Recipes"}`;
 
   return (
-    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       {/* Header */}
-      <View style={styles.headerContainer}>
-        <View style={styles.header}>
-          <BlurBackButton
-            onPress={handleClose}
-            disabled={isPending}
-            style={{ top: 2 }}
-          />
-          <Text style={styles.headerTitle}>Add Recipes</Text>
-          <View style={{ width: 50 }} />
-        </View>
-        <View style={styles.divider} />
-      </View>
+      <AddRecipesHeader
+        onClose={handleClose}
+        disabled={isPending}
+      />
 
       {/* Recipe List */}
       <FlatList
@@ -351,13 +321,9 @@ export default function AddRecipes() {
         renderItem={renderRecipeItem}
         showsVerticalScrollIndicator={false}
         keyExtractor={(item: Recipe) => item.id}
-        contentContainerStyle={[
-          styles.contentContainer,
-          { paddingBottom: 100 + insets.bottom },
-        ]}
+        contentContainerStyle={styles.contentContainer}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No recipes available to add</Text>
             <Text style={styles.emptySubtext}>
               All your recipes are already in this cookbook
             </Text>
@@ -374,13 +340,13 @@ export default function AddRecipes() {
 
       {/* Floating Add Button */}
       {recipes.length > 0 && (
-        <View style={[styles.floatingButtonContainer, { bottom: insets.bottom + 20 }]}>
+        <View style={[styles.buttonContainer]}>
           <TouchableOpacity
             onPress={handleAddRecipes}
             disabled={isAddButtonDisabled}
             style={[
-              styles.floatingButton,
-              isAddButtonDisabled && styles.floatingButtonDisabled,
+              styles.button,
+              isAddButtonDisabled && styles.buttonDisabled,
             ]}
           >
             {isPending ? (
@@ -388,8 +354,8 @@ export default function AddRecipes() {
             ) : (
               <Text
                 style={[
-                  styles.floatingButtonText,
-                  isAddButtonDisabled && styles.floatingButtonTextDisabled,
+                  styles.buttonText,
+                  isAddButtonDisabled && styles.buttonTextDisabled,
                 ]}
               >
                 {addButtonText}
@@ -399,6 +365,30 @@ export default function AddRecipes() {
         </View>
       )}
     </SafeAreaView>
+  );
+}
+
+// Header component
+function AddRecipesHeader({
+  onClose,
+  disabled,
+}: {
+  onClose: () => void;
+  disabled?: boolean;
+}) {
+  return (
+    <View style={styles.headerContainer}>
+      <View style={styles.header}>
+        <BlurBackButton
+          onPress={onClose}
+          disabled={disabled}
+          style={{ top: 2 }}
+        />
+        <Text style={styles.headerTitle}>Add Recipes</Text>
+        <View style={{ width: 50 }} />
+      </View>
+      <View style={styles.divider} />
+    </View>
   );
 }
 
@@ -433,7 +423,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#E5E5E0",
   },
   loadingContainer: {
-    flex: 0.4,
+    marginTop: 100,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -445,15 +435,14 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
-    color: "#667",
-    marginBottom: 8,
+    color: "#999",
     fontFamily: Platform.select({
-      android: "Manrope_500Medium",
-      ios: "Manrope-Medium",
+      android: "Manrope_400Regular",
+      ios: "Manrope-Regular",
     }),
   },
   emptySubtext: {
-    fontSize: 14,
+    fontSize: 16,
     color: "#999",
     fontFamily: Platform.select({
       android: "Manrope_400Regular",
@@ -462,13 +451,14 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     paddingTop: 16,
+    paddingBottom: 150,
     paddingHorizontal: 16,
   },
   recipeItem: {
+    marginBottom: 12,
     flexDirection: "row",
     alignItems: "center",
     paddingVertical: 12,
-    marginBottom: 12,
   },
   recipeItemDisabled: {
     opacity: 0.6,
@@ -547,28 +537,30 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  floatingButtonContainer: {
+  buttonContainer: {
+    left: 0,
+    right: 0,
+    bottom: 0,
+    height: 120,
+    paddingTop: 16,
+    borderTopWidth: 1,
     position: "absolute",
-    left: 16,
-    right: 16,
+    paddingHorizontal: 32,
+    borderTopColor: "#E8E8E3",
+    backgroundColor: "rgba(245, 245, 240, 0.95)",
   },
-  floatingButton: {
-    height: 56,
+  button: {
     borderRadius: 12,
+    paddingVertical: 18,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: Colors.primary,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
-    shadowRadius: 8,
-    elevation: 6,
   },
-  floatingButtonDisabled: {
+  buttonDisabled: {
     backgroundColor: "#ccc",
   },
-  floatingButtonText: {
-    fontSize: 19,
+  buttonText: {
+    fontSize: 20,
     fontWeight: "700",
     color: "#fff",
     fontFamily: Platform.select({
@@ -576,7 +568,7 @@ const styles = StyleSheet.create({
       ios: "Manrope-Bold",
     }),
   },
-  floatingButtonTextDisabled: {
+  buttonTextDisabled: {
     color: "#999",
   },
   footerLoader: {
