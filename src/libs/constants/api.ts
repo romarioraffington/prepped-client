@@ -25,6 +25,7 @@ export const API_ENDPOINTS = {
   // Cookbooks
   COOKBOOKS_V1: `${API_SERVER_BASE_URL}/api/v1/cookbooks`,
   EXTRACTIONS_STATUS_V1: `${API_SERVER_BASE_URL}/api/v1/extractions/{id}/status`,
+  COOKBOOK_RECIPES_V1: `${API_SERVER_BASE_URL}/api/v1/cookbooks/{cookbookId}/recipes`,
   COOKBOOKS_RECIPES_BULK_MOVE_V1: `${API_SERVER_BASE_URL}/api/v1/cookbooks/recipes/bulk-move`,
   RECOMMENDATIONS_V1_AMENITIES: `${API_SERVER_BASE_URL}/api/v1/recommendations/{id}/amenities`,
 

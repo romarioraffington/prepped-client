@@ -97,17 +97,21 @@ export const useRecipes = (options?: UseRecipesOptions) => {
       : []),
   ];
 
+  // When excludeCookbookId is provided, always refetch (no cache)
+  // Otherwise use normal caching behavior
+  const hasExcludeFilter = !!options?.excludeCookbookId;
+
   return useInfiniteQuery({
     queryKey,
     queryFn: ({ pageParam }) => fetchRecipes(pageParam, options),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => lastPage.meta.next_cursor ?? undefined,
 
-    // Optimize for faster pagination
-    staleTime: 5 * 60 * 1000, // 5 minutes - matches global config
-    gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime) - keep pages in cache longer
+    // Conditional caching: only disable cache when filtering by excludeCookbookId
+    staleTime: hasExcludeFilter ? 0 : 5 * 60 * 1000, // 5 minutes for normal queries, 0 for filtered
+    gcTime: hasExcludeFilter ? 0 : 10 * 60 * 1000, // 10 minutes for normal queries, 0 for filtered
     refetchOnWindowFocus: false, // Don't refetch when app regains focus
-    refetchOnMount: false, // Don't refetch on mount if data is fresh
+    refetchOnMount: hasExcludeFilter, // Always refetch on mount when filtering
   });
 };
 

@@ -25,7 +25,7 @@ import type { Recipe } from "@/libs/types";
 import { DotsLoader } from "@/components/DotsLoader";
 import { BlurBackButton } from "@/components/BlurBackButton";
 import { ImagePlaceholder, ShimmerImage } from "@/components/Image";
-import { useRecipes, useBulkAddRecipesToCookbookMutation } from "@/api";
+import { useRecipes, useAddRecipesToCookbookMutation } from "@/api";
 
 const IMAGE_SIZE = 56;
 const IMAGE_RADIUS = 10;
@@ -65,11 +65,11 @@ export default function AddRecipes() {
   // Check if recipes are still loading
   const isLoadingRecipes = isRecipesLoading;
 
-  // Bulk add mutation
+  // Add recipes mutation
   const {
     isPending: isAddPending,
-    mutateAsync: bulkAddAsync
-  } = useBulkAddRecipesToCookbookMutation();
+    mutateAsync: addRecipesAsync
+  } = useAddRecipesToCookbookMutation();
 
   const isPending = isAddPending;
 
@@ -124,9 +124,9 @@ export default function AddRecipes() {
     const recipeText = recipeCount === 1 ? "recipe" : "recipes";
 
     try {
-      await bulkAddAsync({
+      await addRecipesAsync({
+        cookbookId,
         recipeIds,
-        cookbookIds: [cookbookId],
       });
 
       // Success
@@ -172,7 +172,7 @@ export default function AddRecipes() {
     showToast,
     isPending,
     cookbookId,
-    bulkAddAsync,
+    addRecipesAsync,
     cookbookName,
     selectedRecipeIds,
   ]);
