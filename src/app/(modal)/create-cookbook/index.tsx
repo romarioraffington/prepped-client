@@ -34,12 +34,13 @@ export default function CreateCookbook() {
 
   const handleGoBack = () => {
     // If we came from add-to-cookbook, navigate back to it
-    if (selectedRecipeIds && currentCookbookId) {
+    // selectedRecipeIds is always present when coming from add-to-cookbook
+    if (selectedRecipeIds) {
       router.replace({
         pathname: "/(modal)/add-to-cookbook",
         params: {
           selectedRecipeIds,
-          currentCookbookId,
+          ...(currentCookbookId && { currentCookbookId }),
           selectedCookbookIds: selectedCookbookIds || "",
         },
       });
@@ -74,17 +75,14 @@ export default function CreateCookbook() {
 
           // If we came from add-to-cookbook route, navigate back with newCookbookId
           // so the add-to-cookbook route can pre-select the new cookbook
-          if (
-            newCookbookId &&
-            selectedRecipeIds &&
-            currentCookbookId
-          ) {
+          // selectedRecipeIds is always present when coming from add-to-cookbook
+          if (newCookbookId && selectedRecipeIds) {
             router.replace({
               pathname: "/(modal)/add-to-cookbook",
               params: {
                 newCookbookId,
                 selectedRecipeIds,
-                currentCookbookId,
+                ...(currentCookbookId && { currentCookbookId }),
                 selectedCookbookIds: selectedCookbookIds || "",
               },
             });

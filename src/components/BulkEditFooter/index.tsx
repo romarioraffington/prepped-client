@@ -100,7 +100,7 @@ export function BulkEditFooter({
         );
 
       case "recipes":
-        // Copy and Delete only
+        // Add and Delete only
         return (
           <>
             <TouchableOpacity
@@ -109,14 +109,18 @@ export function BulkEditFooter({
               disabled={isDisabled}
             >
               <MaterialIcons
-                size={25}
-                name="content-copy"
+                size={28}
+                name="bookmark-add"
                 color={!isDisabled ? "#667" : "#999"}
               />
               <Text
-                style={[styles.buttonText, isDisabled && styles.buttonTextDisabled]}
+                style={[
+                  styles.buttonText,
+                  { fontSize: 15 },
+                  isDisabled && styles.buttonTextDisabled,
+                ]}
               >
-                Copy
+                Add
               </Text>
             </TouchableOpacity>
 
@@ -126,8 +130,8 @@ export function BulkEditFooter({
               disabled={isDisabled}
             >
               <Ionicons
+                size={26}
                 name="trash-outline"
-                size={20}
                 color={!isDisabled ? Colors.destructive : "#999"}
               />
               <Text
@@ -135,6 +139,7 @@ export function BulkEditFooter({
                   styles.buttonText,
                   styles.buttonTextDestructive,
                   isDisabled && styles.buttonTextDisabled,
+                  { fontSize: 16 },
                 ]}
               >
                 Delete
@@ -225,7 +230,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    paddingTop: 10,
+    paddingTop: 0,
     overflow: "hidden",
     position: "absolute",
     backgroundColor: "rgba(245, 245, 240, 0.95)",
@@ -238,9 +243,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   button: {
+    paddingTop: 5,
     alignItems: "center",
     justifyContent: "center",
-    paddingVertical: 5,
   },
   buttonDisabled: {
     opacity: 0.5,

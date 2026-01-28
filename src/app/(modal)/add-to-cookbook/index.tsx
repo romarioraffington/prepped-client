@@ -50,7 +50,7 @@ type RouteParams = {
   mode?: "add" | "move";
   newCookbookId?: string;
   selectedRecipeIds: string;
-  currentCookbookId: string;
+  currentCookbookId?: string;
   selectedCookbookIds?: string;
 };
 
@@ -78,15 +78,31 @@ export default function AddToCookbook() {
 
   // Get recipes from React Query cache
   const recipes = useMemo(() => {
-    if (!currentCookbookId || recipeIdList.length === 0) return [];
+    if (recipeIdList.length === 0) return [];
 
-    const cookbookData = queryClient.getQueryData<CookbookDetailsCache>(
-      QUERY_KEYS.COOKBOOK_DETAILS(currentCookbookId),
-    );
+    // If currentCookbookId is provided, get recipes from cookbook details cache
+    if (currentCookbookId) {
+      const cookbookData = queryClient.getQueryData<CookbookDetailsCache>(
+        QUERY_KEYS.COOKBOOK_DETAILS(currentCookbookId),
+      );
 
-    if (!cookbookData?.recipes) return [];
+      if (!cookbookData?.recipes) return [];
 
-    return cookbookData.recipes.filter((r) => recipeIdList.includes(r.id));
+      return cookbookData.recipes.filter((r) => recipeIdList.includes(r.id));
+    }
+
+    // Otherwise, get recipes from the recipes list cache
+    const recipesData = queryClient.getQueryData<
+      import("@tanstack/react-query").InfiniteData<{
+        data: Recipe[];
+        meta: PaginationMeta;
+      }>
+    >([QUERY_KEYS.RECIPES]);
+
+    if (!recipesData?.pages) return [];
+
+    const allRecipes = recipesData.pages.flatMap((page) => page.data ?? []);
+    return allRecipes.filter((r) => recipeIdList.includes(r.id));
   }, [currentCookbookId, recipeIdList, queryClient]);
 
   // Parse selected cookbook IDs from route params
@@ -129,7 +145,7 @@ export default function AddToCookbook() {
     }
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
-  // Flatten all cookbook pages and filter out current cookbook, system cookbooks, and featured cookbooks
+  // Flatten all cookbook pages and filter out current cookbook (if provided), system cookbooks, and featured cookbooks
   const cookbooks = useMemo(() => {
     if (!cookbooksData?.pages) {
       return [];
@@ -137,7 +153,7 @@ export default function AddToCookbook() {
     const allCookbooks = cookbooksData.pages.flatMap((page) => page.data ?? []);
     const filtered = allCookbooks.filter(
       (cookbook) =>
-        cookbook.id !== currentCookbookId &&
+        (!currentCookbookId || cookbook.id !== currentCookbookId) &&
         cookbook.variant !== "featured" &&
         cookbook.type !== COLLECTION_TYPE.UNORGANIZED,
     );
@@ -186,7 +202,25 @@ export default function AddToCookbook() {
 
   // Handle save (add or move to cookbooks)
   const handleSave = useCallback(async () => {
-    if (selectedCookbookIds.size === 0 || isPending) return;
+    // Validate that recipes exist (should always be selected)
+    if (recipes.length === 0) {
+      Alert.alert("Error", "No recipes selected.");
+      return;
+    }
+
+    // Validate that at least one cookbook is selected
+    if (selectedCookbookIds.size === 0) {
+      Alert.alert("Error", "Please select at least one cookbook.");
+      return;
+    }
+
+    if (isPending) return;
+
+    // Move mode requires currentCookbookId
+    if (isMoveMode && !currentCookbookId) {
+      Alert.alert("Error", "Cannot move recipes without a source cookbook.");
+      return;
+    }
 
     const recipeCount = recipes.length;
     const recipeIds = recipes.map((r) => r.id);
@@ -197,9 +231,11 @@ export default function AddToCookbook() {
     try {
       if (isMoveMode) {
         // Move mode - call bulk move mutation with all destination cookbooks
+        // currentCookbookId is guaranteed to be defined due to validation above
+        const sourceCookbookId = currentCookbookId as string;
         await bulkMoveAsync({
           recipeIds,
-          sourceCookbookId: currentCookbookId,
+          sourceCookbookId,
           destinationCookbookIds: cookbookIds,
         });
 
@@ -301,7 +337,7 @@ export default function AddToCookbook() {
             ),
             text: (
               <Text>
-                {`Copied ${recipeText} to ${cookbookName}`}
+                {`Saved ${recipeText} to ${cookbookName}`}
               </Text>
             ),
             cta: cookbookIdForNav
@@ -339,7 +375,7 @@ export default function AddToCookbook() {
             ),
             text: (
               <Text style={{ fontWeight: "600" }}>
-                {`Copied ${recipeText} to ${cookbookCount} cookbooks`}
+                {`Saved ${recipeText} to ${cookbookCount} cookbooks`}
               </Text>
             ),
           });
@@ -475,10 +511,11 @@ export default function AddToCookbook() {
   );
 
   // Header title based on mode
-  const headerTitle = isMoveMode ? "Move to Cookbook" : "Copy to Cookbook";
+  const headerTitle = isMoveMode ? "Move to Cookbooks" : "Add to Cookbooks";
 
   // Show error if required params are missing
-  if (!selectedRecipeIds || !currentCookbookId) {
+  // selectedRecipeIds is always required, but currentCookbookId is only required for move mode
+  if (!selectedRecipeIds) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.headerContainer}>
@@ -526,7 +563,7 @@ export default function AddToCookbook() {
   // Section label based on mode
   const recipeSectionLabel = isMoveMode
     ? `Moving ${recipes.length === 1 ? "1 RECIPE" : `${recipes.length} RECIPES`}`
-    : `Copying ${recipes.length === 1 ? "1 RECIPE" : `${recipes.length} RECIPES`}`;
+    : `Adding ${recipes.length === 1 ? "1 RECIPE" : `${recipes.length} RECIPES`}`;
 
   return (
     <SafeAreaView style={styles.container}>

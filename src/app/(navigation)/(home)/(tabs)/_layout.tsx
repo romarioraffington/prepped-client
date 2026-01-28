@@ -65,6 +65,17 @@ function TabsContent() {
   const blurHeight = headerHeight || insets.top + 50;
   const blurOpacity = headerHeight > 0 ? 1 : 0;
 
+  // Bulk edit mode state
+  const [isBulkEditMode, setIsBulkEditMode] = useState(false);
+  const [selectedRecipeIds, setSelectedRecipeIds] = useState<Set<string>>(
+    new Set(),
+  );
+
+  const [hasRecipes, setHasRecipes] = useState(true);
+  const [currentScrollDirection, setCurrentScrollDirection] = useState<
+    "to-top" | "to-bottom" | "idle"
+  >("idle");
+
   // From context
   const {
     scrollDirection,
@@ -108,6 +119,14 @@ function TabsContent() {
     DeviceEventEmitter.emit(BOTTOM_NAV_SCROLL_EVENT, shouldHide);
   }, []);
 
+  // Track scroll direction in React state for use in useEffect
+  useAnimatedReaction(
+    () => scrollDirection.value,
+    (currentDirection) => {
+      scheduleOnRN(setCurrentScrollDirection, currentDirection);
+    },
+  );
+
   // Animate FAB opacity directly with Reanimated - no serialization issues
   useAnimatedReaction(
     () => scrollDirection.value,
@@ -134,6 +153,65 @@ function TabsContent() {
   // Ensure status bar is visible initially
   useEffect(() => {
     setStatusBarHidden(false);
+  }, []);
+
+  // Exit bulk edit mode when switching away from Recipes tab
+  useEffect(() => {
+    if (currentTabIndex !== Tab.Recipes && isBulkEditMode) {
+      setIsBulkEditMode(false);
+      setSelectedRecipeIds(new Set());
+    }
+  }, [currentTabIndex, isBulkEditMode]);
+
+  // Exit bulk edit mode if recipes list becomes empty
+  useEffect(() => {
+    if (isBulkEditMode && !hasRecipes) {
+      setIsBulkEditMode(false);
+      setSelectedRecipeIds(new Set());
+    }
+  }, [isBulkEditMode, hasRecipes]);
+
+  // Hide bottom navigation when in bulk edit mode
+  useEffect(() => {
+    // Only hide bottom nav when on Recipes tab and in bulk edit mode
+    if (currentTabIndex === Tab.Recipes && isBulkEditMode) {
+      emitBottomNavEvent(true);
+    } else if (currentTabIndex === Tab.Recipes && !isBulkEditMode) {
+      // Restore bottom nav visibility based on current scroll direction when exiting bulk edit mode
+      // Treat "idle" as "to-top" (show bottom nav)
+      const shouldHide = currentScrollDirection === "to-bottom";
+      emitBottomNavEvent(shouldHide);
+    }
+  }, [isBulkEditMode, currentTabIndex, currentScrollDirection, emitBottomNavEvent]);
+
+  // Toggle bulk edit mode
+  const handleBulkEditPress = useCallback(() => {
+    setIsBulkEditMode((prev) => !prev);
+    setSelectedRecipeIds(new Set());
+  }, []);
+
+  // Handle recipe selection toggle
+  const handleRecipeSelect = useCallback((recipeId: string) => {
+    setSelectedRecipeIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(recipeId)) {
+        next.delete(recipeId);
+      } else {
+        next.add(recipeId);
+      }
+      return next;
+    });
+  }, []);
+
+  // Exit bulk edit mode
+  const handleBulkEditDone = useCallback(() => {
+    setIsBulkEditMode(false);
+    setSelectedRecipeIds(new Set());
+  }, []);
+
+  // Update hasRecipes state from Recipes component
+  const handleRecipesCountChange = useCallback((recipesExist: boolean) => {
+    setHasRecipes(recipesExist);
   }, []);
 
   // Horizontal scroll handler for tab switching
@@ -167,6 +245,11 @@ function TabsContent() {
           listRef={recipesListRef}
           scrollHandler={scrollHandler}
           headerHeight={headerHeight}
+          isBulkEditMode={isBulkEditMode}
+          selectedRecipeIds={selectedRecipeIds}
+          onRecipeSelect={handleRecipeSelect}
+          onBulkEditDone={handleBulkEditDone}
+          onRecipesCountChange={handleRecipesCountChange}
         />
       )}
     </View>
@@ -295,6 +378,9 @@ function TabsContent() {
         disableTranslate
         animationValue={fabOpacity}
         activeTabIndex={currentTabIndex}
+        isBulkEditMode={isBulkEditMode}
+        hasRecipes={hasRecipes}
+        onBulkEditPress={handleBulkEditPress}
       />
     </View>
   );

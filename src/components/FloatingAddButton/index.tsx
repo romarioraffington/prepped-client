@@ -4,7 +4,7 @@ import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
-import { Alert, Pressable, StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -26,6 +26,9 @@ type FloatingAddButtonProps = {
   animationValue?: SharedValue<number>;
   disableTranslate?: boolean;
   activeTabIndex?: number;
+  isBulkEditMode?: boolean;
+  hasRecipes?: boolean;
+  onBulkEditPress?: () => void;
 };
 
 export const FloatingAddButton: React.FC<FloatingAddButtonProps> = ({
@@ -35,6 +38,9 @@ export const FloatingAddButton: React.FC<FloatingAddButtonProps> = ({
   animationValue,
   disableTranslate = false,
   activeTabIndex = 0,
+  isBulkEditMode = false,
+  hasRecipes = true,
+  onBulkEditPress,
 }) => {
   const insets = useSafeAreaInsets();
   const buttonScale = useSharedValue(1);
@@ -42,33 +48,54 @@ export const FloatingAddButton: React.FC<FloatingAddButtonProps> = ({
   // Determine if we're on the Recipes tab
   const isRecipesTab = activeTabIndex === 1;
 
-  // Animated style for the add icon (visible on Cookbooks tab)
+  // Determine which icon to show on Recipes tab
+  // If no recipes, show add icon; if in bulk edit mode, show checkmark; otherwise show edit icon
+  const showAddIconOnRecipesTab = isRecipesTab && !hasRecipes;
+  const showCheckmarkIcon = isRecipesTab && hasRecipes && isBulkEditMode;
+  const showBulkEditIcon = isRecipesTab && hasRecipes && !isBulkEditMode;
+
+  // Animated style for the add icon (visible on Cookbooks tab OR Recipes tab with no recipes)
+  const showAddIcon = !isRecipesTab || showAddIconOnRecipesTab;
   const rAddIconStyle = useAnimatedStyle(() => {
     return {
-      opacity: withTiming(isRecipesTab ? 0 : 1, { duration: DURATION }),
+      opacity: withTiming(showAddIcon ? 1 : 0, { duration: DURATION }),
       transform: [
         {
-          rotate: withTiming(isRecipesTab ? "90deg" : "0deg", {
+          rotate: withTiming(showAddIcon ? "0deg" : "90deg", {
             duration: DURATION,
           }),
         },
       ],
     };
-  }, [isRecipesTab]);
+  }, [showAddIcon]);
 
-  // Animated style for the bulk edit icon (visible on Recipes tab)
+  // Animated style for the bulk edit icon (visible on Recipes tab with recipes, not in bulk edit mode)
   const rBulkEditIconStyle = useAnimatedStyle(() => {
     return {
-      opacity: withTiming(isRecipesTab ? 1 : 0, { duration: DURATION }),
+      opacity: withTiming(showBulkEditIcon ? 1 : 0, { duration: DURATION }),
       transform: [
         {
-          rotate: withTiming(isRecipesTab ? "0deg" : "-90deg", {
+          rotate: withTiming(showBulkEditIcon ? "0deg" : "-90deg", {
             duration: DURATION,
           }),
         },
       ],
     };
-  }, [isRecipesTab]);
+  }, [showBulkEditIcon]);
+
+  // Animated style for the checkmark icon (visible on Recipes tab in bulk edit mode)
+  const rCheckmarkIconStyle = useAnimatedStyle(() => {
+    return {
+      opacity: withTiming(showCheckmarkIcon ? 1 : 0, { duration: DURATION }),
+      transform: [
+        {
+          rotate: withTiming(showCheckmarkIcon ? "0deg" : "90deg", {
+            duration: DURATION,
+          }),
+        },
+      ],
+    };
+  }, [showCheckmarkIcon]);
 
   // Animated style for button scale on press
   const rButtonScaleStyle = useAnimatedStyle(() => {
@@ -102,8 +129,13 @@ export const FloatingAddButton: React.FC<FloatingAddButtonProps> = ({
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
 
     if (isRecipesTab) {
-      // Show alert when on Recipes tab
-      Alert.alert("Bulk Edit", "Bulk edit functionality coming soon!");
+      if (hasRecipes) {
+        // Toggle bulk edit mode when on Recipes tab with recipes
+        onBulkEditPress?.();
+      } else {
+        // Navigate to create modal when on Recipes tab with no recipes
+        router.push("/(modal)/create");
+      }
     } else {
       // Navigate to create modal when on Cookbooks tab
       router.push("/(modal)/create");
@@ -121,7 +153,13 @@ export const FloatingAddButton: React.FC<FloatingAddButtonProps> = ({
   };
 
   // Dynamic accessibility label
-  const accessibilityLabel = isRecipesTab ? "Bulk Edit" : "Create";
+  const getAccessibilityLabel = () => {
+    if (!isRecipesTab) return "Create";
+    if (!hasRecipes) return "Add Recipe";
+    if (isBulkEditMode) return "Done";
+    return "Bulk Edit";
+  };
+  const accessibilityLabel = getAccessibilityLabel();
 
   return (
     <View
@@ -147,18 +185,23 @@ export const FloatingAddButton: React.FC<FloatingAddButtonProps> = ({
           style={[styles.buttonContainer, rButtonScaleStyle]}
         >
           <View style={styles.button}>
-            {/* Add icon - visible on Cookbooks tab */}
+            {/* Add icon - visible on Cookbooks tab OR Recipes tab with no recipes */}
             <Animated.View style={[styles.iconContainer, rAddIconStyle]}>
               <Ionicons size={28} name="add" color="#fff" />
             </Animated.View>
 
-            {/* Bulk Edit icon - visible on Recipes tab */}
+            {/* Bulk Edit icon - visible on Recipes tab with recipes, not in bulk edit mode */}
             <Animated.View style={[styles.iconContainer, rBulkEditIconStyle]}>
               <MaterialCommunityIcons
                 size={24}
                 color="#fff"
                 name="view-dashboard-edit-outline"
               />
+            </Animated.View>
+
+            {/* Checkmark icon - visible on Recipes tab in bulk edit mode */}
+            <Animated.View style={[styles.iconContainer, rCheckmarkIconStyle]}>
+              <Ionicons size={26} name="checkmark" color="#fff" />
             </Animated.View>
           </View>
         </AnimatedPressable>

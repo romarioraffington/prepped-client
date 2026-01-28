@@ -150,7 +150,7 @@ export default function AddRecipes() {
         ),
         text: (
           <Text style={{ fontWeight: "600" }}>
-            {`Copied ${recipeCount} ${recipeText} to ${cookbookName}`}
+            {`Saved ${recipeCount} ${recipeText} to ${cookbookName}`}
           </Text>
         ),
       });
