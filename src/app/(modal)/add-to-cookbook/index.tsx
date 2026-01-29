@@ -11,7 +11,6 @@ import {
   View,
   FlatList,
   Platform,
-  Pressable,
   StyleSheet,
   TouchableOpacity,
   ActivityIndicator,
@@ -22,8 +21,8 @@ import { useActionToast } from "@/contexts";
 import { createFullSlug } from "@/libs/utils";
 import { DotsLoader } from "@/components/DotsLoader";
 import { useQueryClient } from "@tanstack/react-query";
+import { CookbookListRow } from "@/components/Cookbook";
 import { BlurBackButton } from "@/components/BlurBackButton";
-import { ImagePlaceholder, ShimmerImage } from "@/components/Image";
 import { RecipeCarousel } from "@/components/Recipe/RecipeCarousel";
 import { COLLECTION_TYPE, Colors, QUERY_KEYS } from "@/libs/constants";
 import type { ImageGridItem, PaginationMeta, Recipe } from "@/libs/types";
@@ -43,8 +42,6 @@ interface CookbookDetailsCache {
   meta: PaginationMeta;
 }
 
-const IMAGE_SIZE = 56;
-const IMAGE_RADIUS = 10;
 
 type RouteParams = {
   mode?: "add" | "move";
@@ -450,61 +447,15 @@ export default function AddToCookbook() {
       const recipeText = recipeCount === 1 ? "recipe" : "recipes";
 
       return (
-        <Pressable
+        <CookbookListRow
+          id={item.id}
+          name={item.name}
           disabled={isPending}
-          onPress={() => handleSelectCookbook(item.id)}
-          style={[
-            styles.cookbookItem,
-            isPending && styles.cookbookItemDisabled,
-          ]}
-        >
-          {/* Thumbnail */}
-          <View style={styles.cookbookImageContainer}>
-            {item.imageUris?.[0] ? (
-              <ShimmerImage
-                contentFit="cover"
-                style={styles.cookbookImage}
-                source={{ uri: item.imageUris[0] }}
-              />
-            ) : (
-              <ImagePlaceholder
-                iconSize={20}
-                height={IMAGE_SIZE}
-                style={styles.cookbookPlaceholder}
-              />
-            )}
-          </View>
-
-          {/* Content */}
-          <View style={styles.cookbookContent}>
-            <Text style={styles.cookbookName} numberOfLines={1}>
-              {item.name}
-            </Text>
-            <Text style={styles.cookbookMeta}>
-              {recipeCount} {recipeText}
-            </Text>
-          </View>
-
-          {/* Checkbox */}
-          <View style={styles.checkboxContainer}>
-            <View
-              style={[
-                styles.checkboxOuter,
-                isSelected && styles.checkboxOuterSelected,
-              ]}
-            >
-              <View style={styles.checkboxInner}>
-                {isSelected && (
-                  <Ionicons
-                    size={14}
-                    color={Colors.primary}
-                    name="checkmark-done-sharp"
-                  />
-                )}
-              </View>
-            </View>
-          </View>
-        </Pressable>
+          isChecked={isSelected}
+          onPress={handleSelectCookbook}
+          imageUri={item.imageUris?.[0]}
+          metaText={`${recipeCount} ${recipeText}`}
+        />
       );
     },
     [selectedCookbookIds, handleSelectCookbook, isPending],
@@ -776,80 +727,5 @@ const styles = StyleSheet.create({
   contentContainer: {
     paddingBottom: 16,
     paddingHorizontal: 16,
-  },
-  cookbookItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 12,
-    marginBottom: 12,
-    backgroundColor: "#FAFAF5",
-    borderRadius: 16,
-  },
-  cookbookItemDisabled: {
-    opacity: 0.6,
-  },
-  cookbookImageContainer: {
-    width: IMAGE_SIZE,
-    height: IMAGE_SIZE,
-    overflow: "hidden",
-    marginLeft: 12,
-    borderRadius: IMAGE_RADIUS,
-    backgroundColor: "#e5e5e5",
-  },
-  cookbookImage: {
-    width: "100%",
-    height: "100%",
-  },
-  cookbookPlaceholder: {
-    backgroundColor: "#e5e5e5",
-  },
-  cookbookContent: {
-    flex: 1,
-    marginLeft: 12,
-  },
-  cookbookName: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: "#000",
-    marginBottom: 2,
-    fontFamily: Platform.select({
-      android: "BricolageGrotesque_600SemiBold",
-      ios: "BricolageGrotesque-SemiBold",
-    }),
-  },
-  cookbookMeta: {
-    fontSize: 13,
-    color: "#667",
-    fontWeight: "400",
-    fontFamily: Platform.select({
-      android: "Manrope_400Regular",
-      ios: "Manrope-Medium",
-    }),
-  },
-  checkboxContainer: {
-    marginLeft: 12,
-    marginRight: 12,
-  },
-  checkboxOuter: {
-    width: 25,
-    height: 25,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: "#D9D9D9",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#fff",
-  },
-  checkboxOuterSelected: {
-    borderColor: Colors.primary,
-    backgroundColor: Colors.primary,
-  },
-  checkboxInner: {
-    width: 15,
-    height: 15,
-    borderRadius: 4,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
   },
 });

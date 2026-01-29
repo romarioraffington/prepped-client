@@ -46,6 +46,9 @@ interface StaggeredGridProps {
   // Support ListHeaderComponent for pull-to-refresh
   ListHeaderComponent?: React.ComponentType<any> | React.ReactElement | null;
 
+  // Empty state when list has no items (same as FlatList ListEmptyComponent)
+  ListEmptyComponent?: React.ComponentType<any> | React.ReactElement | null;
+
   // Props that WithPullToRefresh may inject
   scrollEventThrottle?: number;
   bounces?: boolean; // FlashList doesn't support this, but we accept it to avoid prop warnings
@@ -66,6 +69,7 @@ export const StaggeredGrid = forwardRef<
       headerHeight = 0,
       refreshControl,
       ListHeaderComponent,
+      ListEmptyComponent,
       contentBottomPadding = 0,
       onEndReachedThreshold = 0.5,
       scrollEventThrottle = 16,
@@ -120,11 +124,12 @@ export const StaggeredGrid = forwardRef<
         onEndReached={onEndReached}
         keyExtractor={keyExtractor}
         renderItem={flashListRenderItem}
-        scrollEventThrottle={scrollEventThrottle}
+        refreshControl={refreshControl}
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={ListHeaderComponent}
+        ListEmptyComponent={ListEmptyComponent}
+        scrollEventThrottle={scrollEventThrottle}
         ListFooterComponent={ListFooterComponent}
-        refreshControl={refreshControl}
         onEndReachedThreshold={onEndReachedThreshold}
         contentContainerStyle={contentContainerStyle}
       />

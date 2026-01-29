@@ -9,6 +9,8 @@ export interface ImageGridItem {
   lastUpdatedTimestamp: number;
   variant?: CollectionVariant;
   type: number;
+  /** Set when fetched with include_status_for_recipe_id (e.g. manage-cookbooks) */
+  containsRecipe?: boolean;
 }
 
 /**

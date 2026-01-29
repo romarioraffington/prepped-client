@@ -2,7 +2,7 @@
 import * as Haptics from "expo-haptics";
 import { useCallback, useMemo } from "react";
 import { router, useLocalSearchParams } from "expo-router";
-import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import { AntDesign, Ionicons, MaterialIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import {
@@ -132,9 +132,37 @@ export default function AddRecipes() {
       // Success
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
-      // Show success toast
+      // Use recipeCount to determine single vs multiple
+      // recipes being saved: show recipe image only
+      // when saving one recipe
+      const isSavingSingleRecipe = recipeCount === 1;
+
+      const singleRecipe = isSavingSingleRecipe
+        ? recipes.find((r) => r.id === recipeIds[0])
+        : null;
+
+      const showRecipeImage =
+        isSavingSingleRecipe &&
+        singleRecipe?.coverUri != null &&
+        singleRecipe.coverUri !== "";
+
       showToast({
-        icon: (
+        icon: showRecipeImage ? (
+          <View
+            style={{
+              width: 45,
+              height: 45,
+              borderRadius: 8,
+              overflow: "hidden",
+            }}
+          >
+            <ShimmerImage
+              contentFit="cover"
+              style={{ width: 45, height: 45 }}
+              source={{ uri: singleRecipe?.coverUri ?? "" }}
+            />
+          </View>
+        ) : (
           <View
             style={{
               width: 45,
@@ -145,12 +173,12 @@ export default function AddRecipes() {
               backgroundColor: "rgba(234, 88, 12, 0.12)",
             }}
           >
-            <MaterialIcons size={22} name="content-copy" color={Colors.primary} />
+            <AntDesign name="check-circle" size={22} color={Colors.primary} />
           </View>
         ),
         text: (
-          <Text style={{ fontWeight: "600" }}>
-            {`Saved ${recipeCount} ${recipeText} to ${cookbookName}`}
+          <Text>
+            {`Saved ${recipeText} to ${cookbookName}`}
           </Text>
         ),
       });
@@ -551,7 +579,7 @@ const styles = StyleSheet.create({
   },
   button: {
     borderRadius: 12,
-    paddingVertical: 18,
+    paddingVertical: 16,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: Colors.primary,
@@ -560,7 +588,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#ccc",
   },
   buttonText: {
-    fontSize: 20,
+    fontSize: 19,
     fontWeight: "700",
     color: "#fff",
     fontFamily: Platform.select({

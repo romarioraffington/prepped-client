@@ -4,7 +4,12 @@ import { useHeaderHeight } from "@react-navigation/elements";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { default as BottomSheet } from "@gorhom/bottom-sheet";
 import { router, useLocalSearchParams, useNavigation } from "expo-router";
-import { Ionicons, MaterialCommunityIcons, MaterialIcons } from "@expo/vector-icons";
+
+import {
+  Ionicons,
+  MaterialIcons,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 
 import React, {
   useRef,
@@ -38,6 +43,7 @@ import { COLLECTION_TYPE, Colors } from "@/libs/constants";
 import {
   RecipeCard,
   LargeTitle,
+  ShimmerImage,
   StaggeredGrid,
   BulkEditFooter,
   WithPullToRefresh,
@@ -79,22 +85,14 @@ export default function CookbookDetails() {
   );
 
   // Fetch cookbook details
-  const {
-    data,
-    refetch,
-    isLoading,
-  } = useCookbookDetails(cookbookId);
+  const { data, refetch, isLoading } = useCookbookDetails(cookbookId);
 
   // Bulk operation mutations
-  const {
-    isPending: isRemovePending,
-    mutateAsync: bulkRemoveRecipesAsync,
-  } = useBulkRemoveRecipesFromCookbookMutation();
+  const { isPending: isRemovePending, mutateAsync: bulkRemoveRecipesAsync } =
+    useBulkRemoveRecipesFromCookbookMutation();
 
-  const {
-    isPending: isDeletePending,
-    mutateAsync: bulkDeleteRecipesAsync,
-  } = useBulkDeleteRecipesMutation();
+  const { isPending: isDeletePending, mutateAsync: bulkDeleteRecipesAsync } =
+    useBulkDeleteRecipesMutation();
 
   // Extract the needed data
   const collectionType = data?.type;
@@ -600,8 +598,8 @@ export default function CookbookDetails() {
   return (
     <View style={styles.container}>
       <WithPullToRefresh
-        refreshing={refreshing}
         onRefresh={onRefresh}
+        refreshing={refreshing}
         backAnimationDuration={700}
         refreshViewBaseHeight={400}
         hapticFeedbackDirection="to-bottom"
@@ -611,9 +609,9 @@ export default function CookbookDetails() {
           items={recipes}
           renderItem={renderItem}
           headerHeight={headerHeight}
-          contentBottomPadding={contentBottomPadding + bulkEditBottomPadding}
           animatedScrollHandler={scrollHandler}
           ListHeaderComponent={ListHeaderComponent}
+          contentBottomPadding={contentBottomPadding + bulkEditBottomPadding}
         />
       </WithPullToRefresh>
 
@@ -708,26 +706,24 @@ const CookbookHeader = forwardRef<Animated.View, CookbookHeaderProps>(
           />
 
           {/* Recipe count metadata */}
-          {hasRecipes && (
-            <View style={styles.metadataContainer}>
-              <View style={styles.cookbookBadge}>
-                <Ionicons size={10} name="book-outline" color="#FFF4ED" />
-                <Text style={styles.cookbookBadgeText}>cookbook</Text>
-              </View>
-              <Text style={styles.metadataText}>
-                {recipesCount} {recipesText}
-              </Text>
-              {showSelectionCount && (
-                <>
-                  <Text style={styles.metadataSeparator}> • </Text>
-                  <Text style={styles.metadataTextSelected}>
-                    {selectedCount} {selectedCount === 1 ? "item" : "items"}{" "}
-                    selected
-                  </Text>
-                </>
-              )}
+          <View style={styles.metadataContainer}>
+            <View style={styles.cookbookBadge}>
+              <Ionicons size={10} name="book-outline" color="#FFF4ED" />
+              <Text style={styles.cookbookBadgeText}>cookbook</Text>
             </View>
-          )}
+            <Text style={styles.metadataText}>
+              {hasRecipes ? `${recipesCount} ${recipesText}` : "No recipes."}
+            </Text>
+            {showSelectionCount && hasRecipes && (
+              <>
+                <Text style={styles.metadataSeparator}> • </Text>
+                <Text style={styles.metadataTextSelected}>
+                  {selectedCount} {selectedCount === 1 ? "item" : "items"}{" "}
+                  selected
+                </Text>
+              </>
+            )}
+          </View>
         </View>
       </View>
     );

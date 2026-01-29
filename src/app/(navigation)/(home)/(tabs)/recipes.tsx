@@ -55,8 +55,8 @@ export default function Recipes({
   onRecipesCountChange,
 }: RecipesProps) {
   const router = useRouter();
-  const { showToast } = useActionToast();
   const insets = useSafeAreaInsets();
+  const { showToast } = useActionToast();
   const [refreshing, setRefreshing] = useState(false);
   const bottomSheetRef = useRef<BottomSheet | null>(null);
   const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);

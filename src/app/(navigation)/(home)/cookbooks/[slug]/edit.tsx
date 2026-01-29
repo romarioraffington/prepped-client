@@ -25,8 +25,10 @@ export default function EditCookbook() {
   // Extract the cookbook name from the fetched data
   const cookbookName = data?.name ?? "";
 
-  const { mutate: updateCookbook, isPending: isUpdating } =
-    useUpdateCookbookMutation();
+  const {
+    mutate: updateCookbook,
+    isPending: isUpdating
+  } = useUpdateCookbookMutation();
 
   const handleSave = (name: string) => {
     if (!slug || isUpdating) return;
@@ -68,10 +70,10 @@ export default function EditCookbook() {
 
   return (
     <SingleInputForm
-      title="Rename cookbook"
+      onSave={handleSave}
       isLoading={isUpdating}
       saveButtonText="Save"
-      onSave={handleSave}
+      title="Rename cookbook"
       onCancel={handleCancel}
       defaultValue={cookbookName}
     />

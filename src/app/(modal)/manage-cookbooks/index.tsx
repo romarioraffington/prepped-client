@@ -1,11 +1,11 @@
 // External Dependencies
-import { AntDesign } from "@expo/vector-icons";
-import { useFocusEffect } from "@react-navigation/native";
 import * as Haptics from "expo-haptics";
+import { Ionicons } from "@expo/vector-icons";
+import { useFocusEffect } from "@react-navigation/native";
 import { router, useLocalSearchParams } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import React, {
+import {
   useCallback,
   useEffect,
   useMemo,
@@ -18,56 +18,58 @@ import {
   Text,
   View,
   FlatList,
+  Platform,
   StyleSheet,
   TouchableOpacity,
+  ActivityIndicator,
 } from "react-native";
 
-import { CookbookCard, DotsLoader, EmptyImageState } from "@/components";
 // Internal Dependencies
-import { useActionToast } from "@/contexts";
-import { Colors } from "@/libs/constants";
-import type { CookbookCardData } from "@/libs/types";
-import { parseSlug, reportError } from "@/libs/utils";
+import { parseSlug } from "@/libs/utils";
+import { useQueryClient } from "@tanstack/react-query";
+import { DotsLoader } from "@/components/DotsLoader";
+import { BlurBackButton } from "@/components/BlurBackButton";
+import { CookbookListRow } from "@/components/Cookbook";
+import { Colors, QUERY_KEYS } from "@/libs/constants";
+import { RecipeCarouselCard } from "@/components/Recipe/RecipeCarouselCard";
+import type { ImageGridItem, PaginationMeta, Recipe } from "@/libs/types";
 
 import {
-  useCookbooksForCards,
-  useRemoveRecipeFromCookbookMutation,
+  useCookbooks,
   useSaveRecipeToCookbookMutation,
+  useRemoveRecipeFromCookbookMutation,
 } from "@/api";
 
-type Cookbook = CookbookCardData;
+const ITEM_HEIGHT = 80;
 
 export default function ManageCookbooks() {
-  const { showToast } = useActionToast();
+  const queryClient = useQueryClient();
   const { recipeSlug } = useLocalSearchParams<{ recipeSlug: string }>();
 
   // Parse slug to extract ID and name
   const { id: recipeId, name: recipeName } = parseSlug(recipeSlug);
 
+  // Local state for selected cookbook IDs (initialized from containsRecipe)
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  // Track initial state to compare on save
+  const hasInitializedRef = useRef(false);
+  const initialSelectedIdsRef = useRef<Set<string>>(new Set());
+
+  // Mutations
   const {
-    mutate: saveToCookbook,
-    isPending: isSaving
+    isPending: isSaving,
+    mutateAsync: saveAsync,
   } = useSaveRecipeToCookbookMutation();
 
   const {
-    mutate: removeFromCookbook,
-    isPending: isDeleting,
+    isPending: isRemoving,
+    mutateAsync: removeAsync,
   } = useRemoveRecipeFromCookbookMutation();
 
-  const isPending = isSaving || isDeleting;
+  const isPending = isSaving || isRemoving;
 
-  // Track selected cookbook (for removal flow)
-  const [
-    selectedCookbookId,
-    setSelectedCookbookId,
-  ] = useState<string | null>(
-    null,
-  );
-
-  // Fetch all cookbooks and use the includeStatusForRecipeId
-  // option to get the status of the recipe in the cookbooks
-  // This helps us to highlight whether each cookbook already contains
-  // the recipe or not being managed
+  // Fetch cookbooks with containsRecipe status
   const {
     refetch,
     isLoading,
@@ -75,30 +77,9 @@ export default function ManageCookbooks() {
     fetchNextPage,
     isFetchingNextPage,
     data: cookbooksData,
-  } = useCookbooksForCards({
+  } = useCookbooks({
     includeStatusForRecipeId: recipeId,
   });
-
-  // Track if initial data has loaded to avoid refetching on first mount
-  const hasInitialDataRef = useRef(false);
-
-  useEffect(() => {
-    if (cookbooksData && !isLoading) {
-      hasInitialDataRef.current = true;
-    }
-  }, [cookbooksData, isLoading]);
-
-  // Refetch when modal gains focus (after initial load)
-  // This ensures data is fresh when navigating back to this modal
-  useFocusEffect(
-    useCallback(() => {
-      // Only refetch if we've already loaded initial data
-      // (avoids refetching during initial load)
-      if (hasInitialDataRef.current) {
-        refetch();
-      }
-    }, [refetch]),
-  );
 
   // Flatten paginated data
   const cookbooks = useMemo(
@@ -114,297 +95,330 @@ export default function ManageCookbooks() {
     return [...withRecipe, ...withoutRecipe];
   }, [cookbooks]);
 
-  // Find the selected cookbook object (for removal - only if it contains recipe)
-  const selectedCookbookForRemoval = sortedCookbooks.find(
-    (c) => c.id === selectedCookbookId && c.containsRecipe === true,
-  );
-  // Find the selected cookbook object (for addition - only if it doesn't contain recipe)
-  const selectedCookbookForAddition = sortedCookbooks.find(
-    (c) => c.id === selectedCookbookId && c.containsRecipe !== true,
+  // Initialize selection state from containsRecipe
+  useEffect(() => {
+    if (cookbooks.length > 0 && !hasInitializedRef.current) {
+      const initialIds = new Set(
+        cookbooks.filter((c) => c.containsRecipe).map((c) => c.id),
+      );
+      setSelectedIds(initialIds);
+      initialSelectedIdsRef.current = new Set(initialIds);
+      hasInitializedRef.current = true;
+    }
+  }, [cookbooks]);
+
+  // Track if initial data has loaded to avoid refetching on first mount
+  const hasInitialDataRef = useRef(false);
+
+  useEffect(() => {
+    if (cookbooksData && !isLoading) {
+      hasInitialDataRef.current = true;
+    }
+  }, [cookbooksData, isLoading]);
+
+  // Refetch when modal gains focus (after initial load)
+  useFocusEffect(
+    useCallback(() => {
+      if (hasInitialDataRef.current) {
+        refetch();
+      }
+    }, [refetch]),
   );
 
-  const handleCookbookSelect = useCallback(
-    (cookbook: Cookbook) => {
-      if (!recipeSlug || isPending) {
-        return;
+  // Get recipe from cache for the RECIPE section
+  const recipe = useMemo(() => {
+    if (!recipeId) return null;
+
+    // Try to get from recipes list cache
+    const recipesData = queryClient.getQueryData<
+      import("@tanstack/react-query").InfiniteData<{
+        data: Recipe[];
+        meta: PaginationMeta;
+      }>
+    >([QUERY_KEYS.RECIPES]);
+
+    if (recipesData?.pages) {
+      const allRecipes = recipesData.pages.flatMap((page) => page.data ?? []);
+      const found = allRecipes.find((r) => r.id === recipeId);
+      if (found) return found;
+    }
+
+    return null;
+  }, [recipeId, queryClient]);
+
+  // Handle close
+  const handleClose = useCallback(() => {
+    if (isPending) return;
+    router.back();
+  }, [isPending]);
+
+  // Handle cookbook selection (toggle checkbox)
+  const handleSelectCookbook = useCallback(
+    (cookbookId: string) => {
+      if (isPending) return;
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+      setSelectedIds((prev) => {
+        const next = new Set(prev);
+        if (next.has(cookbookId)) {
+          next.delete(cookbookId);
+        } else {
+          next.add(cookbookId);
+        }
+        return next;
+      });
+    },
+    [isPending],
+  );
+
+  // Handle save - commit changes
+  const handleSave = useCallback(async () => {
+    if (isPending || !recipeSlug) return;
+
+    const initialIds = initialSelectedIdsRef.current;
+    const currentIds = selectedIds;
+
+    // Find cookbooks to add (in current but not in initial)
+    const toAdd = [...currentIds].filter((id) => !initialIds.has(id));
+    // Find cookbooks to remove (in initial but not in current)
+    const toRemove = [...initialIds].filter((id) => !currentIds.has(id));
+
+    // No changes
+    if (toAdd.length === 0 && toRemove.length === 0) {
+      router.back();
+      return;
+    }
+
+    try {
+      // Run all mutations
+      const promises: Promise<unknown>[] = [];
+
+      for (const cookbookId of toAdd) {
+        promises.push(
+          saveAsync({
+            cookbookId,
+            recipeSlug,
+          }),
+        );
       }
 
-      // Set as selected (for addition or removal)
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      setSelectedCookbookId((prev) =>
-        prev === cookbook.id ? null : cookbook.id,
-      );
-    },
-    [recipeSlug, isPending],
-  );
+      for (const cookbookId of toRemove) {
+        promises.push(
+          removeAsync({
+            cookbookId,
+            recipeId,
+          }),
+        );
+      }
 
-  const handleAdd = useCallback(() => {
-    if (!recipeSlug || !selectedCookbookForAddition || isPending) {
-      return;
+      await Promise.all(promises);
+
+      // Success
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
+      // Navigate back
+      router.back();
+    } catch (error) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      Alert.alert(
+        "Oops!",
+        error instanceof Error
+          ? error.message
+          : "Failed to update cookbooks. Please try again.",
+        [{ text: "OK" }],
+      );
     }
+  }, [isPending, recipeSlug, recipeId, selectedIds, saveAsync, removeAsync]);
 
-    // Create callback function that will execute the save API call
-    const confirmAdd = () => {
-      saveToCookbook(
-        {
-          recipeSlug,
-          cookbookId: selectedCookbookForAddition.id,
-          cookbookName: selectedCookbookForAddition.name,
-        },
-        {
-          onError: (error) => {
-            // Haptic feedback for error
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-            reportError(error, {
-              component: "ManageCookbooks",
-              action: "Add Recipe To Cookbook",
-              extra: {
-                cookbookId: selectedCookbookForAddition?.id,
-                recipeSlug,
-              },
-            });
-            Alert.alert(
-              "Oops!",
-              "Failed to add to cookbook. Please try again.",
-              [{ text: "OK" }],
-            );
-          },
-        },
-      );
-    };
-
-    // Show toast with callbacks
-    showToast({
-      text: `Adding to ${selectedCookbookForAddition?.name ?? "cookbook"}`,
-      thumbnailUri: selectedCookbookForAddition.coverImageUri || null,
-      cta: {
-        text: "Undo",
-        onPress: () => {
-          router.push({
-            pathname: "/(modal)/manage-cookbooks",
-            params: { recipeSlug },
-          });
-        },
-      },
-      onDismiss: confirmAdd,
-    });
-
-    // Close modal immediately
-    router.back();
-  }, [
-    showToast,
-    isPending,
-    recipeSlug,
-    saveToCookbook,
-    selectedCookbookForAddition,
-  ]);
-
-  const handleRemove = useCallback(() => {
-    if (!recipeSlug || !selectedCookbookForRemoval || isPending) {
-      return;
-    }
-
-    // Parse slug to get recipe ID for the API call
-    const { id: recipeIdForRemoval } = parseSlug(recipeSlug);
-
-    // Create callback function that will execute the delete API call
-    const confirmDelete = () => {
-      removeFromCookbook(
-        {
-          cookbookId: selectedCookbookForRemoval.id,
-          recipeId: recipeIdForRemoval,
-        },
-        {
-          onSuccess: () => {
-            // Haptic feedback
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-          },
-          onError: (error) => {
-            // Haptic feedback for error
-            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-            reportError(error, {
-              component: "ManageCookbooks",
-              action: "Remove Recipe From Cookbook",
-              extra: {
-                cookbookId: selectedCookbookForRemoval?.id,
-                recipeSlug,
-              },
-            });
-            Alert.alert(
-              "Oops!",
-              "Failed to remove from cookbook. Please try again.",
-              [{ text: "OK" }],
-            );
-          },
-        },
-      );
-    };
-
-    // Show toast with callbacks
-    showToast({
-      text: `Removing from ${selectedCookbookForRemoval?.name ?? "cookbook"}`,
-      thumbnailUri: selectedCookbookForRemoval.coverImageUri || null,
-      cta: {
-        text: "Undo",
-        onPress: () => {
-          router.push({
-            pathname: "/(modal)/manage-cookbooks",
-            params: { recipeSlug },
-          });
-        },
-      },
-      onDismiss: confirmDelete,
-    });
-
-    // Close modal immediately
-    router.back();
-  }, [
-    isPending,
-    showToast,
-    recipeSlug,
-    removeFromCookbook,
-    selectedCookbookForRemoval,
-  ]);
-
-  const handleClose = useCallback(() => {
-    router.back();
-  }, []);
-
+  // Handle create cookbook
   const handleCreateCookbook = useCallback(() => {
+    if (isPending) return;
     router.back();
-    // Small delay to ensure the modal
-    // closes before opening the new one
     setTimeout(() => {
       router.push({
         pathname: "/(modal)/create-cookbook",
-        params: {
-          recipeSlug,
-        },
+        params: { recipeSlug },
       });
     }, 100);
-  }, [recipeSlug]);
+  }, [isPending, recipeSlug]);
 
-  const renderCookbookCard = useCallback(
-    ({ item }: { item: Cookbook }) => {
-      const isSelected = selectedCookbookId === item.id;
-      const isSelectedForRemoval = isSelected && item.containsRecipe === true;
-      const isSelectedForAddition = isSelected && item.containsRecipe !== true;
-      return (
-        <View style={[isPending && styles.disabledCard]}>
-          <CookbookCard
-            item={item}
-            showRecentlyViewed={false}
-            isSelectedForRemoval={isSelectedForRemoval}
-            isSelectedForAddition={isSelectedForAddition}
-            onPress={isPending ? () => { } : () => handleCookbookSelect(item)}
-          />
-        </View>
-      );
-    },
-    [handleCookbookSelect, selectedCookbookId, isPending],
-  );
-
+  // Handle end reached for pagination
   const handleEndReached = useCallback(() => {
     if (hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
   }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
 
+  // Calculate item layout for FlatList performance
+  const getItemLayout = useCallback(
+    (_: unknown, index: number) => ({
+      length: ITEM_HEIGHT,
+      offset: ITEM_HEIGHT * index,
+      index,
+    }),
+    [],
+  );
+
+  // Render cookbook item
+  const renderCookbookItem = useCallback(
+    ({ item }: { item: ImageGridItem }) => {
+      const isChecked = selectedIds.has(item.id);
+      const recipeCount = item.count ?? 0;
+      const recipeText = recipeCount === 1 ? "recipe" : "recipes";
+
+      return (
+        <CookbookListRow
+          id={item.id}
+          name={item.name}
+          disabled={isPending}
+          isChecked={isChecked ?? false}
+          onPress={handleSelectCookbook}
+          imageUri={item.imageUris?.[0] ?? null}
+          metaText={`${recipeCount} ${recipeText}`}
+        />
+      );
+    },
+    [selectedIds, handleSelectCookbook, isPending],
+  );
+
+  // Check if there are changes to save (must be before any early return)
+  const hasChanges = useMemo(() => {
+    const initialIds = initialSelectedIdsRef.current;
+    if (initialIds.size !== selectedIds.size) return true;
+    for (const id of selectedIds) {
+      if (!initialIds.has(id)) return true;
+    }
+    return false;
+  }, [selectedIds]);
+
+  const isSaveButtonDisabled = !hasChanges || isPending;
+  const saveButtonText = isPending ? "Saving" : "Save";
+
+  // Loading state
   if (isLoading) {
     return (
       <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <View style={styles.headerContent}>
+        <View style={styles.headerContainer}>
+          <View style={styles.header}>
+            <BlurBackButton onPress={handleClose} />
             <Text style={styles.headerTitle}>Manage Cookbooks</Text>
-            <Text style={styles.headerSubtitle}>
-              {/* Managing the <Text style={styles.subtextBold}>{recipeName}</Text> recipe */}
-            </Text>
+            <View style={{ width: 50 }} />
           </View>
-          <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
-            <AntDesign name="close" size={14} color="#000" />
-          </TouchableOpacity>
+          <View style={styles.divider} />
         </View>
-        <DotsLoader fullHeight={true} />
+        <View style={styles.loadingContainer}>
+          <DotsLoader />
+        </View>
       </SafeAreaView>
     );
   }
 
-  // Check if there are no cookbooks available
-  const hasNoCookbooks = (sortedCookbooks?.length ?? 0) === 0;
-
-  // Determine action type based on selected cookbook
-  const isSelectedForRemoval = selectedCookbookForRemoval !== undefined;
-
-  // Button is disabled until a cookbook is selected
-  const isActionButtonDisabled = !selectedCookbookId || isPending;
-
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <Text style={styles.headerTitle}>Cookbooks</Text>
-          <Text style={styles.headerSubtitle}>
-            Manage the <Text style={styles.subtextBold}>{recipeName}</Text>{" "}
-            Recipe
-          </Text>
+      {/* Header */}
+      <View style={styles.headerContainer}>
+        <View style={styles.header}>
+          <BlurBackButton
+            onPress={handleClose}
+            disabled={isPending}
+            style={{ top: 2 }}
+          />
+          <Text style={styles.headerTitle}>Manage Cookbooks</Text>
+          <TouchableOpacity
+            onPress={handleSave}
+            style={styles.saveButton}
+            disabled={isSaveButtonDisabled}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            {isPending && (
+              <ActivityIndicator size="small" color={Colors.primary} />
+            )}
+            <Text
+              style={[
+                styles.saveButtonText,
+                isSaveButtonDisabled && styles.saveButtonTextDisabled,
+              ]}
+            >
+              {saveButtonText}
+            </Text>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
-          <AntDesign name="close" size={14} color="#000" />
+        <View style={styles.divider} />
+      </View>
+
+      {/* Recipe preview section */}
+      <View style={styles.recipeSection}>
+        <Text style={styles.sectionLabel}>Recipe</Text>
+        <View style={styles.recipeCardContainer}>
+          {recipe ? (
+            <RecipeCarouselCard recipe={recipe} />
+          ) : (
+            <View style={styles.minimalRecipeCard}>
+              <Text style={styles.minimalRecipeName} numberOfLines={1}>
+                {recipeName}
+              </Text>
+            </View>
+          )}
+        </View>
+      </View>
+
+      {/* Cookbook section header */}
+      <View style={styles.cookbookSectionHeader}>
+        <Text style={styles.sectionLabel}>My Cookbooks</Text>
+        <TouchableOpacity
+          disabled={isPending}
+          accessibilityRole="button"
+          style={styles.createButton}
+          onPress={handleCreateCookbook}
+          accessibilityLabel="Create new cookbook"
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        >
+          <Ionicons
+            name="add"
+            size={18}
+            style={styles.createButtonIcon}
+            color={isPending ? Colors.matureForeground : Colors.primary}
+          />
+          <Text
+            style={[
+              styles.createButtonText,
+              isPending && styles.createButtonTextDisabled,
+            ]}
+          >
+            Create
+          </Text>
         </TouchableOpacity>
       </View>
 
-      {hasNoCookbooks ? (
-        <View style={styles.emptyStateContainer}>
-          <EmptyImageState
-            title="No cookbooks yet!"
-            description={`Create your first cookbook to save ${recipeName}.`}
-          />
-        </View>
-      ) : (
-        <FlatList
-          numColumns={2}
-          data={sortedCookbooks}
-          onEndReachedThreshold={0.5}
-          renderItem={renderCookbookCard}
-          keyExtractor={(item) => item.id}
-          columnWrapperStyle={styles.row}
-          onEndReached={handleEndReached}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={styles.listContent}
-          ListFooterComponent={isFetchingNextPage ? <DotsLoader /> : null}
-        />
-      )}
-
-      <View style={styles.footer}>
-        {selectedCookbookId ? (
-          <TouchableOpacity
-            activeOpacity={0.8}
-            disabled={isActionButtonDisabled}
-            onPress={isSelectedForRemoval ? handleRemove : handleAdd}
-            style={[
-              styles.actionButton,
-              isActionButtonDisabled && styles.actionButtonDisabled,
-            ]}
-          >
-            <Text
-              style={[
-                styles.actionButtonText,
-                isActionButtonDisabled && styles.actionButtonTextDisabled,
-              ]}
-            >
-              {isSelectedForRemoval ? "Remove" : "Save"}
+      {/* Cookbooks list */}
+      <FlatList
+        windowSize={5}
+        data={sortedCookbooks}
+        initialNumToRender={10}
+        maxToRenderPerBatch={5}
+        removeClippedSubviews={true}
+        onEndReachedThreshold={0.5}
+        getItemLayout={getItemLayout}
+        updateCellsBatchingPeriod={50}
+        onEndReached={handleEndReached}
+        renderItem={renderCookbookItem}
+        showsVerticalScrollIndicator={false}
+        keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.contentContainer}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>No cookbooks yet!</Text>
+            <Text style={styles.emptySubtext}>
+              Create your first cookbook to organizing.
             </Text>
-          </TouchableOpacity>
-        ) : (
-          <TouchableOpacity
-            activeOpacity={0.8}
-            style={styles.createButton}
-            onPress={handleCreateCookbook}
-          >
-            <Text style={styles.createButtonText}>Create cookbook</Text>
-          </TouchableOpacity>
-        )}
-      </View>
+          </View>
+        }
+        ListFooterComponent={
+          isFetchingNextPage
+            ? <ActivityIndicator size="small" color={Colors.primary} />
+            : null
+        }
+      />
     </SafeAreaView>
   );
 }
@@ -414,96 +428,141 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background,
   },
+  headerContainer: {
+    paddingLeft: 18,
+    paddingRight: 25,
+  },
   header: {
-    paddingTop: 20,
-    paddingBottom: 16,
-    paddingHorizontal: 16,
-    alignItems: "center",
+    paddingTop: 18,
+    paddingBottom: 15,
     flexDirection: "row",
-    justifyContent: "center",
-    borderBottomWidth: 1,
-    borderBottomColor: "#E5E5E5",
-  },
-  headerContent: {
-    flex: 1,
     alignItems: "center",
-  },
-  headerTitle: {
-    fontSize: 17,
-    color: "#000",
-    fontWeight: "500",
-    textAlign: "center",
-    marginBottom: 8,
-  },
-  headerSubtitle: {
-    fontSize: 14,
-    color: "#667",
-    lineHeight: 20,
-    textAlign: "center",
-    paddingHorizontal: 20,
-  },
-  closeButton: {
-    top: 22,
-    right: 0,
-    width: 40,
-    height: 40,
-    position: "absolute",
-  },
-  subtextBold: {
-    fontWeight: "600",
-    color: "#000",
-  },
-  listContent: {
-    paddingTop: 20,
-    paddingBottom: 20,
-    paddingHorizontal: 20,
-  },
-  row: {
     justifyContent: "space-between",
   },
-  disabledCard: {
-    opacity: 0.5,
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#000",
+    fontFamily: Platform.select({
+      android: "BricolageGrotesque_700Bold",
+      ios: "BricolageGrotesque-Bold",
+    }),
   },
-  emptyStateContainer: {
-    flex: 1,
-    justifyContent: "center",
+  saveButton: {
+    gap: 5,
+    flexDirection: "row",
     alignItems: "center",
+    justifyContent: "center",
   },
-  footer: {
-    paddingTop: 16,
-    paddingBottom: 20,
-    borderTopWidth: 1,
+  saveButtonText: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: Colors.primary,
+    fontFamily: Platform.select({
+      android: "Manrope_600SemiBold",
+      ios: "Manrope-SemiBold",
+    }),
+  },
+  saveButtonTextDisabled: {
+    color: "#999",
+  },
+  divider: {
+    height: 1,
+    width: "100%",
+    backgroundColor: "#E5E5E0",
+  },
+  recipeSection: {
+    paddingVertical: 20,
     paddingHorizontal: 16,
-    borderTopColor: "#E5E5E5",
+  },
+  sectionLabel: {
+    fontSize: 13,
+    fontWeight: "800",
+    letterSpacing: 0.5,
+    textTransform: "uppercase",
+    color: Colors.matureForeground,
+    fontFamily: Platform.select({
+      android: "Manrope_800ExtraBold",
+      ios: "Manrope-ExtraBold",
+    }),
+  },
+  recipeCardContainer: {
+    marginTop: 16,
+  },
+  minimalRecipeCard: {
+    padding: 16,
+    borderRadius: 12,
+    backgroundColor: "#FAFAF5",
+  },
+  minimalRecipeName: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: "#000",
+    fontFamily: Platform.select({
+      android: "BricolageGrotesque_600SemiBold",
+      ios: "BricolageGrotesque-SemiBold",
+    }),
+  },
+  cookbookSectionHeader: {
+    paddingVertical: 15,
+    paddingHorizontal: 16,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   createButton: {
-    borderRadius: 12,
-    paddingVertical: 16,
+    gap: 2,
+    flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#222",
-    justifyContent: "center",
+  },
+  createButtonIcon: {
+    marginRight: 0,
   },
   createButtonText: {
-    color: "#fff",
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: "600",
+    color: Colors.primary,
+    fontFamily: Platform.select({
+      android: "Manrope_600SemiBold",
+      ios: "Manrope-SemiBold",
+    }),
   },
-  actionButton: {
-    borderRadius: 12,
-    paddingVertical: 16,
+  createButtonTextDisabled: {
+    color: "#999",
+  },
+  loadingContainer: {
+    flex: 1,
     alignItems: "center",
-    backgroundColor: "#222",
     justifyContent: "center",
   },
-  actionButtonDisabled: {
-    backgroundColor: "#E5E5E5",
+  emptyContainer: {
+    flex: 1,
+    alignItems: "center",
+    paddingVertical: 40,
+    justifyContent: "center",
   },
-  actionButtonText: {
-    color: "#fff",
-    fontSize: 16,
+  emptyText: {
+    fontSize: 18,
     fontWeight: "600",
+    color: "#000",
+    marginBottom: 8,
+    fontFamily: Platform.select({
+      android: "BricolageGrotesque_600SemiBold",
+      ios: "BricolageGrotesque-SemiBold",
+    }),
   },
-  actionButtonTextDisabled: {
-    color: "#999",
+  emptySubtext: {
+    fontSize: 14,
+    color: "#667",
+    textAlign: "center",
+    paddingHorizontal: 20,
+    fontFamily: Platform.select({
+      android: "Manrope_400Regular",
+      ios: "Manrope-Regular",
+    }),
+  },
+  contentContainer: {
+    paddingBottom: 16,
+    paddingHorizontal: 16,
   },
 });
