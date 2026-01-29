@@ -314,7 +314,7 @@ export default function ManageCookbooks() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       {/* Header */}
       <View style={styles.headerContainer}>
         <View style={styles.header}>
@@ -419,7 +419,7 @@ export default function ManageCookbooks() {
             : null
         }
       />
-    </SafeAreaView>
+    </View>
   );
 }
 
